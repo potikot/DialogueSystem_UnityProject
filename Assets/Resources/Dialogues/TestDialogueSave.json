@@ -1,0 +1,45 @@
+{
+  "Nodes": [
+    {
+      "Text": "node 0",
+      "AudioResourceName": null,
+      "Commands": [],
+      "InputConnection": null,
+      "OutputConnections": [],
+      "Id": 0,
+      "HasInputConnection": false,
+      "HasOutputConnections": false
+    },
+    {
+      "Text": "node 1",
+      "AudioResourceName": null,
+      "Commands": [],
+      "InputConnection": null,
+      "OutputConnections": [],
+      "Id": 1,
+      "HasInputConnection": false,
+      "HasOutputConnections": false
+    },
+    {
+      "Text": "node 2",
+      "AudioResourceName": null,
+      "Commands": [],
+      "InputConnection": null,
+      "OutputConnections": [],
+      "Id": 2,
+      "HasInputConnection": false,
+      "HasOutputConnections": false
+    },
+    {
+      "Text": "node 3",
+      "AudioResourceName": null,
+      "Commands": [],
+      "InputConnection": null,
+      "OutputConnections": [],
+      "Id": 3,
+      "HasInputConnection": false,
+      "HasOutputConnections": false
+    }
+  ],
+  "Id": "TestDialogueSave"
+}
