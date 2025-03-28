@@ -2,7 +2,7 @@
   "Nodes": [
     {
       "Text": "node 0",
-      "AudioResourceName": null,
+      "AudioAssetReference": "7b8a849162442d94e9921bf1f68b4edd",
       "Commands": [],
       "InputConnection": null,
       "OutputConnections": [],
@@ -12,7 +12,7 @@
     },
     {
       "Text": "node 1",
-      "AudioResourceName": null,
+      "AudioAssetReference": "7b8a849162442d94e9921bf1f68b4edd",
       "Commands": [],
       "InputConnection": null,
       "OutputConnections": [],
@@ -22,7 +22,7 @@
     },
     {
       "Text": "node 2",
-      "AudioResourceName": null,
+      "AudioAssetReference": "7b8a849162442d94e9921bf1f68b4edd",
       "Commands": [],
       "InputConnection": null,
       "OutputConnections": [],
@@ -32,7 +32,7 @@
     },
     {
       "Text": "node 3",
-      "AudioResourceName": null,
+      "AudioAssetReference": "7b8a849162442d94e9921bf1f68b4edd",
       "Commands": [],
       "InputConnection": null,
       "OutputConnections": [],

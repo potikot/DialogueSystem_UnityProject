@@ -1,16 +1,22 @@
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using PotikotTools.DialogueSystem;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.ResourceProviders;
+using Object = UnityEngine.Object;
 
 public class TestDialogueSave : MonoBehaviour
 {
     [SerializeField] private string _dialogueId = "TestDialogueSave";
-    
+    [SerializeField] private TextAsset _textAsset;
+
     [ContextMenu("Save")]
     private void Save()
     {
         DialogueData dialogueData = GenerateDialogueData();
-        DialogueComponents.Saver.Save(dialogueData);
+        Components.Saver.Save(dialogueData);
         
         DL.Log($"{_dialogueId} saved");
     }
@@ -18,19 +24,21 @@ public class TestDialogueSave : MonoBehaviour
     [ContextMenu("Load")]
     private void Load()
     {
-        DialogueData dialogueData = DialogueComponents.Saver.Load(_dialogueId);
-        
+        DialogueData dialogueData = Components.Saver.Load(_dialogueId);
         DL.Log($"{dialogueData.Id} loaded");
     }
 
     private DialogueData GenerateDialogueData()
     {
+        string guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(_textAsset));
+
         List<NodeData> nodes = new(4);
         for (int i = 0; i < nodes.Capacity; i++)
         {
             nodes.Add(new NodeData(i)
             {
-                Text = $"node {i}"
+                Text = $"node {i}",
+                AudioAssetReference = new AssetReferenceT<AudioClip>(guid)
             });
         }
         
@@ -38,5 +46,11 @@ public class TestDialogueSave : MonoBehaviour
         {
             Nodes = nodes
         };;
+    }
+
+    [ContextMenu("GenerateScript")]
+    private void GenerateScript()
+    {
+        Debug.Log(Components.ResourceManager.GenerateScript());
     }
 }

@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace PotikotTools.DialogueSystem
 {
-    public class DialogueController : MonoBehaviour
+    public class DialogueController
     {
         public event Action OnDialogueStarted;
         public event Action OnDialogueEnded;
@@ -14,6 +16,7 @@ namespace PotikotTools.DialogueSystem
         private NodeData _currentNodeData;
 
         public bool IsDialogueStarted { get; private set; }
+        public Dictionary<Type, Action<NodeData>> NodeHandlers = new Dictionary<Type, Action<NodeData>>();
         
         public void SetDialogueData(DialogueData dialogueData)
         {
@@ -86,7 +89,5 @@ namespace PotikotTools.DialogueSystem
                 EndDialogue();
             }
         }
-
-
     }
 }

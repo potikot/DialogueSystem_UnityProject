@@ -1,5 +1,8 @@
+using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using UnityEngine;
 
 namespace PotikotTools.DialogueSystem
 {
@@ -7,8 +10,19 @@ namespace PotikotTools.DialogueSystem
     {
         private const string Extension = ".json";
         
-        private static readonly string DirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), "Assets", "Resources/Dialogues");
+        private static readonly string DirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), "Assets", "PotikotTools/DialogueSystem/Database");
 
+        static JsonDialogueSaver()
+        {
+            JsonConvert.DefaultSettings = () => new JsonSerializerSettings()
+            {
+                Converters = new List<JsonConverter>()
+                {
+                    new AssetReferenceConverter()
+                }
+            };
+        }
+        
         public void Save(DialogueData dialogueData)
         {
             string fullPath = Path.Combine(DirectoryPath, dialogueData.Id + Extension);

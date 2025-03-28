@@ -244,6 +244,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _dialogueId: TestDialogueSave
+  _textAsset: {fileID: 4900000, guid: 7b8a849162442d94e9921bf1f68b4edd, type: 3}
 --- !u!4 &1562056774
 Transform:
   m_ObjectHideFlags: 0
