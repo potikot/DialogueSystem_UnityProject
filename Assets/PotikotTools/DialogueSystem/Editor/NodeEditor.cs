@@ -8,20 +8,37 @@ namespace PotikotTools.DialogueSystem
 {
     public class NodeEditor : EditorWindow
     {
-        [MenuItem("Tools/DialogueSystem/NodeEditor")]
+        private DialogueData _dialogueData;
+        
+        [MenuItem("Tools/DialogueSystem/Node Editor")]
         public static void Open()
         {
             GetWindow<NodeEditor>("Dialogue Editor");
         }
 
+        private void OnEnable()
+        {
+            _dialogueData = new DialogueData("Test Dialogue Graph")
+            {
+                Speakers = new SpeakerData[]
+                {
+                    new(), new()
+                }
+            };
+        }
+        
         private void CreateGUI()
         {
             AddGraphView();
+            rootVisualElement.Add(new Button(() => Components.Saver.Save(_dialogueData))
+            {
+                text = "Save Dialogue"
+            });
         }
 
         private void AddGraphView()
         {
-            DialogueGraphView graph = new();
+            DialogueGraphView graph = new(_dialogueData);
             graph.StretchToParentSize();
 
             rootVisualElement.Add(graph);

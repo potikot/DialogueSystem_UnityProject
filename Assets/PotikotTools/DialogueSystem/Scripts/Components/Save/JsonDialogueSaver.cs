@@ -31,6 +31,7 @@ namespace PotikotTools.DialogueSystem
                 Directory.CreateDirectory(DirectoryPath);
             
             string json = JsonConvert.SerializeObject(dialogueData, Formatting.Indented);
+            DL.Log("Save:\n" + json);
             File.WriteAllText(fullPath, json);
         }
 

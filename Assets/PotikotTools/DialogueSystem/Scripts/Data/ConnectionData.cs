@@ -1,10 +1,12 @@
+using Newtonsoft.Json;
+
 namespace PotikotTools.DialogueSystem
 {
     public class ConnectionData
     {
         public string Text;
-        public NodeData From;
-        public NodeData To;
+        [JsonIgnore] public NodeData From;
+        [JsonIgnore] public NodeData To;
 
         public ConnectionData(string text)
         {

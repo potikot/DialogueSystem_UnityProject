@@ -8,6 +8,7 @@ namespace PotikotTools.DialogueSystem
     public class NodeData
     {
         public int Id { get; private set; }
+
         public int SpeakerId;
         public string Text;
         public AssetReferenceT<AudioClip> AudioAssetReference;
@@ -16,6 +17,8 @@ namespace PotikotTools.DialogueSystem
         public ConnectionData InputConnection;
         public List<ConnectionData> OutputConnections;
         
+        [JsonIgnore] public DialogueData DialogueData;
+
         [JsonIgnore] public bool HasInputConnection => InputConnection != null;
         [JsonIgnore] public bool HasOutputConnections => OutputConnections.Count > 0;
         

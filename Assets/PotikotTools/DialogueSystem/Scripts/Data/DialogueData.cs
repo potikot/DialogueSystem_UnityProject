@@ -1,10 +1,19 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace PotikotTools.DialogueSystem
 {
     public class DialogueData
     {
+        public string[] Tags;
+        public SpeakerData[] Speakers;
+
+        protected List<NodeData> nodes;
+        
+        protected string _id;
+
         public string Id
         {
             get => _id;
@@ -16,39 +25,55 @@ namespace PotikotTools.DialogueSystem
                 _id = value;
             }
         }
-
-        public string[] Tags;
-        public List<NodeData> Nodes;
-
-        public SpeakerData[] Speakers;
-
-        private string _id;
-
+        
+        public IReadOnlyList<NodeData> Nodes => nodes;
+        
         public DialogueData(string id)
         {
             Id = id;
-            
-            Nodes = new List<NodeData>();
+            nodes = new List<NodeData>();
         }
 
-        public void AddNode(NodeData node)
+        public T AddNode<T>(params object[] args) where T : NodeData
         {
-            Nodes.Add(node);
-        }
+            if (args == null || args.Length == 0)
+                args = new object[1] { GetNextNodeId() };
+            else
+            {
+                object[] newArgs = new object[args.Length + 1];
+                newArgs[0] = GetNextNodeId();
+                args.CopyTo(newArgs, 1);
+                args = newArgs;
+            }
 
+            DL.Log($"Adding node to graph with id({GetNextNodeId()}), args({args.Length})");
+            
+            T node = Activator.CreateInstance(typeof(T), args) as T;
+            node.DialogueData = this;
+
+            nodes.Add(node);
+
+            return node;
+        }
+        
         public bool RemoveNode(NodeData node)
         {
-            return Nodes.Remove(node);
+            return nodes.Remove(node);
         }
         
         public NodeData GetFirstNode()
         {
-            return Nodes.First(n => !n.HasInputConnection);
+            return nodes.First(n => !n.HasInputConnection);
         }
 
-        public int GetNextNodeIndex()
+        public bool HasSpeaker(int id)
         {
-            return Nodes.Count;
+            return id >= 0 && id < Speakers.Length;
+        }
+        
+        private int GetNextNodeId()
+        {
+            return nodes.Count;
         }
     }
 }

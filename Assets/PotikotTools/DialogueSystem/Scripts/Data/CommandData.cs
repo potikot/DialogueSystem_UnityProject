@@ -1,3 +1,5 @@
+using System;
+
 namespace PotikotTools.DialogueSystem
 {
     public enum CommandExecutionOrder
@@ -6,6 +8,7 @@ namespace PotikotTools.DialogueSystem
         AfterPhrase
     }
     
+    [Serializable]
     public class CommandData
     {
         public string Command;

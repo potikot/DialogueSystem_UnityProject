@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -9,11 +10,29 @@ namespace PotikotTools.DialogueSystem
 {
     public class DialogueGraphView : GraphView
     {
-        public DialogueGraphView()
+        protected DialogueData dialogueData;
+        
+        public DialogueGraphView(DialogueData dialogueData)
         {
+            this.dialogueData = dialogueData;
+            
             AddGridBackground();
             AddManipulators();
+            
+            graphViewChanged += change =>
+            {
+                foreach (var edge in change.edgesToCreate)
+                {
+                    var from = edge.output.node as NodeView<SingleChoiceNodeData>;
+                    var to = edge.input.node as NodeView<SingleChoiceNodeData>;
+                    
+                    to.Data.InputConnection = new ConnectionData("", from.Data, to.Data);
+                    from.Data.OutputConnections[0] = new ConnectionData("", from.Data, to.Data);
+                }
 
+                return change;
+            };
+            
             this.AddStyles("DialogueGraph");
         }
 
@@ -24,16 +43,42 @@ namespace PotikotTools.DialogueSystem
 
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
         {
-            evt.menu.AppendAction("Create Node", action =>
-            {
-                SingleChoiceNodeView nodeView = new SingleChoiceNodeView();
-                nodeView.Initialize(new SingleChoiceNodeData(0));
-
-                AddElement(nodeView);
-                nodeView.SetPosition(new Rect(action.eventInfo.mousePosition, Vector2.zero));
-            });
+            evt.menu.AppendAction("Create Single Choice Node", AddSingleChoiceNode);
+            evt.menu.AppendAction("Create Multiple Choice Node", AddMultipleChoiceNode);
         }
 
+        // TODO: write universal method for node view creation
+        
+        private void AddSingleChoiceNode(DropdownMenuAction dropdownMenuAction)
+        {
+            var nodeData = dialogueData.AddNode<SingleChoiceNodeData>();
+
+            nodeData.Commands.Add(new CommandData());
+
+            SingleChoiceNodeView nodeView = new();
+            nodeView.Initialize(nodeData);
+            nodeView.Draw();
+
+            AddElement(nodeView);
+            nodeView.SetPosition(new Rect(dropdownMenuAction.eventInfo.mousePosition, Vector2.zero));
+        }
+        
+        private void AddMultipleChoiceNode(DropdownMenuAction dropdownMenuAction)
+        {
+            var nodeData = dialogueData.AddNode<MultipleChoiceNodeData>();
+            nodeData.OutputConnections.Add(new ConnectionData("Choice 2", nodeData, null));
+            nodeData.OutputConnections.Add(new ConnectionData("Choice 3", nodeData, null));
+
+            nodeData.Commands.Add(new CommandData());
+
+            MultipleChoiceNodeView nodeView = new();
+            nodeView.Initialize(nodeData);
+            nodeView.Draw();
+
+            AddElement(nodeView);
+            nodeView.SetPosition(new Rect(dropdownMenuAction.eventInfo.mousePosition, Vector2.zero));
+        }
+        
         private void AddManipulators()
         {
             this.AddManipulator(new ContentZoomer());

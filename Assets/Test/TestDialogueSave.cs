@@ -44,7 +44,6 @@ public class TestDialogueSave : MonoBehaviour
         
         return new DialogueData(_dialogueId)
         {
-            Nodes = nodes
         };;
     }
 
