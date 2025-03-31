@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
@@ -7,7 +9,8 @@ using UnityEngine.UIElements;
 
 namespace PotikotTools.DialogueSystem
 {
-    public abstract class NodeView<T> : Node where T : NodeData
+    public abstract class NodeView<T> : Node, INodeView
+        where T : NodeData
     {
         protected EditorNodeData editorData;
         protected T data;
@@ -21,6 +24,8 @@ namespace PotikotTools.DialogueSystem
             AddManipulators();
         }
 
+        #region Draw
+
         public virtual void Draw()
         {
             if (data == null)
@@ -31,38 +36,54 @@ namespace PotikotTools.DialogueSystem
 
             title = "Dialogue Node";
 
-            AddPort("Input", Direction.Input);
+            CreatePorts();
+            CreateAddButton();
+            CreateSpeakerTextInput();
+            CreateSpeakerIndexInput();
+            CreateAudioInput();
+
+            extensionContainer.style.backgroundColor = new Color(0.2470588f, 0.2470588f, 0.2470588f, 0.8039216f);
+            RefreshExpandedState();
+        }
+
+        protected virtual void CreatePorts()
+        {
+            AddInputPort("In");
 
             for (int i = 0; i < data.OutputConnections.Count; i++)
-                AddPort(data.OutputConnections[i].Text, Direction.Output);
-            
-            mainContainer.Insert(1, CreateButtons());
+                AddOutputPort(data.OutputConnections[i].Text);
+        }
 
+        protected virtual void CreateSpeakerTextInput()
+        {
             VisualElement speakerTextContainer = new();
             speakerTextContainer.Add(new Label("Speaker Text"));
             TextField speakerTextInput = new()
             {
                 value = data.Text
             };
-            speakerTextInput.RegisterValueChangedCallback(evt =>
-            {
-                data.Text = evt.newValue;
-            });
-
+            speakerTextInput.RegisterValueChangedCallback(evt => data.Text = evt.newValue);
             speakerTextContainer.Add(speakerTextInput);
+            
             extensionContainer.Add(speakerTextContainer);
+        }
 
-            IntegerField speakerIdInput = new("Speaker ID");
-            speakerIdInput.RegisterValueChangedCallback(evt =>
-            {
-                if (data.DialogueData.HasSpeaker(evt.newValue))
-                    data.SpeakerId = evt.newValue;
-                else
-                    speakerIdInput.SetValueWithoutNotify(data.SpeakerId);
-            });
+        protected virtual void CreateSpeakerIndexInput()
+        {
+            PopupField<string> speakerIndexInput = new
+            (
+                "Speaker ID",
+                data.DialogueData.Speakers.Select(s => s.Name).ToList(),
+                data.GetSpeakerName()
+            );
             
-            extensionContainer.Add(speakerIdInput);
+            speakerIndexInput.RegisterValueChangedCallback(evt => data.SpeakerIndex = speakerIndexInput.index);
             
+            extensionContainer.Add(speakerIndexInput);
+        }
+
+        protected virtual void CreateAudioInput()
+        {
             ObjectField audioInput = new()
             {
                 objectType = typeof(AudioClip)
@@ -85,12 +106,9 @@ namespace PotikotTools.DialogueSystem
             });
             
             extensionContainer.Add(audioInput);
-
-            extensionContainer.style.backgroundColor = new Color(0.2470588f, 0.2470588f, 0.2470588f, 0.8039216f);
-            RefreshExpandedState();
         }
-
-        protected virtual VisualElement CreateButtons()
+        
+        protected virtual void CreateAddButton()
         {
             VisualElement c = new()
             {
@@ -109,17 +127,11 @@ namespace PotikotTools.DialogueSystem
                 style = { flexGrow = 1f }
             });
             
-            return c;
+            mainContainer.Insert(1, c);
         }
 
-        protected void AddPort(string text, Direction direction)
-        {
-            if (direction == Direction.Input)
-                AddInputPort(text);
-            else
-                AddOutputPort(text);
-        }
-
+        #endregion
+        
         protected virtual void AddInputPort(string text)
         {
             VisualElement c = new()
@@ -148,27 +160,29 @@ namespace PotikotTools.DialogueSystem
             {
                 style =
                 {
-                    flexDirection = FlexDirection.RowReverse
+                    flexDirection = FlexDirection.Row
                 }
             };
 
-            c.Add(InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Single, null));
-            c.Add(new TextField()
-            {
-                value = text
-            });
-            
             c.Add(new Button(() => RemoveButtonCallback(outputContainer.childCount - 1))
             {
                 text = "x"
             });
+            
+            c.Add(new TextField()
+            {
+                value = text
+            });
+
+            c.Add(new VisualElement() { style = { flexGrow = 1f } });
+            c.Add(InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Single, null));
             
             outputContainer.Add(c);
         }
         
         protected virtual void AddButtonCallback()
         {
-            AddPort("New Choice", Direction.Output);
+            AddOutputPort("New Choice");
         }
 
         protected virtual void RemoveButtonCallback(int index)

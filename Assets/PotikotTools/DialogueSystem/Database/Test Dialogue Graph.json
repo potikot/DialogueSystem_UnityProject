@@ -2,77 +2,39 @@
   "Tags": null,
   "Speakers": [
     {
-      "Name": null
+      "Name": "Andrew"
     },
     {
-      "Name": null
+      "Name": "Lox"
     }
   ],
   "Id": "Test Dialogue Graph",
   "Nodes": [
     {
-      "SpeakerId": 0,
+      "SpeakerIndex": 1,
       "Text": null,
-      "AudioAssetReference": "a7be187972004044b938960a4a211dfe",
-      "Commands": [
-        {
-          "Command": null,
-          "ExecutionOrder": 0,
-          "Delay": 0.0,
-          "HasDelay": false
-        }
-      ],
+      "AudioAssetReference": null,
+      "Commands": [],
       "InputConnection": null,
       "OutputConnections": [
         {
-          "Text": ""
+          "Text": "New Choice"
         }
       ],
       "Id": 0
     },
     {
-      "SpeakerId": 0,
+      "SpeakerIndex": 0,
       "Text": null,
       "AudioAssetReference": null,
-      "Commands": [
-        {
-          "Command": null,
-          "ExecutionOrder": 0,
-          "Delay": 0.0,
-          "HasDelay": false
-        }
-      ],
-      "InputConnection": {
-        "Text": ""
-      },
+      "Commands": [],
+      "InputConnection": null,
       "OutputConnections": [
         {
-          "Text": ""
+          "Text": null
         }
       ],
       "Id": 1
-    },
-    {
-      "SpeakerId": 0,
-      "Text": null,
-      "AudioAssetReference": null,
-      "Commands": [
-        {
-          "Command": null,
-          "ExecutionOrder": 0,
-          "Delay": 0.0,
-          "HasDelay": false
-        }
-      ],
-      "InputConnection": {
-        "Text": ""
-      },
-      "OutputConnections": [
-        {
-          "Text": "Next"
-        }
-      ],
-      "Id": 2
     }
   ]
 }

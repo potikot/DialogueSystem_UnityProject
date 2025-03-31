@@ -17,11 +17,6 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: fa9e328a2be5ece49acaf79e9c03a34d
   m_SerializeEntries:
-  - m_GUID: 7b8a849162442d94e9921bf1f68b4edd
-    m_Address: Dialogues/TestDialogueSave.json
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a7be187972004044b938960a4a211dfe
     m_Address: Assets/Test/Audio/bum.wav
     m_ReadOnly: 0

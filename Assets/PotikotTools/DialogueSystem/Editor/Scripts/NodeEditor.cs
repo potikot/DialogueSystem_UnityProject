@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -20,9 +21,9 @@ namespace PotikotTools.DialogueSystem
         {
             _dialogueData = new DialogueData("Test Dialogue Graph")
             {
-                Speakers = new SpeakerData[]
+                Speakers = new List<SpeakerData>
                 {
-                    new(), new()
+                    new("Andrew"), new("Lox")
                 }
             };
         }

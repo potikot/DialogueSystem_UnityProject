@@ -8,7 +8,7 @@ namespace PotikotTools.DialogueSystem
     public class DialogueData
     {
         public string[] Tags;
-        public SpeakerData[] Speakers;
+        public List<SpeakerData> Speakers;
 
         protected List<NodeData> nodes;
         
@@ -66,9 +66,25 @@ namespace PotikotTools.DialogueSystem
             return nodes.First(n => !n.HasInputConnection);
         }
 
-        public bool HasSpeaker(int id)
+        public bool HasSpeaker(string name) => Speakers.Any(s => s.Name == name);
+        public bool HasSpeaker(int id) => id >= 0 && id < Speakers.Count;
+
+        public bool TryGetSpeaker(int id, out SpeakerData speaker)
         {
-            return id >= 0 && id < Speakers.Length;
+            if (HasSpeaker(id))
+            {
+                speaker = Speakers[id];
+                return true;
+            }
+            
+            speaker = null;
+            return false;
+        }
+
+        public bool TryGetSpeaker(string name, out SpeakerData speaker)
+        {
+            speaker = Speakers.First(s => s.Name == name);
+            return speaker != null;
         }
         
         private int GetNextNodeId()

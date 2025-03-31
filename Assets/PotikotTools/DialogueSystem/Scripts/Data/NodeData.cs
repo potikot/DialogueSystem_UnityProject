@@ -9,7 +9,7 @@ namespace PotikotTools.DialogueSystem
     {
         public int Id { get; private set; }
 
-        public int SpeakerId;
+        public int SpeakerIndex;
         public string Text;
         public AssetReferenceT<AudioClip> AudioAssetReference;
         public List<CommandData> Commands;
@@ -21,7 +21,7 @@ namespace PotikotTools.DialogueSystem
 
         [JsonIgnore] public bool HasInputConnection => InputConnection != null;
         [JsonIgnore] public bool HasOutputConnections => OutputConnections.Count > 0;
-        
+
         private NodeData() { }
 
         public NodeData(int id)
@@ -31,6 +31,14 @@ namespace PotikotTools.DialogueSystem
             
             OutputConnections = new List<ConnectionData>();
             Commands = new List<CommandData>();
+        }
+
+        public string GetSpeakerName()
+        {
+            if (DialogueData.TryGetSpeaker(SpeakerIndex, out SpeakerData speaker))
+                return speaker.Name;
+
+            return null;
         }
     }
 }

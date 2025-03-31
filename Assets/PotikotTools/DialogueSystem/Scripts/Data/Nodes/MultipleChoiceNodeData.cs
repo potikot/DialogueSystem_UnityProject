@@ -4,7 +4,7 @@ namespace PotikotTools.DialogueSystem
     {
         public MultipleChoiceNodeData(int id) : base(id)
         {
-            OutputConnections.Add(new ConnectionData("Choice 1", this, null));
+            OutputConnections.Add(new ConnectionData("New Choice", this, null));
         }
     }
 }
