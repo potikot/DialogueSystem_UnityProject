@@ -32,6 +32,8 @@ namespace PotikotTools.DialogueSystem
                 return null;
             
             string json = File.ReadAllText(fullPath);
+            DL.Log("Load:\n" + json);
+
             return JsonConvert.DeserializeObject<DialogueData>(json);
         }
     }

@@ -31,10 +31,19 @@ namespace PotikotTools.DialogueSystem
         private void CreateGUI()
         {
             AddGraphView();
-            rootVisualElement.Add(new Button(() => Components.Saver.Save(_dialogueData))
+            
+            VisualElement c = new();
+            
+            c.Add(new Button(() => Components.Saver.Save(_dialogueData))
             {
                 text = "Save Dialogue"
             });
+            c.Add(new Button(() => Components.Saver.Load(_dialogueData.Id))
+            {
+                text = "Load Dialogue"
+            });
+            
+            rootVisualElement.Add(c);
         }
 
         private void AddGraphView()

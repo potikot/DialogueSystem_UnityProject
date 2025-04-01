@@ -23,6 +23,11 @@ namespace PotikotTools.DialogueSystem
             AddManipulators();
         }
 
+        public virtual void Delete()
+        {
+            data.DialogueData.RemoveNode(data);
+        }
+        
         #region Draw
 
         public virtual void Draw()
@@ -47,10 +52,10 @@ namespace PotikotTools.DialogueSystem
 
         protected virtual void CreatePorts()
         {
-            AddInputPort("In");
+            AddInputPort();
 
             for (int i = 0; i < data.OutputConnections.Count; i++)
-                AddOutputPort(data.OutputConnections[i].Text);
+                AddOutputPort(data.OutputConnections[i]);
         }
 
         protected virtual void CreateSpeakerTextInput()
@@ -121,9 +126,7 @@ namespace PotikotTools.DialogueSystem
             mainContainer.Insert(1, c);
         }
 
-        #endregion
-        
-        protected virtual void AddInputPort(string text)
+        protected virtual void AddInputPort()
         {
             VisualElement c = new()
             {
@@ -134,7 +137,7 @@ namespace PotikotTools.DialogueSystem
             };
 
             c.Add(InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, null));
-            c.Add(new Label(text)
+            c.Add(new Label("In")
             {
                 style =
                 {
@@ -145,7 +148,7 @@ namespace PotikotTools.DialogueSystem
             inputContainer.Add(c);
         }
         
-        protected virtual void AddOutputPort(string text)
+        protected virtual void AddOutputPort(ConnectionData connectionData)
         {
             VisualElement c = new()
             {
@@ -155,14 +158,14 @@ namespace PotikotTools.DialogueSystem
                 }
             };
 
-            c.Add(new Button(() => RemoveButtonCallback(outputContainer.childCount - 1))
+            c.Add(new Button(() => RemoveButtonCallback(data.OutputConnections.IndexOf(connectionData)))
             {
                 text = "x"
             });
             
             c.Add(new TextField()
             {
-                value = text
+                value = connectionData.Text
             });
 
             c.Add(new VisualElement() { style = { flexGrow = 1f } });
@@ -171,16 +174,22 @@ namespace PotikotTools.DialogueSystem
             outputContainer.Add(c);
         }
         
+        #endregion
+        
         protected virtual void AddButtonCallback()
         {
-            AddOutputPort("New Choice");
+            ConnectionData connectionData = new("New Choice", data, null);
+            data.OutputConnections.Add(connectionData);
+
+            AddOutputPort(connectionData);
         }
 
         protected virtual void RemoveButtonCallback(int index)
         {
-            if (outputContainer.childCount <= 1)
+            if (index < 0 || index >= data.OutputConnections.Count || data.OutputConnections.Count <= 1)
                 return;
 
+            data.OutputConnections.RemoveAt(index);
             outputContainer.RemoveAt(index);
         }
         

@@ -20,6 +20,8 @@ namespace PotikotTools.DialogueSystem
             AddManipulators();
             
             this.AddStyles("DialogueGraph");
+            
+            graphViewChanged += HandleGraphViewChanged;
         }
 
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter)
@@ -33,6 +35,34 @@ namespace PotikotTools.DialogueSystem
             evt.menu.AppendAction("Create Multiple Choice Node", AddNode<MultipleChoiceNodeView, MultipleChoiceNodeData>);
         }
 
+        private GraphViewChange HandleGraphViewChanged(GraphViewChange change)
+        {
+            // TODO: handle node data
+
+            if (change.edgesToCreate != null)
+            {
+                foreach (Edge edge in change.edgesToCreate)
+                    DL.Log($"Connected: {edge.output.node.title} -> {edge.input.node.title}");
+            }
+
+            if (change.elementsToRemove != null)
+            {
+                foreach (GraphElement element in change.elementsToRemove)
+                {
+                    if (element is Edge edge)
+                    {
+                        DL.Log($"Disconnected: {edge.output.node.title} -> {edge.input.node.title}");
+                    }
+                    else if (element is INodeView nodeView)
+                    {
+                        nodeView.Delete();
+                    }
+                }
+            }
+
+            return change;
+        }
+        
         private void AddNode<TView, TData>(DropdownMenuAction dropdownMenuAction)
             where TView : Node, INodeView
             where TData : NodeData

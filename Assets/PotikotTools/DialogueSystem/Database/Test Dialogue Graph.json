@@ -9,19 +9,5 @@
     }
   ],
   "Id": "Test Dialogue Graph",
-  "Nodes": [
-    {
-      "SpeakerIndex": -1,
-      "Text": null,
-      "AudioAssetReference": null,
-      "Commands": [],
-      "InputConnection": null,
-      "OutputConnections": [
-        {
-          "Text": null
-        }
-      ],
-      "Id": 0
-    }
-  ]
+  "Nodes": []
 }

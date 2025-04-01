@@ -1,4 +1,4 @@
-using System;
+using Newtonsoft.Json;
 
 namespace PotikotTools.DialogueSystem
 {
@@ -8,13 +8,12 @@ namespace PotikotTools.DialogueSystem
         AfterPhrase
     }
     
-    [Serializable]
     public class CommandData
     {
         public string Command;
         public CommandExecutionOrder ExecutionOrder;
         public float Delay;
 
-        public bool HasDelay => Delay > 0f;
+        [JsonIgnore] public bool HasDelay => Delay > 0f;
     }
 }

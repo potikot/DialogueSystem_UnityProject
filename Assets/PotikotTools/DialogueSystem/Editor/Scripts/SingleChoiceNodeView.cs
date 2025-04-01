@@ -8,10 +8,10 @@ namespace PotikotTools.DialogueSystem
     {
         protected override void CreateAddButton() { }
 
-        protected override void AddOutputPort(string text)
+        protected override void AddOutputPort(ConnectionData connectionData)
         {
-            if (outputContainer.childCount >= 1)
-                return;
+            // if (outputContainer.childCount >= 1)
+            //     return;
 
             VisualElement c = new()
             {

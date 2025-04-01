@@ -4,5 +4,6 @@ namespace PotikotTools.DialogueSystem
     {
         void Initialize(NodeData nodeData);
         void Draw();
+        void Delete();
     }
 }
