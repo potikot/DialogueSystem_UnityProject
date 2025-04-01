@@ -4,7 +4,6 @@ using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 using UnityEngine.UIElements;
 
 namespace PotikotTools.DialogueSystem
@@ -16,7 +15,7 @@ namespace PotikotTools.DialogueSystem
         protected T data;
 
         public T Data => data;
-        
+
         public virtual void Initialize(NodeData nodeData)
         {
             data = nodeData as T;
@@ -70,42 +69,34 @@ namespace PotikotTools.DialogueSystem
 
         protected virtual void CreateSpeakerIndexInput()
         {
+            List<string> speakerNames = new(data.DialogueData.Speakers.Count + 1) { "None" };
+            speakerNames.AddRange(data.DialogueData.Speakers.Select(s => s.Name));
+            
             PopupField<string> speakerIndexInput = new
             (
-                "Speaker ID",
-                data.DialogueData.Speakers.Select(s => s.Name).ToList(),
-                data.GetSpeakerName()
+                "Speaker",
+                speakerNames,
+                data.GetSpeakerName() ?? "None"
             );
             
-            speakerIndexInput.RegisterValueChangedCallback(evt => data.SpeakerIndex = speakerIndexInput.index);
+            speakerIndexInput.RegisterValueChangedCallback(evt => data.SpeakerIndex = speakerIndexInput.index - 1);
             
             extensionContainer.Add(speakerIndexInput);
         }
 
         protected virtual void CreateAudioInput()
         {
-            ObjectField audioInput = new()
+            TextField audioNameInput = new("Audio Name")
             {
-                objectType = typeof(AudioClip)
+                value = data.AudioResourceName
             };
 
-            if (data.AudioAssetReference != null)
-                audioInput.SetValueWithoutNotify(data.AudioAssetReference.Asset);
-
-            audioInput.RegisterValueChangedCallback(evt =>
+            audioNameInput.RegisterValueChangedCallback(evt =>
             {
-                // TODO: 
-                if (evt.newValue == null)
-                    data.AudioAssetReference = null;
-                else if (evt.newValue.IsAddressable())
-                    data.AudioAssetReference = (evt.newValue as AudioClip).AsAddressable();
-                else if (data.AudioAssetReference != null)
-                    audioInput.SetValueWithoutNotify(data.AudioAssetReference.Asset);
-                else
-                    audioInput.SetValueWithoutNotify(null);
+                data.AudioResourceName = evt.newValue;
             });
             
-            extensionContainer.Add(audioInput);
+            extensionContainer.Add(audioNameInput);
         }
         
         protected virtual void CreateAddButton()

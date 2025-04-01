@@ -3,8 +3,6 @@ using Newtonsoft.Json;
 using PotikotTools.DialogueSystem;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.ResourceProviders;
 using Object = UnityEngine.Object;
 
 public class TestDialogueSave : MonoBehaviour
@@ -38,7 +36,6 @@ public class TestDialogueSave : MonoBehaviour
             nodes.Add(new NodeData(i)
             {
                 Text = $"node {i}",
-                AudioAssetReference = new AssetReferenceT<AudioClip>(guid)
             });
         }
         

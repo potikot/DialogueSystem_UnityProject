@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 
 namespace PotikotTools.DialogueSystem
 {
@@ -11,7 +10,7 @@ namespace PotikotTools.DialogueSystem
 
         public int SpeakerIndex;
         public string Text;
-        public AssetReferenceT<AudioClip> AudioAssetReference;
+        public string AudioResourceName;
         public List<CommandData> Commands;
 
         public ConnectionData InputConnection;
@@ -28,7 +27,8 @@ namespace PotikotTools.DialogueSystem
         {
             new DialogueController().NodeHandlers.Add(typeof(SingleChoiceNodeData), node => { });
             Id = id;
-            
+
+            SpeakerIndex = -1;
             OutputConnections = new List<ConnectionData>();
             Commands = new List<CommandData>();
         }

@@ -12,17 +12,6 @@ namespace PotikotTools.DialogueSystem
         
         private static readonly string DirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), "Assets", "PotikotTools/DialogueSystem/Database");
 
-        static JsonDialogueSaver()
-        {
-            JsonConvert.DefaultSettings = () => new JsonSerializerSettings()
-            {
-                Converters = new List<JsonConverter>()
-                {
-                    new AssetReferenceConverter()
-                }
-            };
-        }
-        
         public void Save(DialogueData dialogueData)
         {
             string fullPath = Path.Combine(DirectoryPath, dialogueData.Id + Extension);
