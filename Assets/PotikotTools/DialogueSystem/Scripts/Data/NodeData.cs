@@ -30,7 +30,7 @@ namespace PotikotTools.DialogueSystem
 
             SpeakerIndex = -1;
             OutputConnections = new List<ConnectionData>();
-            Commands = new List<CommandData>();
+            Commands = new List<CommandData>() {new CommandData(), new CommandData()};
         }
 
         public string GetSpeakerName()

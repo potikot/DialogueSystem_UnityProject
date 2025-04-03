@@ -43,10 +43,4 @@ public class TestDialogueSave : MonoBehaviour
         {
         };;
     }
-
-    [ContextMenu("GenerateScript")]
-    private void GenerateScript()
-    {
-        Debug.Log(Components.ResourceManager.GenerateScript());
-    }
 }

@@ -11,7 +11,7 @@ namespace PotikotTools.DialogueSystem
         public List<SpeakerData> Speakers;
 
         protected List<NodeData> nodes;
-        
+
         protected string _id;
 
         public string Id

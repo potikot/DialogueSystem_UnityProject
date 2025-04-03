@@ -1,5 +1,4 @@
 {
-  "Tags": null,
   "Speakers": [
     {
       "Name": "Andrew"
@@ -9,5 +8,32 @@
     }
   ],
   "Id": "Test Dialogue Graph",
-  "Nodes": []
+  "Nodes": [
+    {
+      "SpeakerIndex": -1,
+      "Commands": [],
+      "OutputConnections": [
+        {
+          "From": 0,
+          "To": 1
+        }
+      ],
+      "Id": 0
+    },
+    {
+      "SpeakerIndex": -1,
+      "Commands": [],
+      "InputConnection": {
+        "From": 0,
+        "To": 1
+      },
+      "OutputConnections": [
+        {
+          "Text": "New Choice",
+          "From": 1
+        }
+      ],
+      "Id": 1
+    }
+  ]
 }

@@ -5,8 +5,10 @@ namespace PotikotTools.DialogueSystem
     public class ConnectionData
     {
         public string Text;
-        [JsonIgnore] public NodeData From;
-        [JsonIgnore] public NodeData To;
+        public NodeData From;
+        public NodeData To;
+
+        public ConnectionData() { }
 
         public ConnectionData(string text)
         {

@@ -1,31 +1,25 @@
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading.Tasks;
+using UnityEngine;
 
 namespace PotikotTools.DialogueSystem
 {
-    public interface IDialogueResourceManager
+    public class DialogueResourceManager : IDialogueResourceManager
     {
-        public T GetResource<T>(string name);
-    }
-    
-    public class DialogueResourceManager
-    {
-        public string GenerateScript()
+        public T GetResource<T>(string name) where T : Object
         {
-            StringBuilder script = new();
+            return Resources.Load<T>(name);
+        }
+        
+        public async Task<T> GetResourceAsync<T>(string name) where T : Object
+        {
+            ResourceRequest request = Resources.LoadAsync<T>(name);
 
-            // usings
-            script.AppendLine("using UnityEngine;");
-            script.AppendLine();
+            while (!request.isDone)
+                await Task.Yield();
             
-            // namespace
-            script.AppendLine("namespace PotikotTools.DialogueSystem");
-            script.AppendLine("{");
-            script.AppendLine("\tpublic class DRM : DialogueResourceManager");
-            script.AppendLine("\t{");
-            script.AppendLine("\t}");
-            script.AppendLine("}");
-            
-            return script.ToString();
+            return request.asset as T;
         }
     }
 }

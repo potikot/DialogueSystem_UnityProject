@@ -17,7 +17,7 @@ namespace PotikotTools.DialogueSystem
 
         public bool IsDialogueStarted { get; private set; }
         public Dictionary<Type, Action<NodeData>> NodeHandlers = new Dictionary<Type, Action<NodeData>>();
-        
+
         public void SetDialogueData(DialogueData dialogueData)
         {
             if (dialogueData == null)
@@ -78,7 +78,7 @@ namespace PotikotTools.DialogueSystem
             {
                 _currentNodeData = _currentNodeData.OutputConnections[choice].To;
                 OnDialogueProgress?.Invoke(_currentNodeData);
-                
+
                 // all this in OnDialogueProgress callbacks
                 // update ui
                 // handle audio

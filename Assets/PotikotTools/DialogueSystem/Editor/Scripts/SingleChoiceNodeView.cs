@@ -6,6 +6,12 @@ namespace PotikotTools.DialogueSystem
 {
     public class SingleChoiceNodeView : NodeView<SingleChoiceNodeData>
     {
+        public override void Draw()
+        {
+            base.Draw();
+            title = "Single Choice Node";
+        }
+        
         protected override void CreateAddButton() { }
 
         protected override void AddOutputPort(ConnectionData connectionData)

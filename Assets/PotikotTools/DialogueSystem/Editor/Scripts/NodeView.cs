@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -23,11 +24,13 @@ namespace PotikotTools.DialogueSystem
             AddManipulators();
         }
 
+        public NodeData GetData() => data;
+        
         public virtual void Delete()
         {
             data.DialogueData.RemoveNode(data);
         }
-        
+
         #region Draw
 
         public virtual void Draw()
@@ -45,6 +48,7 @@ namespace PotikotTools.DialogueSystem
             CreateSpeakerTextInput();
             CreateSpeakerIndexInput();
             CreateAudioInput();
+            // CreateCommandsInput();
 
             extensionContainer.style.backgroundColor = new Color(0.2470588f, 0.2470588f, 0.2470588f, 0.8039216f);
             RefreshExpandedState();
@@ -102,6 +106,19 @@ namespace PotikotTools.DialogueSystem
             });
             
             extensionContainer.Add(audioNameInput);
+        }
+
+        protected virtual void CreateCommandsInput()
+        {
+            VisualElement c = new();
+            ListView commandsInput = new(data.Commands)
+            {
+                reorderable = true,
+                reorderMode = ListViewReorderMode.Animated
+            };
+            
+            c.Add(commandsInput);
+            extensionContainer.Add(c);
         }
         
         protected virtual void CreateAddButton()
@@ -162,11 +179,15 @@ namespace PotikotTools.DialogueSystem
             {
                 text = "x"
             });
-            
-            c.Add(new TextField()
+
+            TextField textField = new()
             {
                 value = connectionData.Text
-            });
+            };
+            
+            textField.RegisterValueChangedCallback(evt => connectionData.Text = evt.newValue);
+            
+            c.Add(textField);
 
             c.Add(new VisualElement() { style = { flexGrow = 1f } });
             c.Add(InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Single, null));

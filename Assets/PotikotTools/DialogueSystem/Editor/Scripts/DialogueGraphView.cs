@@ -31,18 +31,37 @@ namespace PotikotTools.DialogueSystem
 
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
         {
-            evt.menu.AppendAction("Create Single Choice Node", AddNode<SingleChoiceNodeView, SingleChoiceNodeData>);
-            evt.menu.AppendAction("Create Multiple Choice Node", AddNode<MultipleChoiceNodeView, MultipleChoiceNodeData>);
+            evt.menu.AppendAction("Create Single Choice Node", a => AddNode<SingleChoiceNodeView, SingleChoiceNodeData>(a));
+            evt.menu.AppendAction("Create Multiple Choice Node", a => AddNode<MultipleChoiceNodeView, MultipleChoiceNodeData>(a));
+            evt.menu.AppendAction("Create Timer Node", a => AddNode<TimerNodeView, TimerNodeData>(a, 5f));
         }
 
         private GraphViewChange HandleGraphViewChanged(GraphViewChange change)
         {
-            // TODO: handle node data
+            // TODO: optimize algorithm
 
             if (change.edgesToCreate != null)
             {
                 foreach (Edge edge in change.edgesToCreate)
+                {
+                    NodeData from = (edge.output.node as INodeView).GetData();
+                    NodeData to = (edge.input.node as INodeView).GetData();
+
+                    List<Port> outputPorts = edge.output.node.outputContainer.Query<Port>().ToList();
+                    int i = 0;
+                    foreach (var port in outputPorts)
+                    {
+                        if (port == edge.output)
+                            break;
+
+                        i++;
+                    }
+
+                    from.OutputConnections[i].To = to;
+                    to.InputConnection = from.OutputConnections[i];
+
                     DL.Log($"Connected: {edge.output.node.title} -> {edge.input.node.title}");
+                }
             }
 
             if (change.elementsToRemove != null)
@@ -51,6 +70,22 @@ namespace PotikotTools.DialogueSystem
                 {
                     if (element is Edge edge)
                     {
+                        NodeData from = (edge.output.node as INodeView).GetData();
+                        NodeData to = (edge.input.node as INodeView).GetData();
+
+                        List<Port> outputPorts = edge.output.node.outputContainer.Query<Port>().ToList();
+                        int i = 0;
+                        foreach (var port in outputPorts)
+                        {
+                            if (port == edge.output)
+                                break;
+
+                            i++;
+                        }
+                        
+                        from.OutputConnections[i].To = null;
+                        to.InputConnection = null;
+                        
                         DL.Log($"Disconnected: {edge.output.node.title} -> {edge.input.node.title}");
                     }
                     else if (element is INodeView nodeView)
@@ -63,12 +98,12 @@ namespace PotikotTools.DialogueSystem
             return change;
         }
         
-        private void AddNode<TView, TData>(DropdownMenuAction dropdownMenuAction)
+        private void AddNode<TView, TData>(DropdownMenuAction dropdownMenuAction, params object[] dataArgs)
             where TView : Node, INodeView
             where TData : NodeData
         {
             TView nodeView = Activator.CreateInstance<TView>();
-            nodeView.Initialize(dialogueData.AddNode<TData>());
+            nodeView.Initialize(dialogueData.AddNode<TData>(dataArgs));
             nodeView.Draw();
 
             AddElement(nodeView);
