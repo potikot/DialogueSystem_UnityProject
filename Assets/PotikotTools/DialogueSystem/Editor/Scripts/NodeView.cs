@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using PlasticPipe.PlasticProtocol.Messages;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
@@ -48,7 +49,7 @@ namespace PotikotTools.DialogueSystem
             CreateSpeakerTextInput();
             CreateSpeakerIndexInput();
             CreateAudioInput();
-            // CreateCommandsInput();
+            CreateCommandsInput();
 
             extensionContainer.style.backgroundColor = new Color(0.2470588f, 0.2470588f, 0.2470588f, 0.8039216f);
             RefreshExpandedState();
@@ -110,15 +111,98 @@ namespace PotikotTools.DialogueSystem
 
         protected virtual void CreateCommandsInput()
         {
-            VisualElement c = new();
-            ListView commandsInput = new(data.Commands)
+            Foldout foldout = new()
             {
-                reorderable = true,
-                reorderMode = ListViewReorderMode.Animated
+                text = "Commands",
+                value = false
+            };
+
+            foldout.Add(new Button(() =>
+            {
+                CommandData commandData = new();
+                data.Commands.Add(commandData);
+                int index = data.Commands.Count - 1;
+
+                foldout.Add(CreateListElement(data.Commands, index, () =>
+                {
+                    int index = data.Commands.IndexOf(commandData);
+                    
+                    data.Commands.RemoveAt(index);
+                    foldout.RemoveAt(index + 1);
+                }));
+            })
+            {
+                text = "Add Command"
+            });
+
+            for (int i = 0; i < data.Commands.Count; i++)
+            {
+                VisualElement el = CreateListElement(data.Commands, i, () =>
+                {
+                    data.Commands.RemoveAt(i);
+                    foldout.RemoveAt(i + 1);
+                });
+                foldout.Add(el);
+            }
+
+            extensionContainer.Add(foldout);
+        }
+
+        private VisualElement CreateListElement(List<CommandData> commands, int index, Action deleteAction)
+        {
+            CommandData commandData = commands[index];
+
+            Foldout foldout = new()
+            {
+                text = commandData.Command ?? $"Command {index + 1}",
+                value = false
             };
             
-            c.Add(commandsInput);
-            extensionContainer.Add(c);
+            TextField commandInput = new()
+            {
+                value = commandData.Command
+            };
+
+            commandInput.RegisterValueChangedCallback(evt =>
+            {
+                commandData.Command = evt.newValue;
+
+                if (string.IsNullOrEmpty(evt.newValue))
+                    foldout.text = $"Command {index + 1}";
+                else
+                    foldout.text = evt.newValue;
+            });
+
+            EnumField executionOrderInput = new("Execution Order", commandData.ExecutionOrder);
+            executionOrderInput.RegisterValueChangedCallback(evt => commandData.ExecutionOrder = (CommandExecutionOrder) evt.newValue);
+
+            FloatField delayInput = new("Delay")
+            {
+                value = commandData.Delay
+            };
+            
+            delayInput.RegisterValueChangedCallback(evt =>
+            {
+                if (evt.newValue < 0f)
+                    delayInput.SetValueWithoutNotify(0f);
+
+                commandData.Delay = delayInput.value;
+            });
+
+            foldout.Add(commandInput);
+            foldout.Add(executionOrderInput);
+            foldout.Add(delayInput);
+            foldout.Q<Toggle>().Add(new Button(deleteAction)
+            {
+                text = "x",
+                style =
+                {
+                    paddingLeft = 5f,
+                    paddingRight = 5f
+                }
+            });
+
+            return foldout;
         }
         
         protected virtual void CreateAddButton()

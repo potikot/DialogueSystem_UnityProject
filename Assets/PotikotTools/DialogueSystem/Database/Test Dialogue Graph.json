@@ -11,29 +11,39 @@
   "Nodes": [
     {
       "SpeakerIndex": -1,
-      "Commands": [],
-      "OutputConnections": [
+      "Commands": [
         {
-          "From": 0,
-          "To": 1
+          "ExecutionOrder": 0,
+          "Delay": 0.0
+        },
+        {
+          "ExecutionOrder": 0,
+          "Delay": 0.0
+        },
+        {
+          "ExecutionOrder": 0,
+          "Delay": 0.0
+        },
+        {
+          "ExecutionOrder": 0,
+          "Delay": 0.0
+        },
+        {
+          "ExecutionOrder": 0,
+          "Delay": 0.0
+        },
+        {
+          "ExecutionOrder": 0,
+          "Delay": 0.0
         }
       ],
-      "Id": 0
-    },
-    {
-      "SpeakerIndex": -1,
-      "Commands": [],
-      "InputConnection": {
-        "From": 0,
-        "To": 1
-      },
       "OutputConnections": [
         {
           "Text": "New Choice",
-          "From": 1
+          "From": 0
         }
       ],
-      "Id": 1
+      "Id": 0
     }
   ]
 }

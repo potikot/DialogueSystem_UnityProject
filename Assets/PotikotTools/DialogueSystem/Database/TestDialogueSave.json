@@ -1,45 +1,4 @@
 {
-  "Nodes": [
-    {
-      "Text": "node 0",
-      "AudioAssetReference": "7b8a849162442d94e9921bf1f68b4edd",
-      "Commands": [],
-      "InputConnection": null,
-      "OutputConnections": [],
-      "Id": 0,
-      "HasInputConnection": false,
-      "HasOutputConnections": false
-    },
-    {
-      "Text": "node 1",
-      "AudioAssetReference": "7b8a849162442d94e9921bf1f68b4edd",
-      "Commands": [],
-      "InputConnection": null,
-      "OutputConnections": [],
-      "Id": 1,
-      "HasInputConnection": false,
-      "HasOutputConnections": false
-    },
-    {
-      "Text": "node 2",
-      "AudioAssetReference": "7b8a849162442d94e9921bf1f68b4edd",
-      "Commands": [],
-      "InputConnection": null,
-      "OutputConnections": [],
-      "Id": 2,
-      "HasInputConnection": false,
-      "HasOutputConnections": false
-    },
-    {
-      "Text": "node 3",
-      "AudioAssetReference": "7b8a849162442d94e9921bf1f68b4edd",
-      "Commands": [],
-      "InputConnection": null,
-      "OutputConnections": [],
-      "Id": 3,
-      "HasInputConnection": false,
-      "HasOutputConnections": false
-    }
-  ],
-  "Id": "TestDialogueSave"
+  "Id": "TestDialogueSave",
+  "Nodes": []
 }
