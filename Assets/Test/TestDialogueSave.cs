@@ -14,7 +14,7 @@ public class TestDialogueSave : MonoBehaviour
     private void Save()
     {
         DialogueData dialogueData = GenerateDialogueData();
-        Components.Saver.Save(dialogueData);
+        Database.SaveDialogue(dialogueData);
         
         DL.Log($"{_dialogueId} saved");
     }
@@ -22,7 +22,7 @@ public class TestDialogueSave : MonoBehaviour
     [ContextMenu("Load")]
     private void Load()
     {
-        DialogueData dialogueData = Components.Saver.Load(_dialogueId);
+        DialogueData dialogueData = Database.LoadDialogue(_dialogueId);
         DL.Log($"{dialogueData.Id} loaded");
     }
 

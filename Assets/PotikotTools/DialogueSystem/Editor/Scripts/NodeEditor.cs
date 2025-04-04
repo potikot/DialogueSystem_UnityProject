@@ -34,11 +34,11 @@ namespace PotikotTools.DialogueSystem
             
             VisualElement c = new();
             
-            c.Add(new Button(() => Components.Saver.Save(_dialogueData))
+            c.Add(new Button(() => Database.SaveDialogue(_dialogueData))
             {
                 text = "Save Dialogue"
             });
-            c.Add(new Button(() => Components.Saver.Load(_dialogueData.Id))
+            c.Add(new Button(() => Database.LoadDialogue(_dialogueData.Id))
             {
                 text = "Load Dialogue"
             });

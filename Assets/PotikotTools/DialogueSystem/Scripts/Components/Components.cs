@@ -10,8 +10,6 @@ namespace PotikotTools.DialogueSystem
     
     public static class Components
     {
-        public static IDialogueSaver Saver = new JsonDialogueSaver();
-        
         public static DialogueResourceManager ResourceManager = new DialogueResourceManager();
 
         public static AudioController AudioController

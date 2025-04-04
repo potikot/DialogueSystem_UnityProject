@@ -11,8 +11,6 @@ namespace PotikotTools.DialogueSystem
     {
         private const string Extension = ".json";
         
-        private static readonly string DirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), "Assets", "PotikotTools/DialogueSystem/Database");
-
         private static JsonSerializer _serializer;
 
         public JsonDialogueSaver()
@@ -27,32 +25,28 @@ namespace PotikotTools.DialogueSystem
             _serializer.Converters.Add(new ConnectionDataConverter());
         }
 
-        public void Save(DialogueData dialogueData)
+        public void Save(string directoryPath, DialogueData dialogueData)
         {
-            string fullPath = Path.Combine(DirectoryPath, dialogueData.Id + Extension);
+            string fullPath = Path.Combine(directoryPath, dialogueData.Id + Extension);
 
-            if (!Directory.Exists(DirectoryPath))
-                Directory.CreateDirectory(DirectoryPath);
+            if (!Directory.Exists(directoryPath))
+                Directory.CreateDirectory(directoryPath);
 
             using (StreamWriter sw = new(fullPath))
-            {
                 using (JsonWriter jw = new JsonTextWriter(sw))
-                _serializer.Serialize(jw, dialogueData);
-            }
+                    _serializer.Serialize(jw, dialogueData);
         }
 
-        public DialogueData Load(string dialogueId)
+        public DialogueData Load(string directoryPath, string dialogueId)
         {
-            string fullPath = Path.Combine(DirectoryPath, dialogueId + Extension);
+            string fullPath = Path.Combine(directoryPath, dialogueId + Extension);
 
             if (!File.Exists(fullPath))
                 return null;
             
             using (StreamReader sr = new(fullPath))
-            {
                 using (JsonReader jr = new JsonTextReader(sr))
                     return _serializer.Deserialize<DialogueData>(jr);
-            }
         }
     }
 }
