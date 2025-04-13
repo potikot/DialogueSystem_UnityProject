@@ -8,5 +8,59 @@
     }
   ],
   "Id": "Test Dialogue Graph",
-  "Nodes": []
+  "Nodes": [
+    {
+      "SpeakerIndex": 0,
+      "Commands": [],
+      "OutputConnections": [
+        {
+          "From": 0,
+          "To": 1
+        }
+      ],
+      "Id": 0
+    },
+    {
+      "SpeakerIndex": -1,
+      "Commands": [],
+      "InputConnection": {
+        "From": 0,
+        "To": 1
+      },
+      "OutputConnections": [
+        {
+          "Text": "1",
+          "From": 1,
+          "To": 2
+        },
+        {
+          "Text": "2",
+          "From": 1,
+          "To": 2
+        }
+      ],
+      "Id": 1
+    },
+    {
+      "Duration": 5.0,
+      "SpeakerIndex": -1,
+      "Commands": [],
+      "InputConnection": {
+        "Text": "2",
+        "From": 1,
+        "To": 2
+      },
+      "OutputConnections": [
+        {
+          "Text": "1",
+          "From": 2
+        },
+        {
+          "Text": "2",
+          "From": 2
+        }
+      ],
+      "Id": 2
+    }
+  ]
 }

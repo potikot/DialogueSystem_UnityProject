@@ -6,7 +6,7 @@ namespace PotikotTools.DialogueSystem
 
         public void Handle(NodeData data, DialogueController controller)
         {
-            
+
         }
     }
 }
