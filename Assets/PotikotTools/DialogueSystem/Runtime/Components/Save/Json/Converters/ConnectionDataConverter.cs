@@ -33,13 +33,13 @@ namespace PotikotTools.DialogueSystem
             if (obj.TryGetValue("From", out JToken from))
             {
                 int fromId = (int)from;
-                DL.Log("fromId: " + fromId);
+                // DL.Log("fromId: " + fromId);
             }
 
             if (obj.TryGetValue("To", out JToken to))
             {
                 int toId = (int)to;
-                DL.Log("toId: " + toId);
+                // DL.Log("toId: " + toId);
             }
 
             return connectionData;

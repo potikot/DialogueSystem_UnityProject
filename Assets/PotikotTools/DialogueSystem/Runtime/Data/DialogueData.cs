@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace PotikotTools.DialogueSystem
 {
@@ -10,21 +12,24 @@ namespace PotikotTools.DialogueSystem
         public string[] Tags;
         public List<SpeakerData> Speakers;
 
-        protected List<NodeData> nodes;
-
+        public bool LoadResourcesImmediately;
+        
         protected string _id;
+        protected List<NodeData> nodes;
 
         public string Id
         {
             get => _id;
             set
             {
-                // if (value valid)
-                // set
-                
+                if (Components.Database.ContainsDialogue(value))
+                    return;
+
                 _id = value;
             }
         }
+
+        [JsonIgnore] public bool IsResourcesLoaded { get; protected set; }
         
         public IReadOnlyList<NodeData> Nodes => nodes;
         
@@ -85,6 +90,22 @@ namespace PotikotTools.DialogueSystem
         {
             speaker = Speakers.First(s => s.Name == name);
             return speaker != null;
+        }
+
+        public async Task LoadResources()
+        {
+            foreach (NodeData node in nodes)
+                await node.LoadResources();
+
+            IsResourcesLoaded = true;
+        }
+
+        public void ReleaseResources()
+        {
+            foreach (NodeData node in nodes)
+                node.ReleaseResources();
+            
+            IsResourcesLoaded = false;
         }
         
         private int GetNextNodeId()

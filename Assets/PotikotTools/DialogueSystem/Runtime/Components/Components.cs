@@ -1,27 +1,38 @@
+using UnityEditor;
+
 namespace PotikotTools.DialogueSystem
 {
     public class CommandController
     {
+        
     }
 
     public class AudioController
     {
+        
     }
     
     public static class Components
     {
-        public static DialogueResourceManager ResourceManager = new DialogueResourceManager();
+        private static Database _database;
 
-        public static AudioController AudioController
+        public static Database Database
         {
-            get;
-            set;
+            get => _database;
+            set
+            {
+                if (value == null)
+                    return;
+
+                _database = value;
+                _database.Initialize();
+            }
         }
 
-        public static CommandController CommandController
+        [InitializeOnLoadMethod]
+        private static void Initialize()
         {
-            get;
-            set;
+            Database = new Database();
         }
     }
 }

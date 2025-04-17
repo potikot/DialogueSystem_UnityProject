@@ -5,15 +5,13 @@ namespace PotikotTools.DialogueSystem
     public class DialogueSystemPreferencesSO : ScriptableObject
     {
         public string DatabaseDirectory;
-        public string DialoguesDirectory;
         public string AudioDirectory;
         
         public SpeakerData[] Speakers;
 
         public DialogueSystemPreferencesSO()
         {
-            DatabaseDirectory = "Dialogue System/Database";
-            DialoguesDirectory = DatabaseDirectory + "/Dialogues";
+            DatabaseDirectory = "Resources/Dialogue System/Database";
             AudioDirectory = DatabaseDirectory + "/Audio";
         }
     }

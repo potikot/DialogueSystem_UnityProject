@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
@@ -16,7 +17,7 @@ namespace PotikotTools.DialogueSystem
         private NodeData _currentNodeData;
 
         public bool IsDialogueStarted { get; private set; }
-        public Dictionary<Type, Action<NodeData>> NodeHandlers = new Dictionary<Type, Action<NodeData>>();
+        public List<INodeHandler> NodeHandlers = new();
 
         public void SetDialogueData(DialogueData dialogueData)
         {
@@ -46,7 +47,8 @@ namespace PotikotTools.DialogueSystem
 
             IsDialogueStarted = true;
             _currentNodeData = _currentDialogueData.GetFirstNode();
-            
+            HandleNode(_currentNodeData);
+
             OnDialogueStarted?.Invoke();
             OnDialogueProgress?.Invoke(_currentNodeData);
         }
@@ -77,8 +79,9 @@ namespace PotikotTools.DialogueSystem
             if (_currentNodeData.HasOutputConnections)
             {
                 _currentNodeData = _currentNodeData.OutputConnections[choice].To;
+                HandleNode(_currentNodeData);
                 OnDialogueProgress?.Invoke(_currentNodeData);
-
+                
                 // all this in OnDialogueProgress callbacks
                 // update ui
                 // handle audio
@@ -88,6 +91,11 @@ namespace PotikotTools.DialogueSystem
             {
                 EndDialogue();
             }
+        }
+
+        private void HandleNode(NodeData node)
+        {
+            NodeHandlers.First(h => h.CanHandle(node)).Handle(node, this);
         }
     }
 }

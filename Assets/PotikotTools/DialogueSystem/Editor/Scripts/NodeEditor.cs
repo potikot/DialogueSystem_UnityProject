@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
-using UnityEngine;
 using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 namespace PotikotTools.DialogueSystem
 {
+
     public class NodeEditor : EditorWindow
     {
         private DialogueData _dialogueData;
@@ -34,11 +35,11 @@ namespace PotikotTools.DialogueSystem
             
             VisualElement c = new();
             
-            c.Add(new Button(() => Database.SaveDialogue(_dialogueData))
+            c.Add(new Button(() => EditorDatabase.SaveDialogue(_dialogueData))
             {
                 text = "Save Dialogue"
             });
-            c.Add(new Button(() => Database.LoadDialogue(_dialogueData.Id))
+            c.Add(new Button(() => Components.Database.GetDialogue(_dialogueData.Id))
             {
                 text = "Load Dialogue"
             });

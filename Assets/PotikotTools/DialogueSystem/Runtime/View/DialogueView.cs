@@ -4,7 +4,12 @@ using UnityEngine;
 
 namespace PotikotTools.DialogueSystem
 {
-    public class DialogueView : MonoBehaviour
+    public interface IDialogueView
+    {
+        
+    }
+    
+    public class DialogueView : MonoBehaviour, IDialogueView
     {
         [SerializeField] private DialogueController _controller;
 
@@ -18,7 +23,7 @@ namespace PotikotTools.DialogueSystem
         private List<ChoiceView> _choices;
 
         public bool IsEnabled { get; private set; }
-        
+
         public void Show()
         {
             if (IsEnabled) return;

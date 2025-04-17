@@ -1,0 +1,50 @@
+{
+  "LoadResourcesImmediately": false,
+  "Id": "TestDialogueSave",
+  "Nodes": [
+    {
+      "SpeakerIndex": -1,
+      "Text": "node 0",
+      "Commands": [],
+      "OutputConnections": [
+        {
+          "From": 0
+        }
+      ],
+      "Id": 0
+    },
+    {
+      "SpeakerIndex": -1,
+      "Text": "node 1",
+      "Commands": [],
+      "OutputConnections": [
+        {
+          "From": 1
+        }
+      ],
+      "Id": 1
+    },
+    {
+      "SpeakerIndex": -1,
+      "Text": "node 2",
+      "Commands": [],
+      "OutputConnections": [
+        {
+          "From": 2
+        }
+      ],
+      "Id": 2
+    },
+    {
+      "SpeakerIndex": -1,
+      "Text": "node 3",
+      "Commands": [],
+      "OutputConnections": [
+        {
+          "From": 3
+        }
+      ],
+      "Id": 3
+    }
+  ]
+}

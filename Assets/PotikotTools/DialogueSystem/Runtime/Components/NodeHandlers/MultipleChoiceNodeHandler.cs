@@ -1,8 +1,8 @@
 namespace PotikotTools.DialogueSystem
 {
-    public class SingleChoiceNodeHandler : INodeHandler
+    public class MultipleChoiceNodeHandler : INodeHandler
     {
-        public bool CanHandle(NodeData data) => data is SingleChoiceNodeData;
+        public bool CanHandle(NodeData data) => data is MultipleChoiceNodeData;
 
         public void Handle(NodeData data, DialogueController controller)
         {

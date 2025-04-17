@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -10,7 +12,10 @@ namespace PotikotTools.DialogueSystem
 
         public int SpeakerIndex;
         public string Text;
+        
+        public AudioClip AudioResource;
         public string AudioResourceName;
+        
         public List<CommandData> Commands;
 
         public ConnectionData InputConnection;
@@ -25,7 +30,6 @@ namespace PotikotTools.DialogueSystem
 
         public NodeData(int id)
         {
-            new DialogueController().NodeHandlers.Add(typeof(SingleChoiceNodeData), node => { });
             Id = id;
 
             SpeakerIndex = -1;
@@ -33,12 +37,24 @@ namespace PotikotTools.DialogueSystem
             Commands = new List<CommandData>();
         }
 
-        public string GetSpeakerName()
+        public virtual string GetSpeakerName()
         {
             if (DialogueData.TryGetSpeaker(SpeakerIndex, out SpeakerData speaker))
                 return speaker.Name;
 
             return null;
+        }
+
+        public virtual async Task LoadResources()
+        {
+            if (!string.IsNullOrEmpty(AudioResourceName))
+                AudioResource = await Components.Database.LoadResourceAsync<AudioClip>(DialogueData.Id, AudioResourceName);
+        }
+
+        public void ReleaseResources()
+        {
+            Resources.UnloadAsset(AudioResource);
+            DL.Log($"Loaded: {AudioResource.name}");
         }
     }
 }
