@@ -15,9 +15,9 @@ namespace PotikotTools.DialogueSystem
         public bool LoadResourcesImmediately;
         
         protected string _id;
-        protected List<NodeData> nodes;
+        public List<NodeData> nodes;
 
-        public string Id
+        [JsonIgnore] public string Id
         {
             get => _id;
             set
@@ -31,7 +31,9 @@ namespace PotikotTools.DialogueSystem
 
         [JsonIgnore] public bool IsResourcesLoaded { get; protected set; }
         
-        public IReadOnlyList<NodeData> Nodes => nodes;
+        [JsonIgnore] public IReadOnlyList<NodeData> Nodes => nodes;
+        
+        public DialogueData() { }
         
         public DialogueData(string id)
         {

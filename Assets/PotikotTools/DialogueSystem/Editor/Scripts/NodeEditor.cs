@@ -20,7 +20,7 @@ namespace PotikotTools.DialogueSystem
 
         private void OnEnable()
         {
-            _dialogueData = new DialogueData("Test Dialogue Graph")
+            _dialogueData = new DialogueData("tutorial_1")
             {
                 Speakers = new List<SpeakerData>
                 {

@@ -1,28 +1,31 @@
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace PotikotTools.DialogueSystem
 {
-    public interface IDialogueView
+    public class DialogueView : MonoBehaviour, IDialogueView, ITimerDialogueView
     {
-        
-    }
-    
-    public class DialogueView : MonoBehaviour, IDialogueView
-    {
-        [SerializeField] private DialogueController _controller;
-
         [SerializeField] private GameObject _container;
 
-        [SerializeField] private TextMeshProUGUI _text;
+        [SerializeField] private TextMeshProUGUI _label;
 
-        [SerializeField] private RectTransform _choiceContainer;
-        [SerializeField] private ChoiceView _choiceViewPrefab;
+        [SerializeField] private RectTransform _optionsContainer;
+        [SerializeField] private OptionView _optionViewPrefab;
 
-        private List<ChoiceView> _choices;
+        [SerializeField] private Image _timerImage;
+        
+        private List<OptionView> _options;
+        private Action<int> _onOptionSelected;
 
         public bool IsEnabled { get; private set; }
+
+        private void Awake()
+        {
+            _options = new List<OptionView>();
+        }
 
         public void Show()
         {
@@ -40,61 +43,62 @@ namespace PotikotTools.DialogueSystem
             _container.SetActive(false);
         }
 
-        public void SetController(DialogueController dialogueController)
+        public void SetText(string text)
         {
-            RemoveController();
-            
-            _controller = dialogueController;
-            
-            _controller.OnDialogueStarted += OnDialogueStarted;
-            _controller.OnDialogueEnded += OnDialogueEnded;
-            _controller.OnDialogueProgress += OnDialogueProgress;
+            _label.text = text;
         }
 
-        public void RemoveController()
+        public void SetOptions(string[] options)
         {
-            if (_controller == null)
+            if (options == null || options.Length == 0)
+            {
+                DestroyOptions();
                 return;
-
-            _controller.OnDialogueStarted -= OnDialogueStarted;
-            _controller.OnDialogueEnded -= OnDialogueEnded;
-            _controller.OnDialogueProgress -= OnDialogueProgress;
-        }
-
-        private void GenerateChoices(NodeData nodeData)
-        {
-            int choicesCount = nodeData.OutputConnections.Count;
-            int i = 0;
-
-            for (; i < choicesCount; i++)
-            {
-                if (_choices.Count <= i)
-                    _choices.Add(Instantiate(_choiceViewPrefab, _choiceContainer));
-                
-                _choices[i].Show();
-                _choices[i].SetData(nodeData.OutputConnections[i]);
             }
 
-            for (int j = i; j < _choices.Count; j++)
-            {
-                _choices[j].Hide();
-            }
+            GenereateOptions(options);
         }
         
-        private void OnDialogueStarted()
+        public void SetTimer(Timer timer)
         {
-            Show();
+            timer.OnTick += p => _timerImage.fillAmount = p;
         }
 
-        private void OnDialogueEnded()
+        public void OnOptionSelected(Action<int> callback)
         {
-            Hide();
+            _onOptionSelected = callback;
         }
 
-        private void OnDialogueProgress(NodeData nodeData)
+        
+        private void GenereateOptions(string[] options)
         {
-            _text.text = nodeData.Text;
-            GenerateChoices(nodeData);
+            int optionsCount = options.Length;
+            int i = 0;
+
+            for (; i < optionsCount; i++)
+            {
+                if (_options.Count <= i)
+                    _options.Add(Instantiate(_optionViewPrefab, _optionsContainer));
+                
+                int optionIndex = i;
+                _options[i].OnSelected(() => _onOptionSelected?.Invoke(optionIndex));
+                _options[i].Show();
+                _options[i].SetText(options[i]);
+            }
+
+            for (int j = i; j < _options.Count; j++)
+            {
+                _options[j].OnSelected(null);
+                _options[j].Hide();
+            }
+        }
+
+        private void DestroyOptions()
+        {
+            foreach (OptionView option in _options)
+                Destroy(option.gameObject);
+                
+            _options.Clear();
         }
     }
 }

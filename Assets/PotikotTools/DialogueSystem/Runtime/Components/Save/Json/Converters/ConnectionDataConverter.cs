@@ -28,18 +28,13 @@ namespace PotikotTools.DialogueSystem
             if (obj.TryGetValue("Text", out JToken text))
                 connectionData.Text = (string)text;
             
-            // TODO: get node by id
-            
-            if (obj.TryGetValue("From", out JToken from))
+            if (obj.TryGetValue("From", out JToken from)
+                && obj.TryGetValue("To", out JToken to))
             {
                 int fromId = (int)from;
-                // DL.Log("fromId: " + fromId);
-            }
-
-            if (obj.TryGetValue("To", out JToken to))
-            {
                 int toId = (int)to;
-                // DL.Log("toId: " + toId);
+
+                Components.NodeLinker.AddConnection(fromId, toId);
             }
 
             return connectionData;

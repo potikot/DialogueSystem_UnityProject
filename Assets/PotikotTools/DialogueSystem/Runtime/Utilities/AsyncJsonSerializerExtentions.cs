@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using PotikotTools.DialogueSystem;
 using UnityEngine;
 
 namespace Extensions.Newtonsoft.Json
@@ -26,7 +27,13 @@ namespace Extensions.Newtonsoft.Json
 
             using StreamReader reader = new(stream, Encoding.UTF8, true, 1024, true);
             using JsonTextReader jsonReader = new(reader);
-            return await Task.FromResult(serializer.Deserialize<T>(jsonReader));
+            T d = await Task.FromResult(serializer.Deserialize<T>(jsonReader));
+            if (d is DialogueData dialogueData)
+            {
+                DL.LogError(dialogueData.Id);
+                DL.LogError(dialogueData.Nodes.Count);
+            }
+            return d;
         }
 
         public static async Task<string> SerializeJsonAsync<T>(this T instance, JsonSerializer serializer)

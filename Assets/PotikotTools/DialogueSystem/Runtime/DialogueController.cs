@@ -12,13 +12,27 @@ namespace PotikotTools.DialogueSystem
         public event Action OnDialogueEnded;
         public event Action<NodeData> OnDialogueProgress;
         
-        private DialogueData _currentDialogueData;
+        private IDialogueView _dialogueView;
+        private DialogueData _dialogueData;
 
         private NodeData _currentNodeData;
 
         public bool IsDialogueStarted { get; private set; }
-        public List<INodeHandler> NodeHandlers = new();
 
+        public List<INodeHandler> NodeHandlers;
+
+        public void Initialize(DialogueData dialogueData, IDialogueView dialogueView)
+        {
+            _dialogueView = dialogueView;
+            SetDialogueData(dialogueData);
+
+            NodeHandlers = new List<INodeHandler>
+            {
+                new SingleChoiceNodeHandler(),
+                new MultipleChoiceNodeHandler()
+            };
+        }
+        
         public void SetDialogueData(DialogueData dialogueData)
         {
             if (dialogueData == null)
@@ -29,7 +43,7 @@ namespace PotikotTools.DialogueSystem
             if (IsDialogueStarted)
                 EndDialogue();
 
-            _currentDialogueData = dialogueData;
+            _dialogueData = dialogueData;
         }
 
         public void StartDialogue()
@@ -39,14 +53,16 @@ namespace PotikotTools.DialogueSystem
                 DL.LogError("Dialogue is already started");
                 return;
             }
-            if (_currentDialogueData == null)
+            if (_dialogueData == null)
             {
                 DL.LogError("Dialogue Data is null");
                 return;
             }
-
+            
+            DL.Log("Start Dialogue");
             IsDialogueStarted = true;
-            _currentNodeData = _currentDialogueData.GetFirstNode();
+            _dialogueView.Show();
+            _currentNodeData = _dialogueData.GetFirstNode();
             HandleNode(_currentNodeData);
 
             OnDialogueStarted?.Invoke();
@@ -67,6 +83,9 @@ namespace PotikotTools.DialogueSystem
                 return;
             }
             
+            DL.Log("End Dialogue");
+            _dialogueView.OnOptionSelected(null);
+            _dialogueView.Hide();
             IsDialogueStarted = false;
             OnDialogueEnded?.Invoke();
         }
@@ -78,6 +97,12 @@ namespace PotikotTools.DialogueSystem
 
             if (_currentNodeData.HasOutputConnections)
             {
+                if (_currentNodeData.OutputConnections[choice].To == null)
+                {
+                    EndDialogue();
+                    return;
+                }
+
                 _currentNodeData = _currentNodeData.OutputConnections[choice].To;
                 HandleNode(_currentNodeData);
                 OnDialogueProgress?.Invoke(_currentNodeData);
@@ -95,7 +120,7 @@ namespace PotikotTools.DialogueSystem
 
         private void HandleNode(NodeData node)
         {
-            NodeHandlers.First(h => h.CanHandle(node)).Handle(node, this);
+            NodeHandlers.First(h => h.CanHandle(node)).Handle(node, this, _dialogueView);
         }
     }
 }

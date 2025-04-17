@@ -1,0 +1,71 @@
+{
+  "Speakers": [
+    {
+      "Name": "Andrew"
+    },
+    {
+      "Name": "Lox"
+    }
+  ],
+  "LoadResourcesImmediately": false,
+  "_id": "Test Dialogue Graph",
+  "nodes": [
+    {
+      "$type": "PotikotTools.DialogueSystem.MultipleChoiceNodeData, Assembly-CSharp",
+      "SpeakerIndex": 0,
+      "Text": "Как дела?",
+      "Commands": [],
+      "OutputConnections": [
+        {
+          "Text": "Привет, да норм",
+          "From": 0,
+          "To": 2
+        },
+        {
+          "Text": "Да отвыли ты",
+          "From": 0,
+          "To": 3
+        }
+      ],
+      "Id": 0
+    },
+    {
+      "$type": "PotikotTools.DialogueSystem.SingleChoiceNodeData, Assembly-CSharp",
+      "SpeakerIndex": 0,
+      "Text": "Привет",
+      "Commands": [],
+      "OutputConnections": [
+        {
+          "From": 1,
+          "To": 0
+        }
+      ],
+      "Id": 1
+    },
+    {
+      "$type": "PotikotTools.DialogueSystem.SingleChoiceNodeData, Assembly-CSharp",
+      "SpeakerIndex": 0,
+      "Text": "О, кайф",
+      "Commands": [],
+      "OutputConnections": [
+        {
+          "From": 2
+        }
+      ],
+      "Id": 2
+    },
+    {
+      "$type": "PotikotTools.DialogueSystem.MultipleChoiceNodeData, Assembly-CSharp",
+      "SpeakerIndex": 0,
+      "Text": "Блин, да че ты такой грубый",
+      "Commands": [],
+      "OutputConnections": [
+        {
+          "Text": "Пока",
+          "From": 3
+        }
+      ],
+      "Id": 3
+    }
+  ]
+}

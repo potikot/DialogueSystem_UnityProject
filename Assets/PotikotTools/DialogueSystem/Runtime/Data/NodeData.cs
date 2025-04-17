@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace PotikotTools.DialogueSystem
 {
-    public class NodeData
+    public abstract class NodeData
     {
         public int Id { get; private set; }
 

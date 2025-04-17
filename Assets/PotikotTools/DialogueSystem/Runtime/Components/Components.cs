@@ -29,6 +29,8 @@ namespace PotikotTools.DialogueSystem
             }
         }
 
+        public static NodeLinker NodeLinker;
+        
         [InitializeOnLoadMethod]
         private static void Initialize()
         {

@@ -21,7 +21,8 @@ namespace PotikotTools.DialogueSystem
             {
                 Formatting = Formatting.Indented,
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                NullValueHandling = NullValueHandling.Ignore
+                NullValueHandling = NullValueHandling.Ignore,
+                TypeNameHandling = TypeNameHandling.Auto
             };
 
             _serializer.Converters.Add(new ConnectionDataConverter());
@@ -72,7 +73,7 @@ namespace PotikotTools.DialogueSystem
         public async Task<DialogueData> LoadAsync(string directory, string dialogueId)
         {
             string fullPath = Path.Combine(directory, dialogueId, GraphFilename);
-DL.Log(fullPath);
+
             using StreamReader sr = new(fullPath);
             string json = await sr.ReadToEndAsync();
             

@@ -97,8 +97,12 @@ namespace PotikotTools.DialogueSystem
         public virtual async Task<bool> LoadDialogueAsync(string dialogueId)
         {
             DL.Log("LoadDialogue " + dialogueId);
+            
+            Components.NodeLinker = new NodeLinker();
             DialogueData dialogueData = await loader.LoadAsync(rootPath, dialogueId);
-
+            Components.NodeLinker.SetConnections(dialogueData);
+            Components.NodeLinker = null;
+            
             if (dialogueData != null)
             {
                 DL.Log($"Dialogue data exist: {dialogueId}");
@@ -113,7 +117,11 @@ namespace PotikotTools.DialogueSystem
         public virtual bool LoadDialogue(string dialogueId)
         {
             DL.Log("LoadDialogue");
+            
+            Components.NodeLinker = new NodeLinker();
             DialogueData dialogueData = loader.Load(rootPath, dialogueId);
+            Components.NodeLinker.SetConnections(dialogueData);
+            Components.NodeLinker = null;
 
             if (dialogueData != null)
             {
