@@ -39,7 +39,8 @@
       "Id": 1
     },
     {
-      "$type": "PotikotTools.DialogueSystem.MultipleChoiceNodeData, Assembly-CSharp",
+      "$type": "PotikotTools.DialogueSystem.TimerNodeData, Assembly-CSharp",
+      "Duration": 5.0,
       "SpeakerIndex": -1,
       "Commands": [],
       "InputConnection": {

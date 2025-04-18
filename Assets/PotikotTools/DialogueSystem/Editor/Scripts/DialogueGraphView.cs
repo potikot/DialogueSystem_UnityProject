@@ -10,15 +10,25 @@ namespace PotikotTools.DialogueSystem
 {
     public class DialogueGraphView : GraphView
     {
-        protected DialogueData dialogueData;
-        
-        public DialogueGraphView(DialogueData dialogueData)
-        {
-            this.dialogueData = dialogueData;
+        protected EditorDialogueData editorData;
 
+        protected Dictionary<Type, Type> nodeTypes = new()
+        {
+            { typeof(SingleChoiceNodeData), typeof(SingleChoiceNodeView) },
+            { typeof(MultipleChoiceNodeData), typeof(MultipleChoiceNodeView) },
+            { typeof(TimerNodeView), typeof(TimerNodeView) }
+        };
+        
+        protected DialogueData Data => editorData.Data;
+
+        public EditorDialogueData EditorData => editorData;
+        
+        public DialogueGraphView(EditorDialogueData editorDialogueData)
+        {
             AddGridBackground();
             AddManipulators();
-            
+            AddNodes(editorDialogueData);
+
             this.AddStyles("DialogueGraph");
             
             graphViewChanged += HandleGraphViewChanged;
@@ -103,11 +113,52 @@ namespace PotikotTools.DialogueSystem
             where TData : NodeData
         {
             TView nodeView = Activator.CreateInstance<TView>();
-            nodeView.Initialize(dialogueData.AddNode<TData>(dataArgs));
+            EditorNodeData editorData = new EditorNodeData()
+            {
+                position = dropdownMenuAction.eventInfo.mousePosition
+            };
+            
+            nodeView.Initialize(editorData, Data.AddNode<TData>(dataArgs));
             nodeView.Draw();
-
+            
             AddElement(nodeView);
-            nodeView.SetPosition(new Rect(dropdownMenuAction.eventInfo.mousePosition, Vector2.zero));
+        }
+
+        private void AddNodes(EditorDialogueData editorDialogueData)
+        {
+            editorData = editorDialogueData;
+
+            int nodesCount = editorDialogueData.EditorNodeDataList.Count;
+            for (int i = 0; i < nodesCount; i++)
+            {
+                NodeData nodeData = editorDialogueData.Data.Nodes[i];
+                INodeView nodeView = Activator.CreateInstance(nodeTypes[nodeData.GetType()]) as INodeView;
+                nodeView.Initialize(editorDialogueData.EditorNodeDataList[i], nodeData);
+                nodeView.Draw();
+
+                Node node = nodeView as Node;
+                AddElement(node);
+            }
+            
+            foreach (Node fromNode in nodes)
+            {
+                INodeView fromNodeView = fromNode as INodeView;
+                NodeData fromNodeData = fromNodeView.GetData();
+                
+                for (int i = 0; i < fromNodeData.OutputConnections.Count; i++)
+                {
+                    NodeData toNodeData = fromNodeData.OutputConnections[i].To;
+                    if (toNodeData != null)
+                    {
+                        Node toNode = nodes.First(n => toNodeData.Id == (n as INodeView).GetData().Id);
+                        
+                        Port toPort = toNode.inputContainer.Q<Port>();
+                        Port fromPort = fromNode.outputContainer.Query<Port>().ToList()[i];
+
+                        AddElement(fromPort.ConnectTo(toPort));
+                    }
+                }
+            }
         }
         
         private void AddManipulators()

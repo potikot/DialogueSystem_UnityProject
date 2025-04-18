@@ -27,13 +27,7 @@ namespace Extensions.Newtonsoft.Json
 
             using StreamReader reader = new(stream, Encoding.UTF8, true, 1024, true);
             using JsonTextReader jsonReader = new(reader);
-            T d = await Task.FromResult(serializer.Deserialize<T>(jsonReader));
-            if (d is DialogueData dialogueData)
-            {
-                DL.LogError(dialogueData.Id);
-                DL.LogError(dialogueData.Nodes.Count);
-            }
-            return d;
+            return await Task.FromResult(serializer.Deserialize<T>(jsonReader));
         }
 
         public static async Task<string> SerializeJsonAsync<T>(this T instance, JsonSerializer serializer)

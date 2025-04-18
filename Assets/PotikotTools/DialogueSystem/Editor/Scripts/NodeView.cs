@@ -18,10 +18,13 @@ namespace PotikotTools.DialogueSystem
 
         public T Data => data;
 
-        public virtual void Initialize(NodeData nodeData)
+        public virtual void Initialize(EditorNodeData editorData, NodeData data)
         {
-            data = nodeData as T;
+            this.editorData = editorData;
+            this.data = data as T;
 
+            RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+            
             AddManipulators();
         }
 
@@ -42,6 +45,8 @@ namespace PotikotTools.DialogueSystem
                 return;
             }
 
+            SetPosition(new Rect(editorData.position, Vector2.zero));
+            
             title = "Dialogue Node";
 
             CreatePorts();
@@ -280,6 +285,11 @@ namespace PotikotTools.DialogueSystem
         }
         
         #endregion
+
+        protected virtual void OnGeometryChanged(GeometryChangedEvent evt)
+        {
+            editorData.position = evt.newRect.position;
+        }
         
         protected virtual void AddButtonCallback()
         {

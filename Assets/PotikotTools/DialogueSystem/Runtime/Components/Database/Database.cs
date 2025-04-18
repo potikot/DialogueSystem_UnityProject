@@ -107,6 +107,9 @@ namespace PotikotTools.DialogueSystem
             {
                 DL.Log($"Dialogue data exist: {dialogueId}");
                 dialogues.Add(dialogueId, dialogueData);
+                foreach (NodeData node in dialogueData.Nodes)
+                    node.DialogueData = dialogueData;
+                
                 return true;
             }
 
@@ -127,6 +130,9 @@ namespace PotikotTools.DialogueSystem
             {
                 DL.Log($"Dialogue data exist: {dialogueId}");
                 dialogues.Add(dialogueId, dialogueData);
+                foreach (NodeData node in dialogueData.Nodes)
+                    node.DialogueData = dialogueData;
+                
                 return true;
             }
 

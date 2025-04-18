@@ -11,6 +11,6 @@ namespace PotikotTools.DialogueSystem
     public interface IDialogueLoader
     {
         DialogueData Load(string directory, string dialogueId);
-        Task<DialogueData> LoadAsync(string directory, string dialogueId);
+        Task<DialogueData> LoadAsync(string directoryPath, string dialogueId);
     }
 }

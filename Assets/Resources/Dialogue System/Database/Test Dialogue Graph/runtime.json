@@ -19,12 +19,12 @@
         {
           "Text": "Привет, да норм",
           "From": 0,
-          "To": 2
+          "To": 3
         },
         {
           "Text": "Да отвыли ты",
           "From": 0,
-          "To": 3
+          "To": 2
         }
       ],
       "Id": 0
@@ -48,9 +48,7 @@
       "Text": "О, кайф",
       "Commands": [],
       "OutputConnections": [
-        {
-          "From": 2
-        }
+        {}
       ],
       "Id": 2
     },
@@ -61,8 +59,7 @@
       "Commands": [],
       "OutputConnections": [
         {
-          "Text": "Пока",
-          "From": 3
+          "Text": "Пока"
         }
       ],
       "Id": 3

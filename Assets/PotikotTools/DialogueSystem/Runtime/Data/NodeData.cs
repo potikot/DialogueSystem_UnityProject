@@ -18,7 +18,7 @@ namespace PotikotTools.DialogueSystem
         
         public List<CommandData> Commands;
 
-        public ConnectionData InputConnection;
+        [JsonIgnore] public ConnectionData InputConnection;
         public List<ConnectionData> OutputConnections;
         
         [JsonIgnore] public DialogueData DialogueData;

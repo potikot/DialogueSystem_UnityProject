@@ -4,22 +4,47 @@ namespace PotikotTools.DialogueSystem
 {
     public static class EditorDatabase
     {
-        private static IDialogueSaver _saver;
+        private static IEditorDialogueSaver _saver;
+        
         private static Database database => Components.Database;
 
         static EditorDatabase()
         {
-            _saver = new JsonDialogueSaverLoader();
+            _saver = new EditorJsonDialogueSaverLoader();
         }
         
-        public static async Task<bool> SaveDialogueAsync(DialogueData dialogue)
+        public static async Task<bool> SaveDialogueAsync(EditorDialogueData editorData)
         {
-            return await _saver.SaveAsync(database.RootPath, dialogue);
+            bool editorDataSaved = await _saver.SaveEditorDataAsync(database.RootPath, editorData);
+            bool runtimeDataSaved = await _saver.SaveAsync(database.RootPath, editorData.Data);
+            
+            return editorDataSaved && runtimeDataSaved;
+        }
+
+        public static bool SaveDialogue(EditorDialogueData editorData)
+        {
+            bool editorDataSaved = _saver.SaveEditorData(database.RootPath, editorData);
+            bool runtimeDataSaved = _saver.Save(database.RootPath, editorData.Data);
+            
+            return editorDataSaved && runtimeDataSaved;
+        }
+
+        public static async Task<EditorDialogueData> LoadDialogueAsync(string dialogueId)
+        {
+            EditorDialogueData editorData = await _saver.LoadEditorDataAsync(database.RootPath, dialogueId);
+            editorData.Data = await database.GetDialogueAsync(dialogueId);
+            editorData.GenerateEditorNodeDatas();
+            
+            return editorData;
         }
         
-        public static bool SaveDialogue(DialogueData dialogue)
+        public static EditorDialogueData LoadDialogue(string dialogueId)
         {
-            return _saver.Save(database.RootPath, dialogue);
+            EditorDialogueData editorData = _saver.LoadEditorData(database.RootPath, dialogueId);
+            editorData.Data = database.GetDialogue(dialogueId);
+            editorData.GenerateEditorNodeDatas();
+            
+            return editorData;
         }
     }
 }
