@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace PotikotTools.DialogueSystem
 {
-    public static class DS
+    public static class DialogueSystemAPI
     {
         public static DialogueController StartDialogue(string id, IDialogueView view) => StartDialogue(GetDialogue(id), view);
         

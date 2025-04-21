@@ -11,6 +11,6 @@ public class DialogueStarter : MonoBehaviour
     
     private void Start()
     {
-        DS.StartDialogue(_dialogueId, _dialogueView);
+        DialogueSystemAPI.StartDialogue(_dialogueId, _dialogueView);
     }
 }

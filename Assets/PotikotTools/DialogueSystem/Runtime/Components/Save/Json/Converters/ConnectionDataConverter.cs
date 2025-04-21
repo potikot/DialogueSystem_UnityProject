@@ -4,7 +4,6 @@ using Newtonsoft.Json.Linq;
 
 namespace PotikotTools.DialogueSystem
 {
-
     public class ConnectionDataConverter : JsonConverter<ConnectionData>
     {
         public override void WriteJson(JsonWriter writer, ConnectionData value, JsonSerializer serializer)
