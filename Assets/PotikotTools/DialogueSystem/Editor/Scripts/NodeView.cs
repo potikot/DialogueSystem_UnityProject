@@ -8,7 +8,7 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace PotikotTools.DialogueSystem
+namespace PotikotTools.DialogueSystem.Editor
 {
     public abstract class NodeView<T> : Node, INodeView
         where T : NodeData

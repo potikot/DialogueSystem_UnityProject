@@ -33,19 +33,6 @@ namespace PotikotTools.DialogueSystem
             };
         }
         
-        public void SetDialogueData(DialogueData dialogueData)
-        {
-            if (dialogueData == null)
-            {
-                DL.LogError("Dialogue Data is null");
-                return;
-            }
-            if (IsDialogueStarted)
-                EndDialogue();
-
-            _dialogueData = dialogueData;
-        }
-
         public void StartDialogue()
         {
             if (IsDialogueStarted)
@@ -118,6 +105,19 @@ namespace PotikotTools.DialogueSystem
             }
         }
 
+        private void SetDialogueData(DialogueData dialogueData)
+        {
+            if (dialogueData == null)
+            {
+                DL.LogError("Dialogue Data is null");
+                return;
+            }
+            if (IsDialogueStarted)
+                EndDialogue();
+
+            _dialogueData = dialogueData;
+        }
+        
         private void HandleNode(NodeData node)
         {
             NodeHandlers.First(h => h.CanHandle(node)).Handle(node, this, _dialogueView);

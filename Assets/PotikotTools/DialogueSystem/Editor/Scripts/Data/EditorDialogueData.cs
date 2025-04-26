@@ -2,49 +2,49 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using UnityEngine;
 
-namespace PotikotTools.DialogueSystem
+namespace PotikotTools.DialogueSystem.Editor
 {
     public class EditorDialogueData
     {
-        [JsonIgnore] public DialogueData Data;
+        [JsonIgnore] public DialogueData RuntimeData;
         public List<EditorNodeData> EditorNodeDataList;
 
         public EditorDialogueData() { }
         
-        public EditorDialogueData(DialogueData data)
+        public EditorDialogueData(DialogueData runtimeData)
         {
             // TODO: write func that calculates position of the node based on hierarchy
-            Data = data;
+            RuntimeData = runtimeData;
 
-            EditorNodeDataList = new List<EditorNodeData>(Data.Nodes.Count);
-            for (int i = 0; i < Data.Nodes.Count; i++)
+            EditorNodeDataList = new List<EditorNodeData>(RuntimeData.Nodes.Count);
+            for (int i = 0; i < RuntimeData.Nodes.Count; i++)
                 EditorNodeDataList.Add(new EditorNodeData());
         }
 
-        public EditorDialogueData(DialogueData data, List<EditorNodeData> editorNodeDataList)
+        public EditorDialogueData(DialogueData runtimeData, List<EditorNodeData> editorNodeDataList)
         {
-            if (data.Nodes.Count != editorNodeDataList.Count)
+            if (runtimeData.Nodes.Count != editorNodeDataList.Count)
             {
                 DL.LogWarning("Nodes count does not match");
                 GenerateEditorNodeDatas();
             }
             
-            Data = data;
+            RuntimeData = runtimeData;
             EditorNodeDataList = editorNodeDataList;
         }
 
         public void GenerateEditorNodeDatas()
         {
-            if (Data == null)
+            if (RuntimeData == null)
                 return;
 
             if (EditorNodeDataList == null)
             {
                 DL.LogWarning("EditorNodeDataList is null");
-                EditorNodeDataList = new List<EditorNodeData>(Data.Nodes.Count);
+                EditorNodeDataList = new List<EditorNodeData>(RuntimeData.Nodes.Count);
             }
             
-            int lackedCount = Data.Nodes.Count - EditorNodeDataList.Count;
+            int lackedCount = RuntimeData.Nodes.Count - EditorNodeDataList.Count;
             if (lackedCount < 0)
             {
                 lackedCount = Mathf.Abs(lackedCount);

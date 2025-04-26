@@ -1,5 +1,3 @@
-using System.Linq;
-
 namespace PotikotTools.DialogueSystem
 {
     public class SingleChoiceNodeHandler : INodeHandler

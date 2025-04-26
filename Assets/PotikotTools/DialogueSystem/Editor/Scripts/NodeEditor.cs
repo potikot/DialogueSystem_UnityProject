@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
-namespace PotikotTools.DialogueSystem
+namespace PotikotTools.DialogueSystem.Editor
 {
     public class NodeEditor : EditorWindow
     {

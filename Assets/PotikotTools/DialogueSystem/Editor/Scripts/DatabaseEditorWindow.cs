@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 
-namespace PotikotTools.DialogueSystem
+namespace PotikotTools.DialogueSystem.Editor
 {
     public class DatabaseEditorWindow : EditorWindow
     {

@@ -11,12 +11,12 @@ namespace PotikotTools.DialogueSystem
 {
     public class JsonDialogueSaverLoader : IDialogueSaver, IDialogueLoader
     {
-        protected const string GraphFilename = "runtime.json";
-        
-        static protected JsonSerializer serializer;
+        protected JsonSerializer serializer;
 
         public JsonDialogueSaverLoader()
         {
+            // TODO: initialize with preferences
+            
             serializer = new JsonSerializer
             {
                 Formatting = Formatting.Indented,
@@ -31,8 +31,8 @@ namespace PotikotTools.DialogueSystem
 
         public bool Save(string directoryPath, DialogueData dialogueData)
         {
-            string fullPath = Path.Combine(directoryPath, dialogueData.Id, GraphFilename);
-            
+            string fullPath = Path.Combine(directoryPath, dialogueData.Id, DialogueSystemPreferences.Data.RuntimeDataFilename);
+
             if (!Directory.Exists(directoryPath))
                 Directory.CreateDirectory(directoryPath);
 
@@ -47,7 +47,7 @@ namespace PotikotTools.DialogueSystem
         {
             await dialogueData.SerializeJsonAsync(serializer);
             
-            string fullPath = Path.Combine(directoryPath, dialogueData.Id, GraphFilename);
+            string fullPath = Path.Combine(directoryPath, dialogueData.Id, DialogueSystemPreferences.Data.RuntimeDataFilename);
 
             using (StreamWriter sw = new(fullPath))
                 using (JsonWriter jw = new JsonTextWriter(sw))
@@ -58,11 +58,11 @@ namespace PotikotTools.DialogueSystem
 
         public DialogueData Load(string directoryPath, string dialogueId)
         {
-            string fullPath = Path.Combine(directoryPath, dialogueId, GraphFilename);
+            string fullPath = Path.Combine(directoryPath, dialogueId, DialogueSystemPreferences.Data.RuntimeDataFilename);
 
             if (!File.Exists(fullPath))
             {
-                DL.LogError($"Can't find {GraphFilename}");
+                DL.LogError($"Can't find {DialogueSystemPreferences.Data.RuntimeDataFilename}");
                 return null;
             }
 
@@ -73,7 +73,7 @@ namespace PotikotTools.DialogueSystem
 
         public async Task<DialogueData> LoadAsync(string directoryPath, string dialogueId)
         {
-            string fullPath = Path.Combine(directoryPath, dialogueId, GraphFilename);
+            string fullPath = Path.Combine(directoryPath, dialogueId, DialogueSystemPreferences.Data.RuntimeDataFilename);
 
             using StreamReader sr = new(fullPath);
             string json = await sr.ReadToEndAsync();

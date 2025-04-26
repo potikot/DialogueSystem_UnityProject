@@ -2,11 +2,6 @@ using System;
 
 namespace PotikotTools.DialogueSystem
 {
-    public interface ITimerDialogueView
-    {
-        void SetTimer(Timer timer);
-    }
-    
     public interface IDialogueView
     {
         bool IsEnabled { get; }
@@ -18,5 +13,7 @@ namespace PotikotTools.DialogueSystem
         void SetOptions(string[] options);
         
         void OnOptionSelected(Action<int> callback);
+
+        T GetMenu<T>();
     }
 }

@@ -8,6 +8,8 @@ namespace PotikotTools.DialogueSystem
 {
     public class DialogueView : MonoBehaviour, IDialogueView, ITimerDialogueView
     {
+        [SerializeField] private MonoBehaviour[] _menus;
+        
         [SerializeField] private GameObject _container;
 
         [SerializeField] private TextMeshProUGUI _label;
@@ -69,6 +71,14 @@ namespace PotikotTools.DialogueSystem
             _onOptionSelected = callback;
         }
 
+        public T GetMenu<T>()
+        {
+            foreach (var menu in _menus)
+                if (menu is T castedMenu)
+                    return castedMenu;
+            
+            return default;
+        }
         
         private void GenereateOptions(string[] options)
         {

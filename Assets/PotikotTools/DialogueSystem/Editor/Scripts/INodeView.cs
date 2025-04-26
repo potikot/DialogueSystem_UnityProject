@@ -1,4 +1,4 @@
-namespace PotikotTools.DialogueSystem
+namespace PotikotTools.DialogueSystem.Editor
 {
     public interface INodeView
     {

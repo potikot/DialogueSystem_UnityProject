@@ -1,6 +1,6 @@
 using UnityEngine.UIElements;
 
-namespace PotikotTools.DialogueSystem
+namespace PotikotTools.DialogueSystem.Editor
 {
     public class TimerNodeView : NodeView<TimerNodeData>
     {

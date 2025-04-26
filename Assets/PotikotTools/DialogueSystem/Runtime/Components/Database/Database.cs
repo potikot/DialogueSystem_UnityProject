@@ -28,7 +28,7 @@ namespace PotikotTools.DialogueSystem
             isInitialized = true;
 
             loader = new JsonDialogueSaverLoader();
-            rootPath = Path.Combine(Application.dataPath, DialogueSystemPreferences.Preferences.DatabaseDirectory);
+            rootPath = Path.Combine(Application.dataPath, DialogueSystemPreferences.Data.DatabaseDirectory);
 
             tags = new Dictionary<string, List<string>>();
             dialogues = new Dictionary<string, DialogueData>();

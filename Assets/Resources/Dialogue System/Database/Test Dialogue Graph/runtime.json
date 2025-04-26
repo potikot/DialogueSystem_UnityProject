@@ -13,18 +13,17 @@
     {
       "$type": "PotikotTools.DialogueSystem.MultipleChoiceNodeData, Assembly-CSharp",
       "SpeakerIndex": 0,
+      "ListenerIndex": 0,
       "Text": "Как дела?",
       "Commands": [],
       "OutputConnections": [
         {
           "Text": "Привет, да норм",
-          "From": 0,
-          "To": 3
+          "To": 2
         },
         {
           "Text": "Да отвыли ты",
-          "From": 0,
-          "To": 2
+          "To": 3
         }
       ],
       "Id": 0
@@ -32,11 +31,11 @@
     {
       "$type": "PotikotTools.DialogueSystem.SingleChoiceNodeData, Assembly-CSharp",
       "SpeakerIndex": 0,
+      "ListenerIndex": 0,
       "Text": "Привет",
       "Commands": [],
       "OutputConnections": [
         {
-          "From": 1,
           "To": 0
         }
       ],
@@ -45,18 +44,18 @@
     {
       "$type": "PotikotTools.DialogueSystem.SingleChoiceNodeData, Assembly-CSharp",
       "SpeakerIndex": 0,
+      "ListenerIndex": 0,
       "Text": "О, кайф",
       "Commands": [],
       "OutputConnections": [
-        {
-          "To": 4
-        }
+        {}
       ],
       "Id": 2
     },
     {
       "$type": "PotikotTools.DialogueSystem.MultipleChoiceNodeData, Assembly-CSharp",
       "SpeakerIndex": 0,
+      "ListenerIndex": 0,
       "Text": "Блин, да че ты такой грубый",
       "Commands": [],
       "OutputConnections": [
@@ -65,17 +64,6 @@
         }
       ],
       "Id": 3
-    },
-    {
-      "$type": "PotikotTools.DialogueSystem.SingleChoiceNodeData, Assembly-CSharp",
-      "SpeakerIndex": -1,
-      "Commands": [],
-      "OutputConnections": [
-        {
-          "From": 4
-        }
-      ],
-      "Id": 4
     }
   ]
 }

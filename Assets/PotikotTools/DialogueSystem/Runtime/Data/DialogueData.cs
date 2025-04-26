@@ -15,7 +15,7 @@ namespace PotikotTools.DialogueSystem
         public bool LoadResourcesImmediately;
         
         [JsonRequired] protected string _id;
-        public List<NodeData> nodes;
+        [JsonRequired] protected List<NodeData> nodes;
 
         [JsonIgnore] public string Id
         {

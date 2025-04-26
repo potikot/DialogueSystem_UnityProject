@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Extensions.Newtonsoft.Json
 {
-	public static class JsonSerializerExtensions
+	public static class AsyncJsonSerializerExtensions
     {
         public static async Task<T> DeserializeJsonAsync<T>(this string data, JsonSerializer serializer)
         {

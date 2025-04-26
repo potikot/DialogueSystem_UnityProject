@@ -3,17 +3,15 @@ using System.Threading.Tasks;
 using Extensions.Newtonsoft.Json;
 using Newtonsoft.Json;
 
-namespace PotikotTools.DialogueSystem
+namespace PotikotTools.DialogueSystem.Editor
 {
     public class EditorJsonDialogueSaverLoader : JsonDialogueSaverLoader, IEditorDialogueSaver
     {
-        protected const string EditorGraphFilename = "editor.json";
-        
         public async Task<bool> SaveEditorDataAsync(string directoryPath, EditorDialogueData editorDialogueData)
         {
             await editorDialogueData.SerializeJsonAsync(serializer);
             
-            string fullPath = Path.Combine(directoryPath, editorDialogueData.Data.Id, EditorGraphFilename);
+            string fullPath = Path.Combine(directoryPath, editorDialogueData.RuntimeData.Id, DialogueSystemPreferences.Data.EditorDataFilename);
 
             using (StreamWriter sw = new(fullPath))
             using (JsonWriter jw = new JsonTextWriter(sw))
@@ -24,7 +22,7 @@ namespace PotikotTools.DialogueSystem
 
         public bool SaveEditorData(string directoryPath, EditorDialogueData editorDialogueData)
         {
-            string fullPath = Path.Combine(directoryPath, editorDialogueData.Data.Id, EditorGraphFilename);
+            string fullPath = Path.Combine(directoryPath, editorDialogueData.RuntimeData.Id, DialogueSystemPreferences.Data.EditorDataFilename);
             
             if (!Directory.Exists(directoryPath))
                 Directory.CreateDirectory(directoryPath);
@@ -38,7 +36,7 @@ namespace PotikotTools.DialogueSystem
 
         public async Task<EditorDialogueData> LoadEditorDataAsync(string directoryPath, string dialogueId)
         {
-            string fullPath = Path.Combine(directoryPath, dialogueId, EditorGraphFilename);
+            string fullPath = Path.Combine(directoryPath, dialogueId, DialogueSystemPreferences.Data.EditorDataFilename);
 
             using StreamReader sr = new(fullPath);
             string json = await sr.ReadToEndAsync();
@@ -48,11 +46,11 @@ namespace PotikotTools.DialogueSystem
 
         public EditorDialogueData LoadEditorData(string directoryPath, string dialogueId)
         {
-            string fullPath = Path.Combine(directoryPath, dialogueId, EditorGraphFilename);
+            string fullPath = Path.Combine(directoryPath, dialogueId, DialogueSystemPreferences.Data.EditorDataFilename);
 
             if (!File.Exists(fullPath))
             {
-                DL.LogError($"Can't find {EditorGraphFilename}");
+                DL.LogError($"Can't find {DialogueSystemPreferences.Data.EditorDataFilename}");
                 return null;
             }
 

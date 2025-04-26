@@ -6,7 +6,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace PotikotTools.DialogueSystem
+namespace PotikotTools.DialogueSystem.Editor
 {
     public class DialogueGraphView : GraphView
     {
@@ -19,7 +19,7 @@ namespace PotikotTools.DialogueSystem
             { typeof(TimerNodeView), typeof(TimerNodeView) }
         };
         
-        protected DialogueData Data => editorData.Data;
+        protected DialogueData RuntimeData => editorData.RuntimeData;
 
         public EditorDialogueData EditorData => editorData;
         
@@ -118,7 +118,7 @@ namespace PotikotTools.DialogueSystem
                 position = dropdownMenuAction.eventInfo.mousePosition
             };
             
-            nodeView.Initialize(editorData, Data.AddNode<TData>(dataArgs));
+            nodeView.Initialize(editorData, RuntimeData.AddNode<TData>(dataArgs));
             nodeView.Draw();
             
             AddElement(nodeView);
@@ -131,7 +131,7 @@ namespace PotikotTools.DialogueSystem
             int nodesCount = editorDialogueData.EditorNodeDataList.Count;
             for (int i = 0; i < nodesCount; i++)
             {
-                NodeData nodeData = editorDialogueData.Data.Nodes[i];
+                NodeData nodeData = editorDialogueData.RuntimeData.Nodes[i];
                 INodeView nodeView = Activator.CreateInstance(nodeTypes[nodeData.GetType()]) as INodeView;
                 nodeView.Initialize(editorDialogueData.EditorNodeDataList[i], nodeData);
                 nodeView.Draw();

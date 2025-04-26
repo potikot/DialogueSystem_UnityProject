@@ -11,6 +11,7 @@ namespace PotikotTools.DialogueSystem
         public int Id { get; private set; }
 
         public int SpeakerIndex;
+        public int ListenerIndex;
         public string Text;
         
         public AudioClip AudioResource;

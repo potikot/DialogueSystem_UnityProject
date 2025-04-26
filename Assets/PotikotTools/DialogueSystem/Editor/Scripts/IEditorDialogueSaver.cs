@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace PotikotTools.DialogueSystem
+namespace PotikotTools.DialogueSystem.Editor
 {
     public interface IEditorDialogueSaver : IDialogueSaver, IDialogueLoader
     {
