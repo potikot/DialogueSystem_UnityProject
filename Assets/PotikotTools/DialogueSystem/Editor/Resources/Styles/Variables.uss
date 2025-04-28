@@ -1,0 +1,16 @@
+:root
+{
+    --ds-node-editor-padding-5px: 5px;
+    --ds-node-editor-background-color: #3F3F3F;
+    
+    --ds-border-radius-5px: 5px;
+    --ds-border-radius-10px: 10px;
+    
+    --ds-border-width-1px: 1px;
+
+    --ds-button-color-selected: #707070;
+    --ds-button-color-unselected: #585858;
+    
+    /*--ds-border-color-selected: #6e6e6e;*/
+    --ds-border-color-default: #212121;
+}

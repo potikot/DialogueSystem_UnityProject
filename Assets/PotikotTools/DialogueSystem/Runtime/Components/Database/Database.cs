@@ -11,6 +11,7 @@ namespace PotikotTools.DialogueSystem
     {
         protected IDialogueLoader loader;
         protected string rootPath;
+        protected string relativeRootPath;
 
         protected Dictionary<string, List<string>> tags;
         protected Dictionary<string, DialogueData> dialogues;
@@ -19,8 +20,10 @@ namespace PotikotTools.DialogueSystem
         
         protected bool isInitialized = false;
 
+        public int DialoguesCount { get; private set; }
         public IDialogueLoader Loader => loader;
         public string RootPath => rootPath;
+        public string RelativeRootPath => relativeRootPath;
 
         public virtual void Initialize()
         {
@@ -29,7 +32,8 @@ namespace PotikotTools.DialogueSystem
 
             loader = new JsonDialogueSaverLoader();
             rootPath = Path.Combine(Application.dataPath, DialogueSystemPreferences.Data.DatabaseDirectory);
-
+            relativeRootPath = Path.Combine("Assets", DialogueSystemPreferences.Data.DatabaseDirectory);
+            
             tags = new Dictionary<string, List<string>>();
             dialogues = new Dictionary<string, DialogueData>();
 
@@ -47,10 +51,11 @@ namespace PotikotTools.DialogueSystem
             }
 
             string[] dialogueDirectories = Directory.GetDirectories(rootPath);
-
+            DialoguesCount = dialogueDirectories.Length;
+            
             foreach (string dialogueDirectory in dialogueDirectories)
             {
-                string tagsFilePath = Path.Combine(dialogueDirectory, "tags");
+                string tagsFilePath = Path.Combine(dialogueDirectory, "tags.txt");
 
                 if (File.Exists(tagsFilePath))
                 {
@@ -96,13 +101,11 @@ namespace PotikotTools.DialogueSystem
 
         public virtual async Task<bool> LoadDialogueAsync(string dialogueId)
         {
-            DL.Log("LoadDialogue " + dialogueId);
-            
             Components.NodeLinker = new NodeLinker();
             DialogueData dialogueData = await loader.LoadAsync(rootPath, dialogueId);
             Components.NodeLinker.SetConnections(dialogueData);
             Components.NodeLinker = null;
-            
+
             if (dialogueData != null)
             {
                 DL.Log($"Dialogue data exist: {dialogueId}");
@@ -119,8 +122,6 @@ namespace PotikotTools.DialogueSystem
 
         public virtual bool LoadDialogue(string dialogueId)
         {
-            DL.Log("LoadDialogue");
-            
             Components.NodeLinker = new NodeLinker();
             DialogueData dialogueData = loader.Load(rootPath, dialogueId);
             Components.NodeLinker.SetConnections(dialogueData);
@@ -128,7 +129,7 @@ namespace PotikotTools.DialogueSystem
 
             if (dialogueData != null)
             {
-                DL.Log($"Dialogue data exist: {dialogueId}");
+                DL.Log($"Dialogue data loaded: {dialogueId}");
                 dialogues.Add(dialogueId, dialogueData);
                 foreach (NodeData node in dialogueData.Nodes)
                     node.DialogueData = dialogueData;

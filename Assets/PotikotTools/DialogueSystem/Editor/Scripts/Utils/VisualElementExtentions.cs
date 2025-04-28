@@ -19,7 +19,7 @@ namespace PotikotTools.DialogueSystem
                 }
             };
             
-            tf.Children().First().Add(placeholderLabel);
+            tf.Children().Last().Add(placeholderLabel);
 
             tf.RegisterCallback<FocusInEvent>(evt => placeholderLabel.style.display = DisplayStyle.None);
             tf.RegisterCallback<FocusOutEvent>(evt =>

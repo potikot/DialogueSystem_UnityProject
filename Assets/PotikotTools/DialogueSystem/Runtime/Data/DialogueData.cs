@@ -16,31 +16,32 @@ namespace PotikotTools.DialogueSystem
         
         [JsonRequired] protected string _id;
         [JsonRequired] protected List<NodeData> nodes;
-
-        [JsonIgnore] public string Id
-        {
-            get => _id;
-            set
-            {
-                if (Components.Database.ContainsDialogue(value))
-                    return;
-
-                _id = value;
-            }
-        }
-
-        [JsonIgnore] public bool IsResourcesLoaded { get; protected set; }
         
+        [JsonIgnore] public string Id => _id;
         [JsonIgnore] public IReadOnlyList<NodeData> Nodes => nodes;
+        [JsonIgnore] public bool IsResourcesLoaded { get; protected set; }
         
         public DialogueData() { }
         
         public DialogueData(string id)
         {
-            Id = id;
+            if (!TrySetId(id))
+            {
+                // TODO: set unique id
+            }
+            
             nodes = new List<NodeData>();
         }
 
+        public bool TrySetId(string value)
+        {
+            if (Components.Database.ContainsDialogue(value))
+                return false;
+
+            _id = value;
+            return true;
+        }
+        
         public T AddNode<T>(params object[] args) where T : NodeData
         {
             if (args == null || args.Length == 0)

@@ -29,7 +29,7 @@ namespace PotikotTools.DialogueSystem.Editor
             AddManipulators();
             AddNodes(editorDialogueData);
 
-            this.AddStyles("DialogueGraph");
+            this.AddStyleSheets("Styles/DialogueGraph");
             
             graphViewChanged += HandleGraphViewChanged;
         }
@@ -128,12 +128,12 @@ namespace PotikotTools.DialogueSystem.Editor
         {
             editorData = editorDialogueData;
 
-            int nodesCount = editorDialogueData.EditorNodeDataList.Count;
+            int nodesCount = editorData.EditorNodeDataList.Count;
             for (int i = 0; i < nodesCount; i++)
             {
-                NodeData nodeData = editorDialogueData.RuntimeData.Nodes[i];
+                NodeData nodeData = editorData.RuntimeData.Nodes[i];
                 INodeView nodeView = Activator.CreateInstance(nodeTypes[nodeData.GetType()]) as INodeView;
-                nodeView.Initialize(editorDialogueData.EditorNodeDataList[i], nodeData);
+                nodeView.Initialize(editorData.EditorNodeDataList[i], nodeData);
                 nodeView.Draw();
 
                 Node node = nodeView as Node;

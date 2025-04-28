@@ -2,28 +2,36 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using PotikotTools.DialogueSystem.Editor;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.UIElements;
+using Button = UnityEngine.UIElements.Button;
 
 namespace PotikotTools.DialogueSystem
 {
     public class SearchEditorWindow : EditorWindow
     {
-        [MenuItem("Tools/DialogueSystem/Search Window")]
+        private const string _crossSymbol = "\u2715";
+
+        [MenuItem("Tools/DialogueSystem/Database")]
         public static void Open()
         {
             GetWindow<SearchEditorWindow>("Dialogue Database");
         }
-        
-        private void CreateGUI()
+
+        private async void CreateGUI()
         {
-            var c = new VisualElement();
-            c.Margin(5f, 10f);
+            var c = new VisualElement()
+                .AddStyleSheets(
+                    "Styles/SearchEditorWindow",
+                    "Styles/Variables"
+                ).AddUSSClasses("root-container");
 
             c.Add(CreateHeader());
-            c.Add(CreateBody());
+            c.Add(await CreateBody());
             
             rootVisualElement.Add(c);
         }
@@ -32,7 +40,8 @@ namespace PotikotTools.DialogueSystem
 
         private VisualElement CreateHeader()
         {
-            var c = new VisualElement();
+            var c = new VisualElement()
+                .AddUSSClasses("header");
             
             c.Add(CreateSearchBar());
             c.AddVerticalSpace(10f);
@@ -41,47 +50,22 @@ namespace PotikotTools.DialogueSystem
             
             return c;
         }
-        
+
         private VisualElement CreateSearchBar()
         {
-            var c = new VisualElement
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Row
-                }
-            };
-
-            c.BorderRadius(5f);
-            c.BorderWidth(1f);
-            c.BorderColor(Color.black);
-
-            var inputField = new TextField
-            {
-                style =
-                {
-                    flexGrow = 1f,
-                    borderLeftColor = Color.clear
-                }
-            };
+            var c = new VisualElement()
+                .AddUSSClasses("search-bar");
             
-            inputField.AddPlaceholder("Enter search text...");
-            inputField.Margin(0f);
-            inputField.BorderWidth(0f);
-            inputField.BorderRadius(5f, 0f);
-            
-            var textInput = inputField.Children().First();
-            textInput.BorderRadius(5f, 0f);
-            textInput.BorderColor(Color.clear);
+            var inputField = new TextField()
+                .AddUSSClasses("search-bar__input-field")
+                .AddPlaceholder("Enter search text...");
             
             var searchButton = new Button(() => DL.Log("Search"))
             {
                 text = "\\U0001F50D"
             };
-            
-            searchButton.Margin(0f);
-            searchButton.BorderWidth(0f);
-            searchButton.BorderRadius(0f, 5f);
+
+            searchButton.AddUSSClasses("search-bar__submit-button");
             
             c.Add(inputField);
             c.AddHorizontalSpace(1f, Color.black);
@@ -92,178 +76,220 @@ namespace PotikotTools.DialogueSystem
 
         private VisualElement CreateControlsBar() // TODO: naming
         {
-            var c = new VisualElement
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Row,
-                    justifyContent = Justify.SpaceBetween
-                }
-            };
-
-            // dialogue panel view options
-            
-            var dialoguePanelViewOptionsContainer = new VisualElement()
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Row
-                }
-            };
-
-            dialoguePanelViewOptionsContainer.BorderRadius(5f);
-            dialoguePanelViewOptionsContainer.BorderWidth(1f);
-            dialoguePanelViewOptionsContainer.BorderColor(Color.black);
-            
-            // panel view button
-            var panelViewOptionButton = new Button(() => DL.Log("Panel"))
-            {
-                text = "Panel",
-                style =
-                {
-                    borderTopRightRadius = 0f,
-                    borderBottomRightRadius = 0f,
-                }
-            };
-            
-            panelViewOptionButton.BorderWidth(0f);
-            panelViewOptionButton.Margin(0f);
-
-            // stroke view button
-            var strokeViewOptionButton = new Button(() => DL.Log("Stroke"))
-            {
-                text = "Stroke",
-                style =
-                {
-                    borderTopLeftRadius = 0f,
-                    borderBottomLeftRadius = 0f,
-                }
-            };
-            
-            strokeViewOptionButton.BorderWidth(0f);
-            strokeViewOptionButton.Margin(0f);
-
-            dialoguePanelViewOptionsContainer.Add(panelViewOptionButton);
-            dialoguePanelViewOptionsContainer.AddHorizontalSpace(1f, Color.black);
-            dialoguePanelViewOptionsContainer.Add(strokeViewOptionButton);
+            var c = new VisualElement()
+                .AddUSSClasses("controls-bar");
             
             // create dialogue button
 
-            var createDialogueButton = new Button(() => DL.Log("Create Dialogue"))
+            var createDialogueButton = new Button(CreateDialogueButtonCallback)
             {
                 text = "Create Dialogue"
             };
             
-            createDialogueButton.BorderRadius(5f);
-            createDialogueButton.BorderWidth(1f);
-            createDialogueButton.BorderColor(Color.black);
-            createDialogueButton.Margin(0f);
+            createDialogueButton.AddUSSClasses("create-dialogue-button");
             
-            c.Add(dialoguePanelViewOptionsContainer);
+            c.Add(CreateDialogueViewOptionSelector());
             c.Add(createDialogueButton);
+            
             return c;
         }
 
+        private VisualElement CreateDialogueViewOptionSelector()
+        {
+            var c = new VisualElement()
+                .AddUSSClasses("dialogue-view-options-selector");
+
+            var buttons = new List<Button>(2);
+            Action onClick = () =>
+            {
+                foreach (var button in buttons)
+                    button.RemoveUSSClasses("dialogue-view-options-selector__button--selected");
+            };
+
+            // panel view button
+            var panelViewOptionButton = CreateDialogueViewOptionButton(onClick, "dialogue-view-options-selector__panel-button");
+            panelViewOptionButton.text = "Panel";
+
+            // stroke view button
+            var strokeViewOptionButton = CreateDialogueViewOptionButton(onClick, "dialogue-view-options-selector__stroke-button");
+            strokeViewOptionButton.text = "Stroke";
+
+            buttons.Add(panelViewOptionButton);
+            buttons.Add(strokeViewOptionButton);
+
+            c.Add(panelViewOptionButton);
+            c.AddHorizontalSpace(1f, Color.black);
+            c.Add(strokeViewOptionButton);
+
+            return c;
+        }
+        
+        private Button CreateDialogueViewOptionButton(Action onClick, string classSelector)
+        {
+            var button = new Button();
+            
+            button.clicked += () =>
+            {
+                DL.Log("Clicked");
+                onClick?.Invoke();
+                DialogueViewOptionButtonCallback(button, 0);
+            };
+            
+            return button.AddUSSClasses(
+                "dialogue-view-options-selector__button",
+                classSelector
+            );
+        }
+        
         #endregion
 
         #region Body
 
-        private VisualElement CreateBody()
+        private async Task<VisualElement> CreateBody()
         {
-            var c = new VisualElement();
+            var c = new ScrollView()
+                .AddUSSClasses("dialogue-views-container");
 
-            c.Add(CreateDialoguePanel(new EditorDialogueData(new DialogueData("Test"))));
+            var dialogues = await EditorDatabase.LoadAllDialoguesAsync();
+
+            foreach (var dialogue in dialogues)
+            {
+                c.Add(CreateDialoguePanel(dialogue));
+                c.AddVerticalSpace(10f);
+            }
             
             return c;
         }
 
-        private VisualElement CreateDialoguePanel(EditorDialogueData editorData)
+        private VisualElement CreateDialoguePanel(EditorDialogueData editorDialogueData)
         {
-            var c = new VisualElement();
-            
-            c.BorderRadius(5f);
-            c.BorderWidth(1f);
-            c.BorderColor(Color.black);
+            var c = new VisualElement()
+                .AddUSSClasses("dialogue-view");
 
             // delete dialogue button
             
-            var deleteButton = new Button(() => DL.Log($"Delete Dialogue: {editorData.RuntimeData.Id}"))
+            var deleteButton = new Button(() => DeleteDialogueButtonCallback(editorDialogueData))
             {
-                text = "x",
+                text = _crossSymbol
             };
             
-            deleteButton.style.alignSelf = Align.FlexEnd;
-
+            deleteButton.AddUSSClasses(
+                "dialogue-view__button",
+                "dialogue-view__delete-button"
+            );
+            
             // name input
             
-            var nameInputField = new TextField()
+            var nameInputField = new TextField("Name")
             {
-                value = editorData.RuntimeData.Id
+                value = editorDialogueData.Id,
+                isDelayed = true
             };
             
-            nameInputField.AddPlaceholder("Enter name...");
+            nameInputField.AddUSSClasses(
+                "dialogue-view__input-field",
+                "dialogue-view__name-input-field"
+            ).AddPlaceholder("Enter name...");
+
+            nameInputField.RegisterValueChangedCallback(async evt =>
+            {
+                if (!await editorDialogueData.TrySetId(evt.newValue.Trim()))
+                    nameInputField.SetValueWithoutNotify(editorDialogueData.Id);
+
+                nameInputField.RemoveUSSClasses("dialogue-view__input-field--focused");
+            });
+            
+            nameInputField.RegisterCallback<FocusInEvent>(evt =>
+            {
+                nameInputField.AddUSSClasses("dialogue-view__input-field--focused");
+            });
+            nameInputField.RegisterCallback<FocusOutEvent>(evt =>
+            {
+                nameInputField.RemoveUSSClasses("dialogue-view__input-field--focused");
+            });
             
             // description input
             
-            var descriptionInputField = new TextField()
+            var descriptionInputField = new TextField("Description")
             {
-                value = "",
-                multiline = true
+                value = editorDialogueData.Description,
+                // multiline = true
             };
+
+            descriptionInputField.AddUSSClasses(
+                "dialogue-view__input-field",
+                "dialogue-view__description-input-field"
+            ).AddPlaceholder("Enter description...");
             
-            descriptionInputField.AddPlaceholder("Enter description...");
+            descriptionInputField.RegisterCallback<FocusInEvent>(evt =>
+                descriptionInputField.AddUSSClasses("dialogue-view__input-field--focused"));
+            descriptionInputField.RegisterCallback<FocusOutEvent>(evt =>
+                descriptionInputField.RemoveUSSClasses("dialogue-view__input-field--focused"));
             
-            c.Add(deleteButton);
-            c.Add(nameInputField);
+            var header = new VisualElement()
+                .AddUSSClasses("dialogue-view__header");
+            
+            header.Add(nameInputField);
+            header.Add(deleteButton);
+            
+            c.Add(header);
             c.Add(descriptionInputField);
-            c.Add(CreateDialoguePanelFooter());
+            c.Add(CreateDialoguePanelFooter(editorDialogueData));
             
             return c;
         }
 
-        private VisualElement CreateDialoguePanelFooter()
+        private VisualElement CreateDialoguePanelFooter(EditorDialogueData editorDialogueData)
         {
             var c = new VisualElement()
-            {
-                style =
-                {
-                    height = 100f,
-                }
-            };
-
-            var tagsContainer = new VisualElement()
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Row,
-                }
-            };
+                .AddUSSClasses("dialogue-view__footer");
             
-            tagsContainer.Add(CreateTag("Tag 1"));
-            tagsContainer.AddHorizontalSpace(10f);
-            tagsContainer.Add(CreateTag("Tag 2"));
-            tagsContainer.AddHorizontalSpace(10f);
-            tagsContainer.Add(CreateTag("Tag 3"));
+            // edit dialogue button
 
-            c.Add(tagsContainer);
+            var editDialogueButton = new Button(() => NodeEditorWindow.Open(editorDialogueData))
+            {
+                text = "Open in node editor"
+            };
+
+            editDialogueButton.AddUSSClasses(
+                "dialogue-view__button",
+                "dialogue-view__edit-dialogue-button"
+            );
+
+            c.Add(CreateTagsContainer(editorDialogueData.RuntimeData.Tags));
+            c.Add(editDialogueButton);
+            
+            return c;
+        }
+
+        private VisualElement CreateTagsContainer(string[] tags)
+        {
+            // tags container
+            
+            var c = new VisualElement()
+                .AddUSSClasses("dialogue-view__tags-container");
+            
+            float spaceWidth = 10f;
+
+            if (tags != null)
+            {
+                for (var i = 0; i < tags.Length; i++)
+                {
+                    c.Add(CreateTag(tags[i]));
+                    c.AddHorizontalSpace(spaceWidth);
+                }
+            }
+
+            c.Add(CreateAddTagButton(c));
             
             return c;
         }
         
         private VisualElement CreateTag(string text)
         {
-            var c = new VisualElement()
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Row
-                }
-            };
+            var c = new VisualElement();
+            c.AddToClassList("dialogue-view__tag");
             
-            c.BorderRadius(5f);
-            c.BorderWidth(1f);
-            c.BorderColor(Color.black);
-
             // input field
             
             var inputField = new TextField()
@@ -271,38 +297,75 @@ namespace PotikotTools.DialogueSystem
                 value = text
             };
             
-            inputField.Margin(0f);
-            inputField.BorderWidth(0f);
-            inputField.BorderRadius(5f, 0f);
-            
-            var textInput = inputField.Children().First();
-            textInput.BorderRadius(5f, 0f);
-            textInput.BorderColor(Color.clear);
-            textInput.style.backgroundColor = Color.clear;
-            
             // delete button
 
             var deleteButon = new Button(() => DL.Log($"Delete Tag: {text}"))
             {
-                text = "x",
-                style =
-                {
-                    display = DisplayStyle.None,
-                    backgroundColor = Color.clear
-                }
+                text = _crossSymbol
             };
-            
-            deleteButon.BorderColor(Color.clear);
+
+            deleteButon.AddUSSClasses(
+                "dialogue-view__button",
+                "dialogue-view__tag__delete-button"
+            );
             
             c.Add(inputField);
             c.Add(deleteButon);
             
-            c.RegisterCallback<PointerEnterEvent>(evt => deleteButon.style.display = DisplayStyle.Flex);
-            c.RegisterCallback<PointerLeaveEvent>(evt => deleteButon.style.display = DisplayStyle.None);
-            
             return c;
+        }
+
+        private VisualElement CreateAddTagButton(VisualElement tagsContainer)
+        {
+            var button = new Button(() => AddTag(tagsContainer))
+            {
+                text = "+"
+            };
+            
+            button.AddUSSClasses(
+                "dialogue-view__button",
+                "dialogue-view__tags-container__add-button"
+            );
+            
+            return button;
+        }
+        
+        private void AddTag(VisualElement tagsContainer)
+        {
+            int index = tagsContainer.childCount - 1;
+            
+            var tag = CreateTag("New Tag");
+            tagsContainer.Insert(index, tag);
+            
+            tagsContainer.Insert(index + 1, new VisualElement()
+            {
+                style =
+                {
+                    width = 10f
+                }
+            });
+
+            tag.Q<TextField>().Focus();
         }
         
         #endregion
+        
+        // callbacks
+
+        private void DialogueViewOptionButtonCallback(Button button, int option)
+        {
+            button.AddUSSClasses("dialogue-view-options-selector__button--selected");
+        }
+        
+        private void CreateDialogueButtonCallback()
+        {
+            EditorDatabase.CreateDialogue("New Dialogue");
+        }
+        
+        private void DeleteDialogueButtonCallback(EditorDialogueData editorDialogueData)
+        {
+            if (EditorUtility.DisplayDialog($"Delete dialogue", $"Are you really want to delete dialogue: \"{editorDialogueData.Id}\"?", "Yes", "No"))
+                EditorDatabase.DeleteDialogue(editorDialogueData.Id);
+        }
     }
 }

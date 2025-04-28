@@ -1,0 +1,5 @@
+.body
+{
+    padding: var(--ds-node-editor-padding-5px);
+    background-color: var(--ds-node-editor-background-color);
+}

@@ -1,0 +1,282 @@
+/* Root */
+
+.root-container
+{
+    margin: 5px 10px 5px 10px;
+}
+
+/* Header */
+
+.header
+{
+    min-height: 60px;
+}
+
+/* Search Bar */
+
+.search-bar
+{
+    flex-direction: row;
+    
+    border-radius: var(--ds-border-radius-5px);
+    border-width: var(--ds-border-width-1px);
+    border-color: var(--ds-border-color-default);
+}
+
+.search-bar__input-field
+{
+    margin: 0px;
+    
+    flex-grow: 1;
+    
+    border-radius: var(--ds-border-radius-5px) 0px 0px var(--ds-border-radius-5px);
+    border-color: transparent;
+}
+
+.search-bar__input-field > TextInput
+{
+    border-radius: var(--ds-border-radius-5px) 0px 0px var(--ds-border-radius-5px);
+    border-color: transparent;
+}
+
+.search-bar__submit-button
+{
+    margin: 0px;
+    
+    border-radius: 0px var(--ds-border-radius-5px) var(--ds-border-radius-5px) 0px;
+    border-color: transparent;
+}
+
+/* Controls Bar */
+
+.controls-bar
+{
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.dialogue-view-options-selector
+{
+    flex-direction: row;
+    
+    border-radius: var(--ds-border-radius-5px);
+    border-width: var(--ds-border-width-1px);
+    border-color: var(--ds-border-color-default);
+}
+
+.dialogue-view-options-selector__button
+{
+    margin: 0px;
+    border-color: transparent;
+}
+
+.dialogue-view-options-selector__button:hover
+{
+    background-color: var(--ds-button-color-selected);
+}
+
+.dialogue-view-options-selector__button--selected
+{
+    background-color: var(--ds-button-color-selected);
+}
+
+.dialogue-view-options-selector__button--selected:hover
+{
+    background-color: var(--ds-button-color-selected);
+}
+
+.dialogue-view-options-selector__panel-button
+{
+    border-radius: var(--ds-border-radius-5px) 0px 0px var(--ds-border-radius-5px);
+}
+
+.dialogue-view-options-selector__stroke-button
+{
+    border-radius: 0px var(--ds-border-radius-5px) var(--ds-border-radius-5px) 0px;
+}
+
+.create-dialogue-button
+{
+    margin: 0px;
+    
+    border-radius: var(--ds-border-radius-5px);
+    border-width: var(--ds-border-width-1px);
+    border-color: var(--ds-border-color-default);
+}
+
+/* Body */
+
+.body
+{
+
+}
+
+/* General Dialogue Panel View */
+
+.dialogue-view
+{
+    padding: 5px;
+    
+    width: 100%;
+    
+    border-radius: var(--ds-border-radius-5px);
+    border-width: var(--ds-border-width-1px);
+    border-color: var(--ds-border-color-default);
+}
+
+.dialogue-view__header
+{
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.dialogue-view__button
+{
+    margin: 0px;
+    padding: 0px;
+
+    border-radius: var(--ds-border-radius-5px);
+    border-width: var(--ds-border-width-1px);
+    border-color: var(--ds-border-color-default);
+}
+
+.dialogue-view__delete-button
+{
+    align-self: flex-end;
+
+    min-height: 25px;
+    min-width: 25px;
+
+    border-radius: 15px;
+}
+
+.dialogue-view__input-field
+{
+    margin: 0px;
+    margin-top: 3px;
+}
+
+.dialogue-view__input-field > TextInput
+{
+    background-color: transparent;
+    border-color: transparent;
+}
+
+.dialogue-view__input-field--focused > TextInput
+{
+    background-color: #2A2A2A;
+    border-color: #212121;
+}
+
+/* Name Input Field */
+
+.dialogue-view__name-input-field > TextInput
+{
+    min-width: 100px;
+    max-width: 600px;
+}
+
+/* Description Input Field */
+
+.dialogue-view__description-input-field > TextInput
+{
+    min-width: 200px;
+    max-width: 80%;
+}
+
+/* Footer */
+
+.dialogue-view__footer
+{
+    margin-top: 5px;
+    
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+/* Edit Dialogue Button */
+
+.dialogue-view__edit-dialogue-button
+{
+    padding-left: 3px;
+    padding-right: 3px;
+}
+
+/* Tags View */
+
+.dialogue-view__tags-container
+{
+    flex-direction: row;
+}
+
+.dialogue-view__tags-container__add-button
+{
+    min-width: 20px;
+    min-height: 20px;
+    
+    border-radius: 10px;
+}
+
+.dialogue-view__tag
+{
+    flex-grow: 0;
+    flex-direction: row;
+
+    padding-left: 3px;
+    padding-right: 3px;
+    
+    border-radius: var(--ds-border-radius-10px);
+    border-width: var(--ds-border-width-1px);
+    border-color: var(--ds-border-color-default);
+}
+
+.dialogue-view__tag:hover
+{
+    background-color: #2A2A2A;
+}
+
+.dialogue-view__tag > TextField
+{
+    margin: 0px;
+    
+    border-width: 0px;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+.dialogue-view__tag > TextField > TextInput
+{
+    background-color: transparent;
+    
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    border-color: transparent;
+}
+
+.dialogue-view__tag > TextField > TextInput > TextElement
+{
+    cursor: text;
+}
+
+.dialogue-view__tag__delete-button
+{
+    display: none;
+
+    padding-left: 3px;
+    padding-right: 3px;
+    
+    background-color: transparent;
+    border-color: transparent;
+}
+
+
+.dialogue-view__tag:hover > .dialogue-view__tag__delete-button
+{
+    display: flex;
+    
+    transition-delay: .3s;
+}
