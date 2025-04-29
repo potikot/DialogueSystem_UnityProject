@@ -1,4 +1,5 @@
 using UnityEditor;
+using UnityEngine;
 
 namespace PotikotTools.DialogueSystem
 {
@@ -29,7 +30,9 @@ namespace PotikotTools.DialogueSystem
             }
         }
 
-        public static NodeLinker NodeLinker;
+        private static NodeLinker _nodeLinker;
+
+        public static NodeLinker NodeLinker => _nodeLinker ??= new NodeLinker();
         
         [InitializeOnLoadMethod]
         private static void Initialize()

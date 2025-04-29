@@ -38,5 +38,10 @@ namespace PotikotTools.DialogueSystem
                 }
             }
         }
+
+        public void Clear()
+        {
+            _connections.Clear();
+        }
     }
 }

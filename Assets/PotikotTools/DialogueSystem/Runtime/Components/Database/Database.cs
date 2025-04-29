@@ -115,11 +115,9 @@ namespace PotikotTools.DialogueSystem
 
         public virtual async Task<bool> LoadDialogueAsync(string dialogueId)
         {
-            Components.NodeLinker = new NodeLinker();
             DialogueData dialogueData = await loader.LoadAsync(rootPath, dialogueId);
-            DL.Log(dialogueId + " " + Components.NodeLinker);
             Components.NodeLinker.SetConnections(dialogueData);
-            Components.NodeLinker = null;
+            Components.NodeLinker.Clear();
 
             if (dialogueData != null)
             {
@@ -136,10 +134,9 @@ namespace PotikotTools.DialogueSystem
 
         public virtual bool LoadDialogue(string dialogueId)
         {
-            Components.NodeLinker = new NodeLinker();
             DialogueData dialogueData = loader.Load(rootPath, dialogueId);
             Components.NodeLinker.SetConnections(dialogueData);
-            Components.NodeLinker = null;
+            Components.NodeLinker.Clear();
 
             if (dialogueData != null)
             {
