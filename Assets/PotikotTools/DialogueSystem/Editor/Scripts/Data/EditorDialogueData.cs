@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -14,30 +15,30 @@ namespace PotikotTools.DialogueSystem.Editor
         public List<EditorNodeData> EditorNodeDataList;
         [JsonIgnore] public DialogueData RuntimeData;
 
-        public string Id => RuntimeData.Id;
+        [JsonIgnore] public string Id => RuntimeData.Id;
         
         public EditorDialogueData() { }
         
-        public EditorDialogueData(DialogueData runtimeData)
-        {
-            // TODO: write func that calculates position of the node based on hierarchy
-            RuntimeData = runtimeData;
-
-            EditorNodeDataList = new List<EditorNodeData>(RuntimeData.Nodes.Count);
-            for (int i = 0; i < RuntimeData.Nodes.Count; i++)
-                EditorNodeDataList.Add(new EditorNodeData());
-        }
+        public EditorDialogueData(DialogueData runtimeData) : this(runtimeData, null) { }
 
         public EditorDialogueData(DialogueData runtimeData, List<EditorNodeData> editorNodeDataList)
         {
-            if (runtimeData.Nodes.Count != editorNodeDataList.Count)
+            if (runtimeData == null)
+            {
+                DL.LogError($"{nameof(runtimeData)} is null");
+                return;
+            }
+
+            RuntimeData = runtimeData;
+            EditorNodeDataList = editorNodeDataList;
+            
+            if (EditorNodeDataList == null)
+                GenerateEditorNodeDatas();
+            else if (runtimeData.Nodes.Count != editorNodeDataList.Count)
             {
                 DL.LogWarning("Nodes count does not match");
                 GenerateEditorNodeDatas();
             }
-            
-            RuntimeData = runtimeData;
-            EditorNodeDataList = editorNodeDataList;
         }
 
         public async Task<bool> TrySetId(string value)
@@ -63,14 +64,16 @@ namespace PotikotTools.DialogueSystem.Editor
 
         public void GenerateEditorNodeDatas()
         {
+            // TODO: write func that calculates position of the node based on hierarchy
+
             if (RuntimeData == null)
+            {
+                DL.LogError($"{nameof(RuntimeData)} is null");
                 return;
+            }
 
             if (EditorNodeDataList == null)
-            {
-                DL.LogWarning("EditorNodeDataList is null");
                 EditorNodeDataList = new List<EditorNodeData>(RuntimeData.Nodes.Count);
-            }
             
             int lackedCount = RuntimeData.Nodes.Count - EditorNodeDataList.Count;
             if (lackedCount < 0)

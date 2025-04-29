@@ -10,12 +10,17 @@ using UnityEngine.UI;
 using UnityEngine.UIElements;
 using Button = UnityEngine.UIElements.Button;
 
+// TODO: spaces after new dialogue panels
+// TODO: update window on dialogue panel deletion
+
 namespace PotikotTools.DialogueSystem
 {
     public class SearchEditorWindow : EditorWindow
     {
         private const string _crossSymbol = "\u2715";
 
+        private VisualElement _dialoguesContainer;
+        
         [MenuItem("Tools/DialogueSystem/Database")]
         public static void Open()
         {
@@ -81,11 +86,11 @@ namespace PotikotTools.DialogueSystem
             
             // create dialogue button
 
-            var createDialogueButton = new Button(CreateDialogueButtonCallback)
+            var createDialogueButton = new Button()
             {
                 text = "Create Dialogue"
             };
-            
+            createDialogueButton.clicked += () => CreateDialogueButtonCallback(createDialogueButton);
             createDialogueButton.AddUSSClasses("create-dialogue-button");
             
             c.Add(CreateDialogueViewOptionSelector());
@@ -147,18 +152,18 @@ namespace PotikotTools.DialogueSystem
 
         private async Task<VisualElement> CreateBody()
         {
-            var c = new ScrollView()
+            _dialoguesContainer = new ScrollView()
                 .AddUSSClasses("dialogue-views-container");
 
             var dialogues = await EditorDatabase.LoadAllDialoguesAsync();
 
             foreach (var dialogue in dialogues)
             {
-                c.Add(CreateDialoguePanel(dialogue));
-                c.AddVerticalSpace(10f);
+                _dialoguesContainer.Add(CreateDialoguePanel(dialogue));
+                _dialoguesContainer.AddVerticalSpace(10f);
             }
             
-            return c;
+            return _dialoguesContainer;
         }
 
         private VisualElement CreateDialoguePanel(EditorDialogueData editorDialogueData)
@@ -185,9 +190,9 @@ namespace PotikotTools.DialogueSystem
                 value = editorDialogueData.Id,
                 isDelayed = true
             };
-            
+
             nameInputField.AddUSSClasses(
-                "dialogue-view__input-field",
+                "dialogue-view__text-input-field",
                 "dialogue-view__name-input-field"
             ).AddPlaceholder("Enter name...");
 
@@ -196,17 +201,13 @@ namespace PotikotTools.DialogueSystem
                 if (!await editorDialogueData.TrySetId(evt.newValue.Trim()))
                     nameInputField.SetValueWithoutNotify(editorDialogueData.Id);
 
-                nameInputField.RemoveUSSClasses("dialogue-view__input-field--focused");
+                nameInputField.RemoveUSSClasses("dialogue-view__text-input-field--focused");
             });
             
             nameInputField.RegisterCallback<FocusInEvent>(evt =>
-            {
-                nameInputField.AddUSSClasses("dialogue-view__input-field--focused");
-            });
+                nameInputField.AddUSSClasses("dialogue-view__text-input-field--focused"));
             nameInputField.RegisterCallback<FocusOutEvent>(evt =>
-            {
-                nameInputField.RemoveUSSClasses("dialogue-view__input-field--focused");
-            });
+                nameInputField.RemoveUSSClasses("dialogue-view__text-input-field--focused"));
             
             // description input
             
@@ -217,14 +218,14 @@ namespace PotikotTools.DialogueSystem
             };
 
             descriptionInputField.AddUSSClasses(
-                "dialogue-view__input-field",
+                "dialogue-view__text-input-field",
                 "dialogue-view__description-input-field"
             ).AddPlaceholder("Enter description...");
             
             descriptionInputField.RegisterCallback<FocusInEvent>(evt =>
-                descriptionInputField.AddUSSClasses("dialogue-view__input-field--focused"));
+                descriptionInputField.AddUSSClasses("dialogue-view__text-input-field--focused"));
             descriptionInputField.RegisterCallback<FocusOutEvent>(evt =>
-                descriptionInputField.RemoveUSSClasses("dialogue-view__input-field--focused"));
+                descriptionInputField.RemoveUSSClasses("dialogue-view__text-input-field--focused"));
             
             var header = new VisualElement()
                 .AddUSSClasses("dialogue-view__header");
@@ -256,37 +257,39 @@ namespace PotikotTools.DialogueSystem
                 "dialogue-view__edit-dialogue-button"
             );
 
-            c.Add(CreateTagsContainer(editorDialogueData.RuntimeData.Tags));
+            c.Add(CreateTagsContainer(editorDialogueData));
             c.Add(editDialogueButton);
             
             return c;
         }
 
-        private VisualElement CreateTagsContainer(string[] tags)
+        private VisualElement CreateTagsContainer(EditorDialogueData editorDialogueData)
         {
             // tags container
             
             var c = new VisualElement()
                 .AddUSSClasses("dialogue-view__tags-container");
             
-            float spaceWidth = 10f;
-
+            var tags = editorDialogueData.RuntimeData.Tags;
             if (tags != null)
             {
-                for (var i = 0; i < tags.Length; i++)
+                for (var i = 0; i < tags.Count; i++)
                 {
-                    c.Add(CreateTag(tags[i]));
-                    c.AddHorizontalSpace(spaceWidth);
+                    c.Add(CreateTag(editorDialogueData, i));
+                    c.AddHorizontalSpace(10f);
                 }
             }
 
-            c.Add(CreateAddTagButton(c));
+            c.Add(CreateAddTagButton(c, editorDialogueData));
             
             return c;
         }
         
-        private VisualElement CreateTag(string text)
+        private VisualElement CreateTag(EditorDialogueData editorDialogueData, int tagIndex)
         {
+            var tags = editorDialogueData.RuntimeData.Tags;
+            string tag = tags[tagIndex];
+            
             var c = new VisualElement();
             c.AddToClassList("dialogue-view__tag");
             
@@ -294,12 +297,38 @@ namespace PotikotTools.DialogueSystem
             
             var inputField = new TextField()
             {
-                value = text
+                value = tag,
+                isDelayed = true
             };
+            
+            inputField.RegisterValueChangedCallback(async evt =>
+            {
+                if (tags.Contains(evt.newValue))
+                {
+                    inputField.SetValueWithoutNotify(evt.previousValue);
+                    return;
+                }
+                
+                int changedTagIndex = tags.IndexOf(evt.previousValue);
+                if (changedTagIndex == -1) // TODO:
+                {
+                    DL.LogError("Tag deleted or changed from another script");
+                    return;
+                }
+                
+                tags[changedTagIndex] = evt.newValue;
+                await EditorDatabase.SaveDialogueAsync(editorDialogueData);
+            });
             
             // delete button
 
-            var deleteButon = new Button(() => DL.Log($"Delete Tag: {text}"))
+            var deleteButon = new Button(async () =>
+            {
+                tags.Remove(tag);
+                c.RemoveFromHierarchy();
+                
+                await EditorDatabase.SaveDialogueAsync(editorDialogueData);
+            })
             {
                 text = _crossSymbol
             };
@@ -315,9 +344,9 @@ namespace PotikotTools.DialogueSystem
             return c;
         }
 
-        private VisualElement CreateAddTagButton(VisualElement tagsContainer)
+        private VisualElement CreateAddTagButton(VisualElement tagsContainer, EditorDialogueData editorDialogueData)
         {
-            var button = new Button(() => AddTag(tagsContainer))
+            var button = new Button(async () => await AddTag(tagsContainer, editorDialogueData))
             {
                 text = "+"
             };
@@ -326,26 +355,28 @@ namespace PotikotTools.DialogueSystem
                 "dialogue-view__button",
                 "dialogue-view__tags-container__add-button"
             );
-            
+
             return button;
         }
         
-        private void AddTag(VisualElement tagsContainer)
+        private async Task AddTag(VisualElement tagsContainer, EditorDialogueData editorDialogueData)
         {
-            int index = tagsContainer.childCount - 1;
-            
-            var tag = CreateTag("New Tag");
-            tagsContainer.Insert(index, tag);
-            
-            tagsContainer.Insert(index + 1, new VisualElement()
-            {
-                style =
-                {
-                    width = 10f
-                }
-            });
+            var tags = editorDialogueData.RuntimeData.Tags;
+            int tagViewIndex = tagsContainer.childCount - 1;
 
-            tag.Q<TextField>().Focus();
+            string newTagTemplate = "tag-";
+            int i = 1;
+            while (tags.Contains(newTagTemplate + i.ToString()))
+                i++;
+            
+            tags.Add(newTagTemplate + i.ToString());
+            var tagView = CreateTag(editorDialogueData, tags.Count - 1);
+
+            tagsContainer.Insert(tagViewIndex, tagView);
+            tagsContainer.InsertHorizontalSpace(tagViewIndex + 1, 10f);
+
+            await EditorDatabase.SaveDialogueAsync(editorDialogueData);
+            tagView.Q<TextField>().Focus();
         }
         
         #endregion
@@ -357,14 +388,45 @@ namespace PotikotTools.DialogueSystem
             button.AddUSSClasses("dialogue-view-options-selector__button--selected");
         }
         
-        private void CreateDialogueButtonCallback()
+        private void CreateDialogueButtonCallback(Button button) // TODO:
         {
-            EditorDatabase.CreateDialogue("New Dialogue");
+            Rect buttonWorldBound = button.worldBound;
+            var dialogueNameInputField = new TextField()
+            {
+                value = "New Dialogue",
+                style =
+                {
+                    position = Position.Absolute,
+                    width = buttonWorldBound.width,
+                    height = buttonWorldBound.height,
+                    top = buttonWorldBound.y - buttonWorldBound.height,
+                    left = buttonWorldBound.x,
+                }
+            };
+            
+            dialogueNameInputField.RegisterCallback<FocusOutEvent>(FocusOutEventCallback);
+            
+            rootVisualElement.Add(dialogueNameInputField);
+            
+            button.visible = false;
+            dialogueNameInputField.Focus();
+            
+            void FocusOutEventCallback(FocusOutEvent evt)
+            {
+                if (EditorDatabase.TryCreateDialogue(dialogueNameInputField.value, out EditorDialogueData editorDialogueData))
+                {
+                    _dialoguesContainer.Add(CreateDialoguePanel(editorDialogueData));
+                }
+                
+                button.visible = true;
+                dialogueNameInputField.RemoveFromHierarchy();
+                dialogueNameInputField.UnregisterCallback<FocusOutEvent>(FocusOutEventCallback);
+            }
         }
         
         private void DeleteDialogueButtonCallback(EditorDialogueData editorDialogueData)
         {
-            if (EditorUtility.DisplayDialog($"Delete dialogue", $"Are you really want to delete dialogue: \"{editorDialogueData.Id}\"?", "Yes", "No"))
+            if (EditorUtility.DisplayDialog("Delete dialogue", $"Are you really want to delete dialogue: \"{editorDialogueData.Id}\"?", "Yes", "No"))
                 EditorDatabase.DeleteDialogue(editorDialogueData.Id);
         }
     }

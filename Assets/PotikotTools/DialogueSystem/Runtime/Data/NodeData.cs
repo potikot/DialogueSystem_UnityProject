@@ -27,8 +27,6 @@ namespace PotikotTools.DialogueSystem
         [JsonIgnore] public bool HasInputConnection => InputConnection != null;
         [JsonIgnore] public bool HasOutputConnections => OutputConnections.Count > 0;
 
-        private NodeData() { }
-
         public NodeData(int id)
         {
             Id = id;
@@ -55,7 +53,6 @@ namespace PotikotTools.DialogueSystem
         public void ReleaseResources()
         {
             Resources.UnloadAsset(AudioResource);
-            DL.Log($"Loaded: {AudioResource.name}");
         }
     }
 }

@@ -17,10 +17,10 @@ namespace PotikotTools.DialogueSystem
         
         public static Task<DialogueData> GetDialogueAsync(string id) => Components.Database.GetDialogueAsync(id);
         public static Task<bool> LoadDialogueAsync(string id) => Components.Database.LoadDialogueAsync(id);
-        public static Task<bool> LoadDialogueGroupAsync(string tag) => Components.Database.LoadDialogueGroupAsync(tag);
+        public static Task<bool> LoadDialogueGroupAsync(string tag) => Components.Database.LoadDialoguesByTagAsync(tag);
         
         public static DialogueData GetDialogue(string id) => Components.Database.GetDialogue(id);
         public static bool LoadDialogue(string id) => Components.Database.LoadDialogue(id);
-        public static bool LoadDialogueGroup(string tag) => Components.Database.LoadDialogueGroup(tag);
+        public static bool LoadDialogueGroup(string tag) => Components.Database.LoadDialoguesByTag(tag);
     }
 }

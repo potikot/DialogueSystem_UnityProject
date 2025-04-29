@@ -25,7 +25,7 @@ namespace PotikotTools.DialogueSystem
         public string RootPath => rootPath;
         public string RelativeRootPath => relativeRootPath;
 
-        public virtual void Initialize()
+        public virtual async void Initialize()
         {
             if (isInitialized) return;
             isInitialized = true;
@@ -53,26 +53,40 @@ namespace PotikotTools.DialogueSystem
             string[] dialogueDirectories = Directory.GetDirectories(rootPath);
             DialoguesCount = dialogueDirectories.Length;
             
+            // TODO: optimize
             foreach (string dialogueDirectory in dialogueDirectories)
             {
-                string tagsFilePath = Path.Combine(dialogueDirectory, "tags.txt");
+                string dialogueId = Path.GetFileName(dialogueDirectory);
 
-                if (File.Exists(tagsFilePath))
+                DialogueData data = await GetDialogueAsync(dialogueId);
+                foreach (string tag in data.Tags)
                 {
-                    string dialogueId = Path.GetFileName(dialogueDirectory);
-                    string[] lines = File.ReadAllLines(tagsFilePath);
-
-                    foreach (var line in lines)
-                    {
-                        if (tags.TryGetValue(line, out var idList))
-                            idList.Add(dialogueId);
-                        else
-                            tags.Add(line, new List<string>()
-                            {
-                                dialogueId
-                            });
-                    }
+                    if (tags.TryGetValue(tag, out var idList))
+                        idList.Add(dialogueId);
+                    else
+                        tags.Add(tag, new List<string>() { dialogueId });
                 }
+
+                ReleaseAllDialogues();
+
+                // string tagsFilePath = Path.Combine(dialogueDirectory, DialogueSystemPreferences.Data.RuntimeDataFilename);
+                //
+                // if (File.Exists(tagsFilePath))
+                // {
+                //     string dialogueId = Path.GetFileName(dialogueDirectory);
+                //     string[] lines = File.ReadAllLines(tagsFilePath);
+                //
+                //     foreach (var line in lines)
+                //     {
+                //         if (tags.TryGetValue(line, out var idList))
+                //             idList.Add(dialogueId);
+                //         else
+                //             tags.Add(line, new List<string>()
+                //             {
+                //                 dialogueId
+                //             });
+                //     }
+                // }
             }
         }
 
@@ -103,12 +117,12 @@ namespace PotikotTools.DialogueSystem
         {
             Components.NodeLinker = new NodeLinker();
             DialogueData dialogueData = await loader.LoadAsync(rootPath, dialogueId);
+            DL.Log(dialogueId + " " + Components.NodeLinker);
             Components.NodeLinker.SetConnections(dialogueData);
             Components.NodeLinker = null;
 
             if (dialogueData != null)
             {
-                DL.Log($"Dialogue data exist: {dialogueId}");
                 dialogues.Add(dialogueId, dialogueData);
                 foreach (NodeData node in dialogueData.Nodes)
                     node.DialogueData = dialogueData;
@@ -129,7 +143,6 @@ namespace PotikotTools.DialogueSystem
 
             if (dialogueData != null)
             {
-                DL.Log($"Dialogue data loaded: {dialogueId}");
                 dialogues.Add(dialogueId, dialogueData);
                 foreach (NodeData node in dialogueData.Nodes)
                     node.DialogueData = dialogueData;
@@ -141,7 +154,7 @@ namespace PotikotTools.DialogueSystem
             return false;
         }
 
-        public virtual async Task<bool> LoadDialogueGroupAsync(string tag)
+        public virtual async Task<bool> LoadDialoguesByTagAsync(string tag)
         {
             if (!tags.TryGetValue(tag, out List<string> dialogueIds))
                 return false;
@@ -154,7 +167,7 @@ namespace PotikotTools.DialogueSystem
             return flag;
         }
 
-        public virtual bool LoadDialogueGroup(string tag)
+        public virtual bool LoadDialoguesByTag(string tag)
         {
             if (!tags.TryGetValue(tag, out List<string> dialogueIds)
                 || dialogueIds.Count == 0)
@@ -165,6 +178,8 @@ namespace PotikotTools.DialogueSystem
                 if (!LoadDialogue(dialogueId))
                     flag = false;
 
+            DL.Log($"Loaded {dialogueIds.Count} dialogues");
+            
             return flag;
         }
 
@@ -177,13 +192,20 @@ namespace PotikotTools.DialogueSystem
             }
         }
 
-        public virtual void ReleaseDialogueGroup(string tag)
+        public virtual void ReleaseDialoguesByTag(string tag)
         {
             if (!tags.TryGetValue(tag, out List<string> dialogueIds))
                 return;
 
             foreach (string dialogueId in dialogueIds)
                 ReleaseDialogue(dialogueId);
+        }
+
+        public virtual void ReleaseAllDialogues()
+        {
+            var copyOfDialogues = new Dictionary<string, DialogueData>(dialogues);
+            foreach (var dialogue in copyOfDialogues)
+                ReleaseDialogue(dialogue.Key);
         }
         
         public virtual async Task<T> LoadResourceAsync<T>(string dialogueId, string resourceName) where T : Object

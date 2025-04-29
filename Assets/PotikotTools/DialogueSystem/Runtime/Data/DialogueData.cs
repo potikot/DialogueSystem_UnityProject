@@ -3,18 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 
 namespace PotikotTools.DialogueSystem
 {
+    // TODO: add way to sync many systems that can change similar fields
+    
     public class DialogueData
     {
-        public string[] Tags;
+        public event Action<NodeData, int> OnNodeAdded;
+        public event Action<NodeData, int> OnNodeRemoved;
+        
+        public List<string> Tags;
         public List<SpeakerData> Speakers;
 
         public bool LoadResourcesImmediately;
         
-        [JsonRequired] protected string _id;
+        [JsonRequired] protected string _id; // TODO: rename to "id"
         [JsonRequired] protected List<NodeData> nodes;
         
         [JsonIgnore] public string Id => _id;
@@ -30,6 +36,8 @@ namespace PotikotTools.DialogueSystem
                 // TODO: set unique id
             }
             
+            Tags = new List<string>();
+            Speakers = new List<SpeakerData>();
             nodes = new List<NodeData>();
         }
 
@@ -60,13 +68,20 @@ namespace PotikotTools.DialogueSystem
             node.DialogueData = this;
 
             nodes.Add(node);
-
+            OnNodeAdded?.Invoke(node, nodes.Count - 1);
+            
             return node;
         }
         
         public bool RemoveNode(NodeData node)
         {
-            return nodes.Remove(node);
+            int index = nodes.IndexOf(node);
+            if (index == -1)
+                return false;
+            
+            nodes.RemoveAt(index);
+            OnNodeRemoved?.Invoke(node, index);
+            return true;
         }
         
         public NodeData GetFirstNode()

@@ -34,7 +34,7 @@ namespace PotikotTools.DialogueSystem
             return tf;
         }
 
-        public static VisualElement AddVerticalSpace(this VisualElement e, float height, Color color = new())
+        public static T AddVerticalSpace<T>(this T e, float height, Color color = new()) where T : VisualElement
         {
             e.Add(new VisualElement()
             {
@@ -48,9 +48,37 @@ namespace PotikotTools.DialogueSystem
             return e;
         }
         
-        public static VisualElement AddHorizontalSpace(this VisualElement e, float width, Color color = new())
+        public static T InsertVerticalSpace<T>(this T e, int index, float height, Color color = new()) where T : VisualElement
+        {
+            e.Insert(index, new VisualElement()
+            {
+                style =
+                {
+                    height = height,
+                    backgroundColor = color
+                }
+            });
+            
+            return e;
+        }
+        
+        public static T AddHorizontalSpace<T>(this T e, float width, Color color = new()) where T : VisualElement
         {
             e.Add(new VisualElement()
+            {
+                style =
+                {
+                    width = width,
+                    backgroundColor = color
+                }
+            });
+            
+            return e;
+        }
+        
+        public static T InsertHorizontalSpace<T>(this T e, int index, float width, Color color = new()) where T : VisualElement
+        {
+            e.Insert(index, new VisualElement()
             {
                 style =
                 {

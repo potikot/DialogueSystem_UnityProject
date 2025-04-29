@@ -9,8 +9,10 @@ public class DialogueStarter : MonoBehaviour
     [SerializeField] private DialogueView _dialogueView;
     [SerializeField] private string _dialogueId;
     
-    private void Start()
+    private async void Start()
     {
+        await DialogueSystemAPI.LoadDialogueGroupAsync("fefee");
+        
         DialogueSystemAPI.StartDialogue(_dialogueId, _dialogueView);
     }
 }

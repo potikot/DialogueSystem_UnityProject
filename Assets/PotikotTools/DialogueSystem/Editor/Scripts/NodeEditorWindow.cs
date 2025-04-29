@@ -20,7 +20,7 @@ namespace PotikotTools.DialogueSystem.Editor
 
         public static void Open(EditorDialogueData editorData)
         {
-            var window = GetWindow<NodeEditorWindow>("Dialogue Editor");
+            var window = GetWindow<NodeEditorWindow>($"{editorData.Id} Dialogue Editor");
             window.editorData = editorData;
         }
 

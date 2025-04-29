@@ -150,19 +150,24 @@
     border-radius: 15px;
 }
 
-.dialogue-view__input-field
+.dialogue-view__text-input-field
 {
     margin: 0px;
     margin-top: 3px;
 }
 
-.dialogue-view__input-field > TextInput
+.dialogue-view__text-input-field > TextInput
 {
     background-color: transparent;
     border-color: transparent;
 }
 
-.dialogue-view__input-field--focused > TextInput
+.dialogue-view__text-input-field > TextInput > TextElement
+{
+    cursor: text;
+}
+
+.dialogue-view__text-input-field--focused > TextInput
 {
     background-color: #2A2A2A;
     border-color: #212121;

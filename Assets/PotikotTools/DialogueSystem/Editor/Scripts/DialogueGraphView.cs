@@ -16,7 +16,7 @@ namespace PotikotTools.DialogueSystem.Editor
         {
             { typeof(SingleChoiceNodeData), typeof(SingleChoiceNodeView) },
             { typeof(MultipleChoiceNodeData), typeof(MultipleChoiceNodeView) },
-            { typeof(TimerNodeView), typeof(TimerNodeView) }
+            { typeof(TimerNodeData), typeof(TimerNodeView) }
         };
         
         protected DialogueData RuntimeData => editorData.RuntimeData;
@@ -117,6 +117,8 @@ namespace PotikotTools.DialogueSystem.Editor
             {
                 position = dropdownMenuAction.eventInfo.mousePosition
             };
+            
+            EditorData.EditorNodeDataList.Add(editorData);
             
             nodeView.Initialize(editorData, RuntimeData.AddNode<TData>(dataArgs));
             nodeView.Draw();

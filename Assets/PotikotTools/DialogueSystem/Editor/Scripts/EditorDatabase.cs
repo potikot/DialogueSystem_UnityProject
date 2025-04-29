@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -15,6 +16,8 @@ namespace PotikotTools.DialogueSystem.Editor
         {
             _saver = new EditorJsonDialogueSaverLoader();
         }
+        
+        // TODO: Posibility to Save and Load only requred things
         
         public static async Task<bool> SaveDialogueAsync(EditorDialogueData editorData)
         {
@@ -65,26 +68,33 @@ namespace PotikotTools.DialogueSystem.Editor
             return editorData;
         }
 
-        public static void CreateDialogue(string dialogueId)
+        public static bool TryCreateDialogue(string dialogueId, out EditorDialogueData editorData)
         {
             string guid = AssetDatabase.CreateFolder(database.RelativeRootPath, dialogueId);
-            
-            if (string.IsNullOrEmpty(guid))
-                return; // TODO: show message
-            
-            var runtimeData = new DialogueData(dialogueId);
-            var editorData = new EditorDialogueData(runtimeData);
 
-            if (!editorData.RuntimeData.TrySetId(Path.GetFileName(AssetDatabase.GUIDToAssetPath(guid))))
+            if (string.IsNullOrEmpty(guid))
             {
-                // TODO: set unique id
+                DL.LogError($"Cannot create folder for dialogue with id: {dialogueId}. Relative path: {database.RelativeRootPath}");
+                editorData = null;
+                return false;
+            }
+
+            string uniqueDialogueId = Path.GetFileName(AssetDatabase.GUIDToAssetPath(guid));
+            if (string.IsNullOrEmpty(uniqueDialogueId))
+            {
+                DL.LogError($"Cannot create folder for dialogue with id: \"{dialogueId}\". Relative path: \"{database.RelativeRootPath}\"");
+                editorData = null;
+                return false;
             }
             
-            SaveDialogue(editorData);
+            var runtimeData = new DialogueData(uniqueDialogueId);
+            editorData = new EditorDialogueData(runtimeData);
 
-            AssetDatabase.Refresh();
+            SaveDialogue(editorData);
+            
+            return true;
         }
-        
+
         public static void DeleteDialogue(EditorDialogueData editorData) => DeleteDialogue(editorData.Id);
         
         public static void DeleteDialogue(string dialogueId)

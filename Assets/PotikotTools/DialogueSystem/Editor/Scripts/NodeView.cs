@@ -84,18 +84,22 @@ namespace PotikotTools.DialogueSystem.Editor
 
         protected virtual void CreateSpeakerIndexInput()
         {
+            if (data.DialogueData.Speakers == null)
+                return;
+            
             List<string> speakerNames = new(data.DialogueData.Speakers.Count + 1) { "None" };
             speakerNames.AddRange(data.DialogueData.Speakers.Select(s => s.Name));
-            
+        
             PopupField<string> speakerIndexInput = new
             (
                 "Speaker",
                 speakerNames,
                 data.GetSpeakerName() ?? "None"
+                
             );
             
             speakerIndexInput.RegisterValueChangedCallback(evt => data.SpeakerIndex = speakerIndexInput.index - 1);
-            
+        
             extensionContainer.Add(speakerIndexInput);
         }
 

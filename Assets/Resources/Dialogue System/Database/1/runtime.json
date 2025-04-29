@@ -1,0 +1,81 @@
+{
+  "Tags": [
+    "tag-1",
+    "fefee"
+  ],
+  "Speakers": [],
+  "LoadResourcesImmediately": false,
+  "_id": "1",
+  "nodes": [
+    {
+      "$type": "PotikotTools.DialogueSystem.SingleChoiceNodeData, Assembly-CSharp",
+      "SpeakerIndex": -1,
+      "ListenerIndex": 0,
+      "Commands": [],
+      "OutputConnections": [
+        {
+          "From": 0,
+          "To": 1
+        }
+      ],
+      "Id": 0
+    },
+    {
+      "$type": "PotikotTools.DialogueSystem.MultipleChoiceNodeData, Assembly-CSharp",
+      "SpeakerIndex": -1,
+      "ListenerIndex": 0,
+      "Commands": [],
+      "OutputConnections": [
+        {
+          "Text": "New Choice",
+          "From": 1,
+          "To": 2
+        },
+        {
+          "Text": "New Choice",
+          "From": 1,
+          "To": 3
+        }
+      ],
+      "Id": 1
+    },
+    {
+      "$type": "PotikotTools.DialogueSystem.SingleChoiceNodeData, Assembly-CSharp",
+      "SpeakerIndex": -1,
+      "ListenerIndex": 0,
+      "Commands": [],
+      "OutputConnections": [
+        {
+          "From": 2,
+          "To": 4
+        }
+      ],
+      "Id": 2
+    },
+    {
+      "$type": "PotikotTools.DialogueSystem.MultipleChoiceNodeData, Assembly-CSharp",
+      "SpeakerIndex": -1,
+      "ListenerIndex": 0,
+      "Commands": [],
+      "OutputConnections": [
+        {
+          "Text": "New Choice"
+        }
+      ],
+      "Id": 3
+    },
+    {
+      "$type": "PotikotTools.DialogueSystem.TimerNodeData, Assembly-CSharp",
+      "Duration": 5.0,
+      "SpeakerIndex": -1,
+      "ListenerIndex": 0,
+      "Commands": [],
+      "OutputConnections": [
+        {
+          "Text": "New Choice"
+        }
+      ],
+      "Id": 4
+    }
+  ]
+}
