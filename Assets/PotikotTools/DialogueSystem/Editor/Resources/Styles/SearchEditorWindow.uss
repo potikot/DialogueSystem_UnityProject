@@ -143,9 +143,12 @@
 .dialogue-view__delete-button
 {
     align-self: flex-end;
-
-    min-height: 25px;
-    min-width: 25px;
+    
+    font-size: 8px;
+    -unity-font-style: bold;
+    
+    min-height: 20px;
+    min-width: 20px;
 
     border-radius: 15px;
 }

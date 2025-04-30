@@ -53,7 +53,7 @@ namespace PotikotTools.DialogueSystem
             string[] dialogueDirectories = Directory.GetDirectories(rootPath);
             DialoguesCount = dialogueDirectories.Length;
             
-            // TODO: optimize
+            // TODO: optimize tags saving/loading
             foreach (string dialogueDirectory in dialogueDirectories)
             {
                 string dialogueName = Path.GetFileName(dialogueDirectory);
@@ -66,25 +66,6 @@ namespace PotikotTools.DialogueSystem
                     else
                         tags.Add(tag, new List<string>() { dialogueName });
                 }
-
-                // string tagsFilePath = Path.Combine(dialogueDirectory, DialogueSystemPreferences.Data.RuntimeDataFilename);
-                //
-                // if (File.Exists(tagsFilePath))
-                // {
-                //     string dialogueName = Path.GetFileName(dialogueDirectory);
-                //     string[] lines = File.ReadAllLines(tagsFilePath);
-                //
-                //     foreach (var line in lines)
-                //     {
-                //         if (tags.TryGetValue(line, out var idList))
-                //             idList.Add(dialogueName);
-                //         else
-                //             tags.Add(line, new List<string>()
-                //             {
-                //                 dialogueName
-                //             });
-                //     }
-                // }
             }
         }
 
