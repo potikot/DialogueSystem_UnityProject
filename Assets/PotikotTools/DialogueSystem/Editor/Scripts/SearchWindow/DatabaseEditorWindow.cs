@@ -3,16 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PotikotTools.DialogueSystem.Editor;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.UIElements;
-using Button = UnityEngine.UIElements.Button;
 
-namespace PotikotTools.DialogueSystem
+namespace PotikotTools.DialogueSystem.Editor
 {
-    public class SearchEditorWindow : EditorWindow
+    public class DatabaseEditorWindow : EditorWindow
     {
         private const string _crossSymbol = "\u2715";
 
@@ -22,7 +19,7 @@ namespace PotikotTools.DialogueSystem
         [MenuItem("Tools/DialogueSystem/Database")]
         public static void Open()
         {
-            GetWindow<SearchEditorWindow>("Dialogue Database");
+            GetWindow<DatabaseEditorWindow>("Dialogue Database");
         }
 
         private async void CreateGUI()
@@ -61,9 +58,15 @@ namespace PotikotTools.DialogueSystem
             
             var inputField = new TextField()
                 .AddUSSClasses("search-bar__input-field")
-                .AddPlaceholder("Enter search text...");
+                .AddPlaceholder("Dialogue name or t:tag");
+
+            inputField.RegisterCallback<KeyDownEvent>(evt =>
+            {
+                if (evt.keyCode == KeyCode.Return)
+                    OnSearch();
+            });
             
-            var searchButton = new Button(() => DL.Log("Search"))
+            var searchButton = new Button(OnSearch)
             {
                 text = "\\U0001F50D"
             };
@@ -75,6 +78,54 @@ namespace PotikotTools.DialogueSystem
             c.Add(searchButton);
             
             return c;
+
+            void OnSearch()
+            {
+                if (string.IsNullOrEmpty(inputField.text))
+                {
+                    foreach (var e in _dialoguesContainer.Children())
+                        e.style.display = DisplayStyle.Flex;
+                    
+                    return;
+                }
+
+                List<DialogueData> foundDialogues;
+                
+                if (inputField.text.StartsWith("t:"))
+                    foundDialogues = SearchDialoguesUtility.SearchDialoguesByTag(inputField.text[2..]);
+                else
+                    foundDialogues = SearchDialoguesUtility.SearchDialoguesByName(inputField.text);
+                    
+                if (foundDialogues == null)
+                {
+                    foreach (var e in _dialoguesContainer.Children())
+                        e.style.display = DisplayStyle.Flex;
+                    
+                    return;
+                }
+                
+                bool removeNextSpace = false;
+                
+                foreach (var e in _dialoguesContainer.Children())
+                {
+                    if (string.IsNullOrEmpty(e.viewDataKey))
+                    {
+                        e.style.display = removeNextSpace ? DisplayStyle.None : DisplayStyle.Flex;
+                        continue;
+                    }
+                    
+                    if (foundDialogues.Any(d => d.Id == e.viewDataKey))
+                    {
+                        e.style.display = DisplayStyle.Flex;
+                        removeNextSpace = false;
+                    }
+                    else
+                    {
+                        e.style.display = DisplayStyle.None;
+                        removeNextSpace = true;
+                    }
+                }
+            }
         }
 
         private VisualElement CreateControlsBar() // TODO: naming
@@ -97,6 +148,7 @@ namespace PotikotTools.DialogueSystem
             return c;
         }
 
+        // TODO: selector functionality
         private VisualElement CreateDialogueViewOptionSelector()
         {
             var c = new VisualElement()
@@ -124,7 +176,7 @@ namespace PotikotTools.DialogueSystem
             c.AddHorizontalSpace(1f, Color.black);
             c.Add(strokeViewOptionButton);
 
-            return c;
+            return new VisualElement();
         }
         
         private Button CreateDialogueViewOptionButton(Action onClick, string classSelector)
@@ -169,8 +221,12 @@ namespace PotikotTools.DialogueSystem
         private VisualElement CreateDialoguePanel(EditorDialogueData editorDialogueData)
         {
             var c = new VisualElement()
-                .AddUSSClasses("dialogue-view");
-
+            {
+                viewDataKey = editorDialogueData.Id
+            };
+            
+            c.AddUSSClasses("dialogue-view");
+            
             // name input
             
             var nameInputField = new TextField("Name")
@@ -442,7 +498,9 @@ namespace PotikotTools.DialogueSystem
             {
                 if (EditorDatabase.TryCreateDialogue(dialogueNameInputField.value, out EditorDialogueData editorDialogueData))
                 {
-                    _dialoguesContainer.AddVerticalSpace(_spaceBetweenDialogueContainers);
+                    if (_dialoguesContainer.childCount > 0)
+                        _dialoguesContainer.AddVerticalSpace(_spaceBetweenDialogueContainers);
+                    
                     _dialoguesContainer.Add(CreateDialoguePanel(editorDialogueData));
                 }
                 
@@ -459,7 +517,6 @@ namespace PotikotTools.DialogueSystem
                 onDelete?.Invoke();
                 EditorDatabase.DeleteDialogue(editorDialogueData.Id);
             }
-            
         }
     }
 }

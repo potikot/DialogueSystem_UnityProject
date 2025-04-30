@@ -20,10 +20,12 @@ namespace PotikotTools.DialogueSystem
 
         public bool LoadResourcesImmediately;
         
-        [JsonRequired] protected string _id; // TODO: rename to "id"
+        [JsonRequired] protected string id;
         [JsonRequired] protected List<NodeData> nodes;
+
+        [JsonRequired] protected int nextNodeId;
         
-        [JsonIgnore] public string Id => _id;
+        [JsonIgnore] public string Id => id;
         [JsonIgnore] public IReadOnlyList<NodeData> Nodes => nodes;
         [JsonIgnore] public bool IsResourcesLoaded { get; protected set; }
         
@@ -46,7 +48,7 @@ namespace PotikotTools.DialogueSystem
             if (Components.Database.ContainsDialogue(value))
                 return false;
 
-            _id = value;
+            id = value;
             return true;
         }
         
@@ -62,8 +64,6 @@ namespace PotikotTools.DialogueSystem
                 args = newArgs;
             }
 
-            DL.Log($"Adding node to graph with id({GetNextNodeId()}), args({args.Length})");
-            
             T node = Activator.CreateInstance(typeof(T), args) as T;
             node.DialogueData = this;
 
@@ -128,7 +128,7 @@ namespace PotikotTools.DialogueSystem
         
         private int GetNextNodeId()
         {
-            return nodes.Count;
+            return nextNodeId++;
         }
     }
 }

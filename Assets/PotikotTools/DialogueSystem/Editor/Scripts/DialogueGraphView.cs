@@ -12,7 +12,7 @@ namespace PotikotTools.DialogueSystem.Editor
     {
         protected EditorDialogueData editorData;
 
-        protected Dictionary<Type, Type> nodeTypes = new()
+        protected readonly Dictionary<Type, Type> nodeTypes = new()
         {
             { typeof(SingleChoiceNodeData), typeof(SingleChoiceNodeView) },
             { typeof(MultipleChoiceNodeData), typeof(MultipleChoiceNodeView) },
@@ -100,6 +100,12 @@ namespace PotikotTools.DialogueSystem.Editor
                     }
                     else if (element is INodeView nodeView)
                     {
+                        if (nodeView is Node node)
+                        {
+                            node.inputContainer.Q<Port>().DisconnectAll();
+                            node.outputContainer.Query<Port>().ForEach(p => p.DisconnectAll());
+                        }
+                        
                         nodeView.Delete();
                     }
                 }

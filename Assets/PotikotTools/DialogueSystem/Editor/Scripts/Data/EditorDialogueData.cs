@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using UnityEditor;
@@ -8,12 +9,20 @@ using UnityEngine;
 
 namespace PotikotTools.DialogueSystem.Editor
 {
+    // TODO: fix initialization with deserialize from json
     public class EditorDialogueData
     {
+        private DialogueData _runtimeData;
+        
         public string Description;
         
         public List<EditorNodeData> EditorNodeDataList;
-        [JsonIgnore] public DialogueData RuntimeData;
+
+        [JsonIgnore] public DialogueData RuntimeData
+        {
+            get => _runtimeData;
+            set => Initialize(value);
+        }
 
         [JsonIgnore] public string Id => RuntimeData.Id;
         
@@ -39,8 +48,37 @@ namespace PotikotTools.DialogueSystem.Editor
                 DL.LogWarning("Nodes count does not match");
                 GenerateEditorNodeDatas();
             }
+
+            RuntimeData.OnNodeRemoved += (data, index) =>
+            {
+                EditorNodeDataList.RemoveAt(index);
+            };
         }
 
+        private void Initialize(DialogueData runtimeData)
+        {
+            if (runtimeData == null)
+            {
+                DL.LogError($"{nameof(runtimeData)} is null");
+                return;
+            }
+            
+            _runtimeData = runtimeData;
+            
+            if (EditorNodeDataList == null)
+                GenerateEditorNodeDatas();
+            else if (runtimeData.Nodes.Count != EditorNodeDataList.Count)
+            {
+                DL.LogWarning("Nodes count does not match");
+                GenerateEditorNodeDatas();
+            }
+            
+            RuntimeData.OnNodeRemoved += (data, index) =>
+            {
+                EditorNodeDataList.RemoveAt(index);
+            };
+        }
+        
         public async Task<bool> TrySetId(string value)
         {
             string previousId = Id;

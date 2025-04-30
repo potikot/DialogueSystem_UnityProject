@@ -13,6 +13,7 @@ namespace PotikotTools.DialogueSystem
         protected string rootPath;
         protected string relativeRootPath;
 
+        // TODO: update tags when tag added to dialogue data after initialization
         protected Dictionary<string, List<string>> tags;
         protected Dictionary<string, DialogueData> dialogues;
 
@@ -20,6 +21,8 @@ namespace PotikotTools.DialogueSystem
         
         protected bool isInitialized = false;
 
+        public IReadOnlyDictionary<string, List<string>> Tags => tags;
+        public IReadOnlyDictionary<string, DialogueData> Dialogues => dialogues;
         public int DialoguesCount { get; private set; }
         public IDialogueLoader Loader => loader;
         public string RootPath => rootPath;
@@ -87,7 +90,7 @@ namespace PotikotTools.DialogueSystem
 
         public virtual DialogueData GetDialogue(string dialogueName)
         {
-            if (!dialogues.TryGetValue(dialogueName, out DialogueData data))
+            if (dialogues.TryGetValue(dialogueName, out DialogueData data))
                 return data;
 
             if (LoadDialogue(dialogueName))
