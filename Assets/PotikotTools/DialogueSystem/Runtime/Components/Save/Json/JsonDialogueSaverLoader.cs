@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Extensions.Newtonsoft.Json;
 using Newtonsoft.Json;
@@ -75,10 +76,37 @@ namespace PotikotTools.DialogueSystem
         {
             string fullPath = Path.Combine(directoryPath, dialogueId, DialogueSystemPreferences.Data.RuntimeDataFilename);
 
-            using StreamReader sr = new(fullPath);
-            string json = await sr.ReadToEndAsync();
+            using (StreamReader sr = new(fullPath))
+            {
+                string json = await sr.ReadToEndAsync();
+                return await json.DeserializeJsonAsync<DialogueData>(serializer);
+            }
+        }
+        
+        public List<string> LoadTags(string directoryPath, string dialogueId)
+        {
+            string fullPath = Path.Combine(directoryPath, dialogueId, DialogueSystemPreferences.Data.RuntimeDataFilename);
+
+            using (StreamReader sr = new(fullPath))
+            {
+                string json = sr.ReadToEnd();
             
-            return await json.DeserializeJsonAsync<DialogueData>(serializer);
+                JObject jObject = JObject.Parse(json);
+                return jObject["Tags"].ToObject<List<string>>();
+            }
+        }
+        
+        public async Task<List<string>> LoadTagsAsync(string directoryPath, string dialogueId)
+        {
+            string fullPath = Path.Combine(directoryPath, dialogueId, DialogueSystemPreferences.Data.RuntimeDataFilename);
+
+            using (StreamReader sr = new(fullPath))
+            {
+                string json = await sr.ReadToEndAsync();
+                
+                JObject jObject = JObject.Parse(json);
+                return jObject["Tags"].ToObject<List<string>>();
+            }
         }
     }
 }

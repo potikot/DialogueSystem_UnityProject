@@ -21,7 +21,7 @@ namespace PotikotTools.DialogueSystem
 
         [JsonIgnore] public ConnectionData InputConnection;
         public List<ConnectionData> OutputConnections;
-        
+
         [JsonIgnore] public DialogueData DialogueData;
 
         [JsonIgnore] public bool HasInputConnection => InputConnection != null;

@@ -56,109 +56,116 @@ namespace PotikotTools.DialogueSystem
             // TODO: optimize
             foreach (string dialogueDirectory in dialogueDirectories)
             {
-                string dialogueId = Path.GetFileName(dialogueDirectory);
+                string dialogueName = Path.GetFileName(dialogueDirectory);
 
-                DialogueData data = await GetDialogueAsync(dialogueId);
-                foreach (string tag in data.Tags)
+                List<string> data = await GetDialogueTagsAsync(dialogueName);
+                foreach (string tag in data)
                 {
                     if (tags.TryGetValue(tag, out var idList))
-                        idList.Add(dialogueId);
+                        idList.Add(dialogueName);
                     else
-                        tags.Add(tag, new List<string>() { dialogueId });
+                        tags.Add(tag, new List<string>() { dialogueName });
                 }
-
-                ReleaseAllDialogues();
 
                 // string tagsFilePath = Path.Combine(dialogueDirectory, DialogueSystemPreferences.Data.RuntimeDataFilename);
                 //
                 // if (File.Exists(tagsFilePath))
                 // {
-                //     string dialogueId = Path.GetFileName(dialogueDirectory);
+                //     string dialogueName = Path.GetFileName(dialogueDirectory);
                 //     string[] lines = File.ReadAllLines(tagsFilePath);
                 //
                 //     foreach (var line in lines)
                 //     {
                 //         if (tags.TryGetValue(line, out var idList))
-                //             idList.Add(dialogueId);
+                //             idList.Add(dialogueName);
                 //         else
                 //             tags.Add(line, new List<string>()
                 //             {
-                //                 dialogueId
+                //                 dialogueName
                 //             });
                 //     }
                 // }
             }
         }
 
-        public virtual async Task<DialogueData> GetDialogueAsync(string dialogueId)
+        public virtual async Task<List<string>> GetDialogueTagsAsync(string dialogueName)
         {
-            if (!dialogues.TryGetValue(dialogueId, out DialogueData data)
-                && await LoadDialogueAsync(dialogueId))
-                return dialogues[dialogueId];
-
-            return data;
+            return await loader.LoadTagsAsync(rootPath, dialogueName);
         }
 
-        public virtual DialogueData GetDialogue(string dialogueId)
+        public virtual async Task<DialogueData> GetDialogueAsync(string dialogueName)
         {
-            if (!dialogues.TryGetValue(dialogueId, out DialogueData data)
-                && LoadDialogue(dialogueId))
-                return dialogues[dialogueId];
+            if (dialogues.TryGetValue(dialogueName, out DialogueData data))
+                return data;
 
-            return data;
+            if (await LoadDialogueAsync(dialogueName))
+                return dialogues[dialogueName];
+            else
+                return null;
         }
 
-        public virtual bool ContainsDialogue(string dialogueId)
+        public virtual DialogueData GetDialogue(string dialogueName)
         {
-            return dialogues.ContainsKey(dialogueId);
+            if (!dialogues.TryGetValue(dialogueName, out DialogueData data))
+                return data;
+
+            if (LoadDialogue(dialogueName))
+                return dialogues[dialogueName];
+            else
+                return null;
         }
 
-        public virtual async Task<bool> LoadDialogueAsync(string dialogueId)
+        public virtual bool ContainsDialogue(string dialogueName)
         {
-            DialogueData dialogueData = await loader.LoadAsync(rootPath, dialogueId);
+            return dialogues.ContainsKey(dialogueName);
+        }
+
+        public virtual async Task<bool> LoadDialogueAsync(string dialogueName)
+        {
+            DialogueData dialogueData = await loader.LoadAsync(rootPath, dialogueName);
             Components.NodeLinker.SetConnections(dialogueData);
             Components.NodeLinker.Clear();
 
             if (dialogueData != null)
             {
-                dialogues.Add(dialogueId, dialogueData);
+                dialogues.Add(dialogueName, dialogueData);
                 foreach (NodeData node in dialogueData.Nodes)
                     node.DialogueData = dialogueData;
                 
                 return true;
             }
 
-            DL.LogError($"Dialogue data doesn't exist: {dialogueId}");
+            DL.LogError($"Dialogue data doesn't exist: {dialogueName}");
             return false;
         }
 
-        public virtual bool LoadDialogue(string dialogueId)
+        public virtual bool LoadDialogue(string dialogueName)
         {
-            DialogueData dialogueData = loader.Load(rootPath, dialogueId);
+            DialogueData dialogueData = loader.Load(rootPath, dialogueName);
             Components.NodeLinker.SetConnections(dialogueData);
             Components.NodeLinker.Clear();
 
             if (dialogueData != null)
             {
-                dialogues.Add(dialogueId, dialogueData);
+                dialogues.Add(dialogueName, dialogueData);
                 foreach (NodeData node in dialogueData.Nodes)
                     node.DialogueData = dialogueData;
                 
                 return true;
             }
 
-            DL.LogError($"Dialogue data doesn't exist: {dialogueId}");
+            DL.LogError($"Dialogue data doesn't exist: {dialogueName}");
             return false;
         }
 
         public virtual async Task<bool> LoadDialoguesByTagAsync(string tag)
         {
-            if (!tags.TryGetValue(tag, out List<string> dialogueIds))
+            if (!tags.TryGetValue(tag, out List<string> dialogueNames))
                 return false;
 
             bool flag = true;
-            foreach (string dialogueId in dialogueIds)
-                if (!await LoadDialogueAsync(dialogueId))
+            foreach (string dialogueName in dialogueNames)
+                if (!await LoadDialogueAsync(dialogueName))
                     flag = false;
 
             return flag;
@@ -166,46 +173,46 @@ namespace PotikotTools.DialogueSystem
 
         public virtual bool LoadDialoguesByTag(string tag)
         {
-            if (!tags.TryGetValue(tag, out List<string> dialogueIds)
-                || dialogueIds.Count == 0)
+            if (!tags.TryGetValue(tag, out List<string> dialogueNames)
+                || dialogueNames.Count == 0)
                 return false;
 
             bool flag = true;
-            foreach (string dialogueId in dialogueIds)
-                if (!LoadDialogue(dialogueId))
+            foreach (string dialogueName in dialogueNames)
+                if (!LoadDialogue(dialogueName))
                     flag = false;
 
-            DL.Log($"Loaded {dialogueIds.Count} dialogues");
+            DL.Log($"Loaded {dialogueNames.Count} dialogues");
             
             return flag;
         }
 
-        public virtual void ReleaseDialogue(string dialogueId)
+        public virtual void ReleaseDialogue(string dialogueName)
         {
-            if (dialogues.TryGetValue(dialogueId, out DialogueData data))
+            if (dialogues.TryGetValue(dialogueName, out DialogueData data))
             {
                 data.ReleaseResources();
-                dialogues.Remove(dialogueId);
+                dialogues.Remove(dialogueName);
             }
         }
 
         public virtual void ReleaseDialoguesByTag(string tag)
         {
-            if (!tags.TryGetValue(tag, out List<string> dialogueIds))
+            if (!tags.TryGetValue(tag, out List<string> dialogueNames))
                 return;
 
-            foreach (string dialogueId in dialogueIds)
-                ReleaseDialogue(dialogueId);
+            foreach (string dialogueName in dialogueNames)
+                ReleaseDialogue(dialogueName);
         }
 
         public virtual void ReleaseAllDialogues()
         {
-            var copyOfDialogues = new Dictionary<string, DialogueData>(dialogues);
-            foreach (var dialogue in copyOfDialogues)
-                ReleaseDialogue(dialogue.Key);
+            var dialogueNames = new List<string>(dialogues.Keys);
+            foreach (var dialogueName in dialogueNames)
+                ReleaseDialogue(dialogueName);
         }
         
-        public virtual async Task<T> LoadResourceAsync<T>(string dialogueId, string resourceName) where T : Object
+        public virtual async Task<T> LoadResourceAsync<T>(string dialogueName, string resourceName) where T : Object
         {
             if (!resourceDirectories.TryGetValue(typeof(T), out string directory))
                 return null;
