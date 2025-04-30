@@ -67,16 +67,20 @@ namespace PotikotTools.DialogueSystem.Editor
             // });
             inputField.RegisterValueChangedCallback(_ => OnSearch());
             
-            var searchButton = new Button(OnSearch)
-            {
-                text = "\\U0001F50D"
-            };
-
-            searchButton.AddUSSClasses("search-bar__submit-button");
+            // var searchButton = new Button(OnSearch)
+            //     .AddUSSClasses("search-bar__submit-button");
+            //
+            // searchButton.Add(new VisualElement()
+            // {
+            //     style =
+            //     {
+            //         backgroundImage = new StyleBackground(EditorGUIUtility.IconContent("d_Search Icon").image as Texture2D)
+            //     }
+            // }.AddUSSClasses("search-bar__submit-button-image"));
             
             c.Add(inputField);
-            c.AddHorizontalSpace(1f, Color.black);
-            c.Add(searchButton);
+            // c.AddHorizontalSpace(1f, Color.black);
+            // c.Add(searchButton);
             
             return c;
 

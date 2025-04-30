@@ -735,7 +735,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _dialogueView: {fileID: 702064429}
-  _dialogueId: New Dialogue
+  _dialogueId: new dialogue
 --- !u!1 &1635556671
 GameObject:
   m_ObjectHideFlags: 0
