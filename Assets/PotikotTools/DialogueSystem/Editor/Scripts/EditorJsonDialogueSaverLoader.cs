@@ -9,27 +9,27 @@ namespace PotikotTools.DialogueSystem.Editor
     {
         public async Task<bool> SaveEditorDataAsync(string directoryPath, EditorDialogueData editorDialogueData)
         {
-            await editorDialogueData.SerializeJsonAsync(serializer);
-            
-            string fullPath = Path.Combine(directoryPath, editorDialogueData.RuntimeData.Id, DialogueSystemPreferences.Data.EditorDataFilename);
+            string fullPath = Path.Combine(directoryPath, editorDialogueData.Id, DialogueSystemPreferences.Data.EditorDataFilename);
 
             using (StreamWriter sw = new(fullPath))
-            using (JsonWriter jw = new JsonTextWriter(sw))
-                serializer.Serialize(jw, editorDialogueData);
+            {
+                string json = await editorDialogueData.SerializeJsonAsync(serializer);
+                await sw.WriteAsync(json);
+            }
             
             return true;
         }
 
         public bool SaveEditorData(string directoryPath, EditorDialogueData editorDialogueData)
         {
-            string fullPath = Path.Combine(directoryPath, editorDialogueData.RuntimeData.Id, DialogueSystemPreferences.Data.EditorDataFilename);
+            string fullPath = Path.Combine(directoryPath, editorDialogueData.Id, DialogueSystemPreferences.Data.EditorDataFilename);
             
             if (!Directory.Exists(directoryPath))
                 Directory.CreateDirectory(directoryPath);
 
             using (StreamWriter sw = new(fullPath))
-            using (JsonWriter jw = new JsonTextWriter(sw))
-                serializer.Serialize(jw, editorDialogueData);
+                using (JsonWriter jw = new JsonTextWriter(sw))
+                    serializer.Serialize(jw, editorDialogueData);
             
             return true;
         }
@@ -38,10 +38,11 @@ namespace PotikotTools.DialogueSystem.Editor
         {
             string fullPath = Path.Combine(directoryPath, dialogueId, DialogueSystemPreferences.Data.EditorDataFilename);
 
-            using StreamReader sr = new(fullPath);
-            string json = await sr.ReadToEndAsync();
-            
-            return await json.DeserializeJsonAsync<EditorDialogueData>(serializer);
+            using (StreamReader sr = new(fullPath))
+            {
+                string json = await sr.ReadToEndAsync();
+                return await json.DeserializeJsonAsync<EditorDialogueData>(serializer);
+            }
         }
 
         public EditorDialogueData LoadEditorData(string directoryPath, string dialogueId)
@@ -55,8 +56,8 @@ namespace PotikotTools.DialogueSystem.Editor
             }
 
             using (StreamReader sr = new(fullPath))
-            using (JsonReader jr = new JsonTextReader(sr))
-                return serializer.Deserialize<EditorDialogueData>(jr);
+                using (JsonReader jr = new JsonTextReader(sr))
+                    return serializer.Deserialize<EditorDialogueData>(jr);
         }
     }
 }

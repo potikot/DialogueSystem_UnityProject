@@ -26,7 +26,7 @@ namespace PotikotTools.DialogueSystem.Editor
         {
             var c = new VisualElement()
                 .AddStyleSheets(
-                    "Styles/SearchEditorWindow",
+                    "Styles/DatabaseEditorWindow",
                     "Styles/Variables"
                 ).AddUSSClasses("root-container");
 
@@ -60,11 +60,12 @@ namespace PotikotTools.DialogueSystem.Editor
                 .AddUSSClasses("search-bar__input-field")
                 .AddPlaceholder("Dialogue name or t:tag");
 
-            inputField.RegisterCallback<KeyDownEvent>(evt =>
-            {
-                if (evt.keyCode == KeyCode.Return)
-                    OnSearch();
-            });
+            // inputField.RegisterCallback<KeyDownEvent>(evt =>
+            // {
+            //     if (evt.keyCode == KeyCode.Return)
+            //         OnSearch();
+            // });
+            inputField.RegisterValueChangedCallback(_ => OnSearch());
             
             var searchButton = new Button(OnSearch)
             {
@@ -81,7 +82,9 @@ namespace PotikotTools.DialogueSystem.Editor
 
             void OnSearch()
             {
-                if (string.IsNullOrEmpty(inputField.text))
+                string text = inputField.text.Trim();
+                
+                if (string.IsNullOrEmpty(text))
                 {
                     foreach (var e in _dialoguesContainer.Children())
                         e.style.display = DisplayStyle.Flex;
@@ -89,13 +92,10 @@ namespace PotikotTools.DialogueSystem.Editor
                     return;
                 }
 
-                List<DialogueData> foundDialogues;
-                
-                if (inputField.text.StartsWith("t:"))
-                    foundDialogues = SearchDialoguesUtility.SearchDialoguesByTag(inputField.text[2..]);
-                else
-                    foundDialogues = SearchDialoguesUtility.SearchDialoguesByName(inputField.text);
-                    
+                List<DialogueData> foundDialogues = text.StartsWith("t:")
+                    ? SearchDialoguesUtility.SearchDialoguesByTag(text[2..])
+                    : SearchDialoguesUtility.SearchDialoguesByName(text);
+
                 if (foundDialogues == null)
                 {
                     foreach (var e in _dialoguesContainer.Children())

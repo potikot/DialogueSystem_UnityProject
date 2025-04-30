@@ -286,5 +286,5 @@
 {
     display: flex;
     
-    transition-delay: .3s;
+    transition-delay: .15s;
 }

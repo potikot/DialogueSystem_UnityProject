@@ -1,8 +1,10 @@
 {
-  "Tags": [],
+  "Tags": [
+    "tag-1"
+  ],
   "Speakers": [],
   "LoadResourcesImmediately": false,
-  "id": "empty",
+  "id": "New Dialogue 1",
   "nodes": [],
   "nextNodeId": 0
 }

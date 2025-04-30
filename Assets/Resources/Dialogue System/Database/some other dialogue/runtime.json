@@ -1,5 +1,7 @@
 {
-  "Tags": [],
+  "Tags": [
+    "tag-1"
+  ],
   "Speakers": [],
   "LoadResourcesImmediately": false,
   "id": "some other dialogue",

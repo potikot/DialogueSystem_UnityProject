@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace PotikotTools.DialogueSystem.Editor
@@ -10,7 +11,7 @@ namespace PotikotTools.DialogueSystem.Editor
             
             foreach (var dialogue in Components.Database.Dialogues)
             {
-                if (dialogue.Key.StartsWith(dialogueName))
+                if (dialogue.Key.StartsWith(dialogueName, StringComparison.OrdinalIgnoreCase))
                 {
                     DL.Log("Found Dialogue: " + dialogueName + " : " + dialogue.Value.Id);
                     foundDialogues.Add(dialogue.Value);

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -46,13 +47,13 @@ namespace PotikotTools.DialogueSystem
 
         public async Task<bool> SaveAsync(string directoryPath, DialogueData dialogueData)
         {
-            await dialogueData.SerializeJsonAsync(serializer);
-            
             string fullPath = Path.Combine(directoryPath, dialogueData.Id, DialogueSystemPreferences.Data.RuntimeDataFilename);
 
             using (StreamWriter sw = new(fullPath))
-                using (JsonWriter jw = new JsonTextWriter(sw))
-                    serializer.Serialize(jw, dialogueData);
+            {
+                string json = await dialogueData.SerializeJsonAsync(serializer);
+                await sw.WriteAsync(json);
+            }
             
             return true;
         }
