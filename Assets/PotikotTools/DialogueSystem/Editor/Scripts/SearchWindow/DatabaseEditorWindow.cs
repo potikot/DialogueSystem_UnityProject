@@ -292,9 +292,14 @@ namespace PotikotTools.DialogueSystem.Editor
 
             async void OnNameValueChanged(ChangeEvent<string> evt)
             {
-                if (!await editorDialogueData.TrySetId(evt.newValue.Trim()))
-                    nameInputField.SetValueWithoutNotify(editorDialogueData.Id);
-
+                string newName = evt.newValue.Trim();
+                
+                if (newName == editorDialogueData.Id)
+                    return;
+                
+                await editorDialogueData.TrySetId(newName);
+                
+                nameInputField.SetValueWithoutNotify(editorDialogueData.Id);
                 nameInputField.RemoveUSSClasses("dialogue-view__text-input-field--focused");
             }
             
