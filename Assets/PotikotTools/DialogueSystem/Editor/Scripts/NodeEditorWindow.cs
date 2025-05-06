@@ -1,27 +1,24 @@
 using System;
-using System.Collections.Generic;
 using UnityEditor;
-using UnityEditor.Experimental.GraphView;
-using UnityEngine;
 using UnityEngine.UIElements;
-using Object = UnityEngine.Object;
 
 namespace PotikotTools.DialogueSystem.Editor
 {
     public class NodeEditorWindow : EditorWindow
     {
+        public event Action<NodeEditorWindow> OnClose;
+        
         private DialogueGraphView _graph;
 
-        private EditorDialogueData editorData
+        public EditorDialogueData EditorData
         {
             get => _graph.EditorData;
             set => AddGraphView(value);
         }
 
-        public static void Open(EditorDialogueData editorData)
+        private void OnDestroy()
         {
-            var window = GetWindow<NodeEditorWindow>($"'{editorData.Id}' Dialogue Editor");
-            window.editorData = editorData;
+            OnClose?.Invoke(this);
         }
 
         private void CreateGUI()
@@ -35,7 +32,7 @@ namespace PotikotTools.DialogueSystem.Editor
                 if (_graph == null)
                     return;
 
-                await EditorDatabase.SaveDialogueAsync(editorData);
+                await EditorComponents.Database.SaveDialogueAsync(EditorData);
 
             }) { text = "Save Dialogue" });
 
@@ -46,10 +43,8 @@ namespace PotikotTools.DialogueSystem.Editor
         {
             if (editorData == null)
                 return;
-            
-            if (_graph != null)
-                _graph.RemoveFromHierarchy();
-            
+
+            _graph?.RemoveFromHierarchy();
             _graph = new DialogueGraphView(editorData);
             _graph.StretchToParentSize();
             

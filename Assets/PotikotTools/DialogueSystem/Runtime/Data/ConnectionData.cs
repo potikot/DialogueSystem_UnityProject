@@ -1,5 +1,3 @@
-using Newtonsoft.Json;
-
 namespace PotikotTools.DialogueSystem
 {
     public class ConnectionData

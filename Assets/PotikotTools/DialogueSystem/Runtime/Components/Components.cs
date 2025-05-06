@@ -13,6 +13,8 @@ namespace PotikotTools.DialogueSystem
         
     }
     
+    [InitializeOnLoad]
+    [DefaultExecutionOrder(-1000)]
     public static class Components
     {
         private static Database _database;
@@ -33,9 +35,8 @@ namespace PotikotTools.DialogueSystem
         private static NodeLinker _nodeLinker;
 
         public static NodeLinker NodeLinker => _nodeLinker ??= new NodeLinker();
-        
-        [InitializeOnLoadMethod]
-        private static void Initialize()
+
+        static Components()
         {
             Database = new Database();
         }

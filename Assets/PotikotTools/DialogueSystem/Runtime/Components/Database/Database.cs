@@ -14,30 +14,30 @@ namespace PotikotTools.DialogueSystem
         protected string relativeRootPath;
 
         // TODO: update tags when tag added to dialogue data after initialization
-        protected Dictionary<string, List<string>> tags;
+        protected Dictionary<string, HashSet<string>> tags;
         protected Dictionary<string, DialogueData> dialogues;
 
         protected Dictionary<Type, string> resourceDirectories;
         
-        protected bool isInitialized = false;
+        protected bool isInitialized;
 
-        public IReadOnlyDictionary<string, List<string>> Tags => tags;
-        public IReadOnlyDictionary<string, DialogueData> Dialogues => dialogues;
-        public int DialoguesCount { get; private set; }
+        public IReadOnlyDictionary<string, HashSet<string>> Tags => tags;
         public IDialogueLoader Loader => loader;
         public string RootPath => rootPath;
         public string RelativeRootPath => relativeRootPath;
 
+        internal IReadOnlyDictionary<string, DialogueData> Dialogues => dialogues;
+        
         public virtual async void Initialize()
         {
             if (isInitialized) return;
             isInitialized = true;
 
-            loader = new JsonDialogueSaverLoader();
+            loader = new JsonDialogueLoader();
             rootPath = Path.Combine(Application.dataPath, DialogueSystemPreferences.Data.DatabaseDirectory);
             relativeRootPath = Path.Combine("Assets", DialogueSystemPreferences.Data.DatabaseDirectory);
             
-            tags = new Dictionary<string, List<string>>();
+            tags = new Dictionary<string, HashSet<string>>();
             dialogues = new Dictionary<string, DialogueData>();
 
             resourceDirectories = new Dictionary<Type, string>
@@ -54,7 +54,6 @@ namespace PotikotTools.DialogueSystem
             }
 
             string[] dialogueDirectories = Directory.GetDirectories(rootPath);
-            DialoguesCount = dialogueDirectories.Length;
             
             // TODO: optimize tags saving/loading
             foreach (string dialogueDirectory in dialogueDirectories)
@@ -64,10 +63,7 @@ namespace PotikotTools.DialogueSystem
                 List<string> data = await GetDialogueTagsAsync(dialogueName);
                 foreach (string tag in data)
                 {
-                    if (tags.TryGetValue(tag, out var idList))
-                        idList.Add(dialogueName);
-                    else
-                        tags.Add(tag, new List<string>() { dialogueName });
+                    GetOrAddTag(tag).Add(dialogueName);
                 }
             }
         }
@@ -84,8 +80,8 @@ namespace PotikotTools.DialogueSystem
 
             if (await LoadDialogueAsync(dialogueName))
                 return dialogues[dialogueName];
-            else
-                return null;
+            
+            return null;
         }
 
         public virtual DialogueData GetDialogue(string dialogueName)
@@ -95,8 +91,8 @@ namespace PotikotTools.DialogueSystem
 
             if (LoadDialogue(dialogueName))
                 return dialogues[dialogueName];
-            else
-                return null;
+
+            return null;
         }
 
         public virtual bool ContainsDialogue(string dialogueName)
@@ -106,13 +102,13 @@ namespace PotikotTools.DialogueSystem
 
         public virtual async Task<bool> LoadDialogueAsync(string dialogueName)
         {
-            DialogueData dialogueData = await loader.LoadAsync(rootPath, dialogueName);
+            DialogueData dialogueData = await loader.LoadDataAsync(rootPath, dialogueName);
             Components.NodeLinker.SetConnections(dialogueData);
             Components.NodeLinker.Clear();
 
             if (dialogueData != null)
             {
-                dialogues.Add(dialogueName, dialogueData);
+                dialogues.TryAdd(dialogueName, dialogueData);
                 foreach (NodeData node in dialogueData.Nodes)
                     node.DialogueData = dialogueData;
                 
@@ -125,13 +121,13 @@ namespace PotikotTools.DialogueSystem
 
         public virtual bool LoadDialogue(string dialogueName)
         {
-            DialogueData dialogueData = loader.Load(rootPath, dialogueName);
+            DialogueData dialogueData = loader.LoadData(rootPath, dialogueName);
             Components.NodeLinker.SetConnections(dialogueData);
             Components.NodeLinker.Clear();
 
             if (dialogueData != null)
             {
-                dialogues.Add(dialogueName, dialogueData);
+                dialogues.TryAdd(dialogueName, dialogueData);
                 foreach (NodeData node in dialogueData.Nodes)
                     node.DialogueData = dialogueData;
                 
@@ -144,7 +140,7 @@ namespace PotikotTools.DialogueSystem
 
         public virtual async Task<bool> LoadDialoguesByTagAsync(string tag)
         {
-            if (!tags.TryGetValue(tag, out List<string> dialogueNames))
+            if (!tags.TryGetValue(tag, out var dialogueNames))
                 return false;
 
             bool flag = true;
@@ -157,7 +153,7 @@ namespace PotikotTools.DialogueSystem
 
         public virtual bool LoadDialoguesByTag(string tag)
         {
-            if (!tags.TryGetValue(tag, out List<string> dialogueNames)
+            if (!tags.TryGetValue(tag, out var dialogueNames)
                 || dialogueNames.Count == 0)
                 return false;
 
@@ -182,7 +178,7 @@ namespace PotikotTools.DialogueSystem
 
         public virtual void ReleaseDialoguesByTag(string tag)
         {
-            if (!tags.TryGetValue(tag, out List<string> dialogueNames))
+            if (!tags.TryGetValue(tag, out var dialogueNames))
                 return;
 
             foreach (string dialogueName in dialogueNames)
@@ -219,7 +215,7 @@ namespace PotikotTools.DialogueSystem
             #else
             
             TaskCompletionSource<T> tcs = new();
-            request.completed += ao =>
+            request.completed += _ =>
             {
                 if (request.asset is T resource)
                 {
@@ -235,6 +231,29 @@ namespace PotikotTools.DialogueSystem
             
             return await tcs.Task;
             #endif
+        }
+
+        internal void AddDialogue(DialogueData dialogueData)
+        {
+            if (dialogueData == null
+                || !dialogues.TryAdd(dialogueData.Id, dialogueData))
+                return;
+
+            foreach (string tag in dialogueData.Tags)
+            {
+                GetOrAddTag(tag).Add(dialogueData.Id);
+            }
+        }
+
+        internal HashSet<string> GetOrAddTag(string tag)
+        {
+            if (tags.TryGetValue(tag, out var dialogueNames))
+                return dialogueNames;
+
+            dialogueNames = new HashSet<string>();
+            tags.Add(tag, dialogueNames);
+
+            return dialogueNames;
         }
     }
 }

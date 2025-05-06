@@ -9,7 +9,7 @@ namespace PotikotTools.DialogueSystem.Editor
         {
             var foundDialogues = new List<DialogueData>();
             
-            foreach (var dialogue in Components.Database.Dialogues)
+            foreach (var dialogue in Components.Database.Dialogues) // TODO: update dialogues when modified
             {
                 if (dialogue.Key.StartsWith(dialogueName, StringComparison.OrdinalIgnoreCase))
                 {
@@ -26,7 +26,7 @@ namespace PotikotTools.DialogueSystem.Editor
             DL.Log("Searching Dialogue: " + tag);
             var foundDialogues = new List<DialogueData>();
             
-            foreach (var tagDialogues in Components.Database.Tags)
+            foreach (var tagDialogues in Components.Database.Tags) // TODO: update tags when modified
             {
                 if (tagDialogues.Key.StartsWith(tag))
                     foreach (string dialogueName in tagDialogues.Value)

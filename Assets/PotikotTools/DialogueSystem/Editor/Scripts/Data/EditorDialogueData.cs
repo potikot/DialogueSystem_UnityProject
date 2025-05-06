@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using UnityEditor;
@@ -96,7 +94,7 @@ namespace PotikotTools.DialogueSystem.Editor
                 return false;
             }
 
-            await EditorDatabase.SaveDialogueAsync(this);
+            await EditorComponents.Database.SaveDialogueAsync(this);
             return true;
         }
 
