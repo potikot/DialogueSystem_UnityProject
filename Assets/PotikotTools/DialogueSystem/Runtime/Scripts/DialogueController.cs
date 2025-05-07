@@ -152,7 +152,6 @@ namespace PotikotTools.DialogueSystem
 
         private async void ExecuteCommandAsync(CommandData command)
         {
-            DL.LogError(command.Text);
             if (command.HasDelay)
                 await Components.CommandHandler.ExecuteWithDelayAsync(command.Text, command.Delay);
             else
