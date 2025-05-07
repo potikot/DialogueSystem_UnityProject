@@ -160,18 +160,18 @@ namespace PotikotTools.DialogueSystem.Editor
 
             Foldout foldout = new()
             {
-                text = commandData.Command ?? $"Command {index + 1}",
+                text = commandData.Text ?? $"Command {index + 1}",
                 value = false
             };
             
             TextField commandInput = new()
             {
-                value = commandData.Command
+                value = commandData.Text
             };
 
             commandInput.RegisterValueChangedCallback(evt =>
             {
-                commandData.Command = evt.newValue;
+                commandData.Text = evt.newValue;
 
                 if (string.IsNullOrEmpty(evt.newValue))
                     foldout.text = $"Command {index + 1}";
@@ -184,7 +184,8 @@ namespace PotikotTools.DialogueSystem.Editor
 
             FloatField delayInput = new("Delay")
             {
-                value = commandData.Delay
+                value = commandData.Delay,
+                tooltip = "In seconds"
             };
             
             delayInput.RegisterValueChangedCallback(evt =>

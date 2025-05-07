@@ -16,7 +16,7 @@ namespace PotikotTools.DialogueSystem.Editor
 
         private VisualElement _dialoguesContainer;
 
-        [MenuItem("Tools/DialogueSystem/Database")]
+        [MenuItem("Tools/PotikotTools/DialogueSystem/Database")]
         public static void Open()
         {
             GetWindow<DatabaseEditorWindow>("Dialogue Database");
