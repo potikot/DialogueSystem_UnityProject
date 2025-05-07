@@ -8,13 +8,9 @@ namespace PotikotTools.DialogueSystem
 
         public ConnectionData() { }
 
-        public ConnectionData(string text)
+        public ConnectionData(string text, NodeData from, NodeData to)
         {
             Text = text;
-        }
-        
-        public ConnectionData(string text, NodeData from, NodeData to) : this(text)
-        {
             From = from;
             To = to;
         }

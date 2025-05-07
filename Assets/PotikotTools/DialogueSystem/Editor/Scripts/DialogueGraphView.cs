@@ -45,67 +45,6 @@ namespace PotikotTools.DialogueSystem.Editor
             evt.menu.AppendAction("Create Timer Node", a => AddNode<TimerNodeView, TimerNodeData>(a, 5f));
         }
 
-        private GraphViewChange HandleGraphViewChanged(GraphViewChange change)
-        {
-            // TODO: optimize algorithm
-
-            if (change.edgesToCreate != null)
-            {
-                foreach (Edge edge in change.edgesToCreate)
-                {
-                    NodeData from = (edge.output.node as INodeView).GetData();
-                    NodeData to = (edge.input.node as INodeView).GetData();
-
-                    List<Port> outputPorts = edge.output.node.outputContainer.Query<Port>().ToList();
-                    int i = 0;
-                    foreach (var port in outputPorts)
-                    {
-                        if (port == edge.output)
-                            break;
-
-                        i++;
-                    }
-
-                    from.OutputConnections[i].To = to;
-                    to.InputConnection = from.OutputConnections[i];
-
-                    DL.Log($"Connected: {edge.output.node.title} -> {edge.input.node.title}");
-                }
-            }
-
-            if (change.elementsToRemove != null)
-            {
-                foreach (GraphElement element in change.elementsToRemove)
-                {
-                    if (element is Edge edge)
-                    {
-                        NodeData from = (edge.output.node as INodeView).GetData();
-                        NodeData to = (edge.input.node as INodeView).GetData();
-
-                        List<Port> outputPorts = edge.output.node.outputContainer.Query<Port>().ToList();
-                        int i = outputPorts.TakeWhile(port => port != edge.output).Count();
-
-                        from.OutputConnections[i].To = null;
-                        to.InputConnection = null;
-                        
-                        DL.Log($"Disconnected: {edge.output.node.title} -> {edge.input.node.title}");
-                    }
-                    else if (element is INodeView nodeView)
-                    {
-                        if (nodeView is Node node)
-                        {
-                            node.inputContainer.Q<Port>().DisconnectAll();
-                            node.outputContainer.Query<Port>().ForEach(p => p.DisconnectAll());
-                        }
-                        
-                        nodeView.Delete();
-                    }
-                }
-            }
-
-            return change;
-        }
-        
         private void AddNode<TView, TData>(DropdownMenuAction dropdownMenuAction, params object[] dataArgs)
             where TView : Node, INodeView
             where TData : NodeData
@@ -142,7 +81,9 @@ namespace PotikotTools.DialogueSystem.Editor
             
             foreach (Node fromNode in nodes)
             {
-                INodeView fromNodeView = fromNode as INodeView;
+                if (fromNode is not INodeView fromNodeView)
+                    return;
+
                 NodeData fromNodeData = fromNodeView.GetData();
                 
                 for (int i = 0; i < fromNodeData.OutputConnections.Count; i++)
@@ -175,5 +116,104 @@ namespace PotikotTools.DialogueSystem.Editor
             
             Insert(0, grid);
         }
+
+        #region OnGraphViewChanged
+
+        private static GraphViewChange HandleGraphViewChanged(GraphViewChange change)
+        {
+            // TODO: optimize algorithm
+
+            CreateEdges(change.edgesToCreate);
+            RemoveElements(change.elementsToRemove);
+
+            return change;
+        }
+
+        private static void CreateEdges(List<Edge> elements)
+        {
+            if (elements == null)
+                return;
+            
+            foreach (Edge edge in elements)
+            {
+                if (!TryGetNodeData(edge, out var data))
+                {
+                    DL.LogError("Edge data could not be parsed");
+                    continue;
+                }
+                
+                data.from.OutputConnections[data.optionIndex].From = data.from;
+                data.from.OutputConnections[data.optionIndex].To = data.to;
+                data.to.InputConnection = data.from.OutputConnections[data.optionIndex];
+
+                DL.Log($"Connected: {edge.output.node.title} -> {edge.input.node.title}");
+            }
+        }
+        
+        private static void RemoveElements(List<GraphElement> elements)
+        {
+            if (elements == null)
+                return;
+
+            foreach (GraphElement element in elements)
+            {
+                switch (element)
+                {
+                    case Edge edge:
+                    {
+                        if (!TryGetNodeData(edge, out var data))
+                        {
+                            DL.LogError("Edge data could not be parsed");
+                            continue;
+                        }
+                        
+                        data.from.OutputConnections[data.optionIndex].To = null;
+                        data.to.InputConnection = null;
+                        
+                        DL.Log($"Disconnected: {edge.output.node.title} -> {edge.input.node.title}");
+                        break;
+                    }
+                    case INodeView nodeView:
+                    {
+                        if (nodeView is Node node)
+                        {
+                            node.inputContainer.Q<Port>().DisconnectAll();
+                            node.outputContainer.Query<Port>().ForEach(p => p.DisconnectAll());
+                        }
+                        
+                        nodeView.Delete();
+                        break;
+                    }
+                }
+            }
+        }
+
+        private static bool TryGetNodeData(Edge edge, out (NodeData from, NodeData to, int optionIndex) data)
+        {
+            data = default;
+            if (edge.output.node is not INodeView outputNodeView
+                || edge.input.node is not INodeView inputNodeView)
+                return false;
+
+            NodeData from = outputNodeView.GetData();
+            NodeData to = inputNodeView.GetData();
+
+            List<Port> outputPorts = edge.output.node.outputContainer.Query<Port>().ToList();
+            int i = outputPorts.IndexOf(edge.output);
+
+            data.from = from;
+            data.to = to;
+            data.optionIndex = i;
+            
+            if (i < 0)
+            {
+                DL.LogError("Port index out of range");
+                return false;
+            }
+
+            return true;
+        }
+        
+        #endregion
     }
 }

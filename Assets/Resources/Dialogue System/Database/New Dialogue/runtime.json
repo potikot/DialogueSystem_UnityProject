@@ -43,7 +43,13 @@
           "To": 2
         },
         {
-          "Text": "Close"
+          "Text": "Close",
+          "From": 1
+        },
+        {
+          "Text": "4",
+          "From": 1,
+          "To": 5
         }
       ],
       "Id": 1
@@ -61,10 +67,58 @@
         }
       ],
       "OutputConnections": [
-        {}
+        {
+          "From": 2,
+          "To": 3
+        }
       ],
       "Id": 2
+    },
+    {
+      "$type": "PotikotTools.DialogueSystem.SingleChoiceNodeData, PotikotTools.DialogueSystem",
+      "SpeakerIndex": -1,
+      "ListenerIndex": 0,
+      "Text": "1",
+      "Commands": [],
+      "OutputConnections": [
+        {
+          "From": 3,
+          "To": 4
+        }
+      ],
+      "Id": 3
+    },
+    {
+      "$type": "PotikotTools.DialogueSystem.SingleChoiceNodeData, PotikotTools.DialogueSystem",
+      "SpeakerIndex": -1,
+      "ListenerIndex": 0,
+      "Text": "2",
+      "Commands": [],
+      "OutputConnections": [
+        {}
+      ],
+      "Id": 4
+    },
+    {
+      "$type": "PotikotTools.DialogueSystem.MultipleChoiceNodeData, PotikotTools.DialogueSystem",
+      "SpeakerIndex": -1,
+      "ListenerIndex": 0,
+      "Text": "3",
+      "Commands": [],
+      "OutputConnections": [
+        {
+          "Text": "1",
+          "From": 5,
+          "To": 4
+        },
+        {
+          "Text": "2",
+          "From": 5,
+          "To": 4
+        }
+      ],
+      "Id": 5
     }
   ],
-  "nextNodeId": 3
+  "nextNodeId": 6
 }

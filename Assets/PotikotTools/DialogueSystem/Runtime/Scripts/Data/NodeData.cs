@@ -26,7 +26,7 @@ namespace PotikotTools.DialogueSystem
         [JsonIgnore] public bool HasInputConnection => InputConnection != null;
         [JsonIgnore] public bool HasOutputConnections => OutputConnections.Count > 0;
 
-        public NodeData(int id)
+        protected NodeData(int id)
         {
             Id = id;
 
