@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor.Experimental.GraphView;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace PotikotTools.DialogueSystem.Editor
@@ -82,15 +83,8 @@ namespace PotikotTools.DialogueSystem.Editor
                         NodeData to = (edge.input.node as INodeView).GetData();
 
                         List<Port> outputPorts = edge.output.node.outputContainer.Query<Port>().ToList();
-                        int i = 0;
-                        foreach (var port in outputPorts)
-                        {
-                            if (port == edge.output)
-                                break;
+                        int i = outputPorts.TakeWhile(port => port != edge.output).Count();
 
-                            i++;
-                        }
-                        
                         from.OutputConnections[i].To = null;
                         to.InputConnection = null;
                         
@@ -117,14 +111,14 @@ namespace PotikotTools.DialogueSystem.Editor
             where TData : NodeData
         {
             TView nodeView = Activator.CreateInstance<TView>();
-            EditorNodeData editorData = new EditorNodeData()
+            EditorNodeData editorNodeData = new EditorNodeData()
             {
-                position = dropdownMenuAction.eventInfo.mousePosition
+                position = this.ChangeCoordinatesTo(contentViewContainer, dropdownMenuAction.eventInfo.localMousePosition)
             };
             
-            EditorData.EditorNodeDataList.Add(editorData);
+            EditorData.EditorNodeDataList.Add(editorNodeData);
             
-            nodeView.Initialize(editorData, RuntimeData.AddNode<TData>(dataArgs));
+            nodeView.Initialize(editorNodeData, RuntimeData.AddNode<TData>(dataArgs));
             nodeView.Draw();
             
             AddElement(nodeView);
