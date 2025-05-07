@@ -82,8 +82,6 @@ namespace PotikotTools.DialogueSystem.Editor
             
             var runtimeData = new DialogueData(uniqueDialogueId);
             EditorDialogueData editorData = new EditorDialogueData(runtimeData);
-
-            DL.LogWarning(editorData.Id);
             
             await SaveDialogueAsync(editorData);
             database.AddDialogue(runtimeData);

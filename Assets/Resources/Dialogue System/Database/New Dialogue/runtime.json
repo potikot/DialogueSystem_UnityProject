@@ -1,0 +1,70 @@
+{
+  "Tags": [],
+  "Speakers": [],
+  "LoadResourcesImmediately": false,
+  "id": "New Dialogue",
+  "nodes": [
+    {
+      "$type": "PotikotTools.DialogueSystem.SingleChoiceNodeData, PotikotTools.DialogueSystem",
+      "SpeakerIndex": -1,
+      "ListenerIndex": 0,
+      "Text": "CMD Examples",
+      "Commands": [
+        {
+          "Text": "DL.Log dialogue started",
+          "ExecutionOrder": 0,
+          "Delay": 0.0
+        }
+      ],
+      "OutputConnections": [
+        {
+          "From": 0,
+          "To": 1
+        }
+      ],
+      "Id": 0
+    },
+    {
+      "$type": "PotikotTools.DialogueSystem.MultipleChoiceNodeData, PotikotTools.DialogueSystem",
+      "SpeakerIndex": -1,
+      "ListenerIndex": 0,
+      "Text": "COMMAND",
+      "Commands": [
+        {
+          "Text": "DL.Log smth",
+          "ExecutionOrder": 0,
+          "Delay": 0.0
+        }
+      ],
+      "OutputConnections": [
+        {
+          "Text": "With delay",
+          "From": 1,
+          "To": 2
+        },
+        {
+          "Text": "Close"
+        }
+      ],
+      "Id": 1
+    },
+    {
+      "$type": "PotikotTools.DialogueSystem.SingleChoiceNodeData, PotikotTools.DialogueSystem",
+      "SpeakerIndex": -1,
+      "ListenerIndex": 0,
+      "Text": "CMD with delay 3s",
+      "Commands": [
+        {
+          "Text": "DL.LogWarning warn delay 5",
+          "ExecutionOrder": 0,
+          "Delay": 3.0
+        }
+      ],
+      "OutputConnections": [
+        {}
+      ],
+      "Id": 2
+    }
+  ],
+  "nextNodeId": 3
+}
