@@ -12,10 +12,12 @@ namespace PotikotTools.DialogueSystem
             
             if (!string.IsNullOrEmpty(value.Text))
                 obj["Text"] = value.Text;
-            if (value.From != null)
+
+            if (value.From != null && value.To != null)
+            {
                 obj["From"] = value.From.Id;
-            if (value.To != null)
                 obj["To"] = value.To.Id;
+            }
             
             obj.WriteTo(writer);
         }
@@ -28,8 +30,7 @@ namespace PotikotTools.DialogueSystem
             if (obj.TryGetValue("Text", out JToken text))
                 connectionData.Text = (string)text;
             
-            if (obj.TryGetValue("From", out JToken from)
-                && obj.TryGetValue("To", out JToken to))
+            if (obj.TryGetValue("From", out JToken from) && obj.TryGetValue("To", out JToken to))
             {
                 int fromId = (int)from;
                 int toId = (int)to;
