@@ -19,8 +19,8 @@ namespace PotikotTools.DialogueSystem
             foreach (var command in castedData.Commands)
                 controller.HandleCommand(command);
             
-            dialogueView.SetText(castedData.Text);
-            dialogueView.SetOptions(castedData.OutputConnections.Select(oc => oc.Text).ToArray());
+            dialogueView.SetSpeakerText(castedData.Text);
+            dialogueView.SetAnswerOptions(castedData.OutputConnections.Select(oc => oc.Text).ToArray());
             dialogueView.OnOptionSelected(controller.Next);
 
             var tdv = dialogueView.GetMenu<ITimerDialogueView>();

@@ -8,49 +8,52 @@ namespace PotikotTools.DialogueSystem
 {
     public class DialogueView : MonoBehaviour, IDialogueView, ITimerDialogueView
     {
-        [SerializeField] private MonoBehaviour[] _menus;
+        [SerializeField] protected List<MonoBehaviour> menus;
         
-        [SerializeField] private GameObject _container;
+        [SerializeField] protected GameObject container;
 
-        [SerializeField] private TextMeshProUGUI _label;
+        [SerializeField] protected TextMeshProUGUI label;
 
-        [SerializeField] private RectTransform _optionsContainer;
-        [SerializeField] private OptionView _optionViewPrefab;
+        [SerializeField] protected RectTransform optionsContainer;
+        [SerializeField] protected OptionView optionViewPrefab;
 
-        [SerializeField] private Image _timerImage;
+        [SerializeField] protected Image timerImage;
         
-        private List<OptionView> _options;
-        private Action<int> _onOptionSelected;
+        protected List<OptionView> optionViews;
+        protected Action<int> onOptionSelected;
 
-        public bool IsEnabled { get; private set; }
+        public bool IsEnabled { get; protected set; }
 
-        private void Awake()
+        protected virtual void Awake()
         {
-            _options = new List<OptionView>();
+            optionViews = new List<OptionView>();
+            menus ??= new List<MonoBehaviour>();
+
+            menus.Add(this);
         }
 
-        public void Show()
+        public virtual void Show()
         {
             if (IsEnabled) return;
             IsEnabled = true;
             
-            _container.SetActive(true);
+            container.SetActive(true);
         }
 
-        public void Hide()
+        public virtual void Hide()
         {
             if (!IsEnabled) return;
             IsEnabled = false;
             
-            _container.SetActive(false);
+            container.SetActive(false);
         }
 
-        public void SetText(string text)
+        public virtual void SetSpeakerText(string text)
         {
-            _label.text = text;
+            label.text = text;
         }
 
-        public void SetOptions(string[] options)
+        public virtual void SetAnswerOptions(string[] options)
         {
             if (options == null || options.Length == 0)
             {
@@ -58,57 +61,57 @@ namespace PotikotTools.DialogueSystem
                 return;
             }
 
-            GenereateOptions(options);
+            GenerateOptions(options);
         }
         
-        public void SetTimer(Timer timer)
+        public virtual void SetTimer(Timer timer)
         {
-            timer.OnTick += p => _timerImage.fillAmount = p;
+            timer.OnTick += p => timerImage.fillAmount = p;
         }
 
-        public void OnOptionSelected(Action<int> callback)
+        public virtual void OnOptionSelected(Action<int> callback)
         {
-            _onOptionSelected = callback;
+            onOptionSelected = callback;
         }
 
-        public T GetMenu<T>()
+        public virtual T GetMenu<T>()
         {
-            foreach (var menu in _menus)
+            foreach (var menu in menus)
                 if (menu is T castedMenu)
                     return castedMenu;
             
             return default;
         }
         
-        private void GenereateOptions(string[] options)
+        protected virtual void GenerateOptions(string[] options)
         {
             int optionsCount = options.Length;
             int i = 0;
 
             for (; i < optionsCount; i++)
             {
-                if (_options.Count <= i)
-                    _options.Add(Instantiate(_optionViewPrefab, _optionsContainer));
+                if (optionViews.Count <= i)
+                    optionViews.Add(Instantiate(optionViewPrefab, optionsContainer));
                 
                 int optionIndex = i;
-                _options[i].OnSelected(() => _onOptionSelected?.Invoke(optionIndex));
-                _options[i].Show();
-                _options[i].SetText(options[i]);
+                optionViews[i].OnSelected(() => onOptionSelected?.Invoke(optionIndex));
+                optionViews[i].Show();
+                optionViews[i].SetText(options[i]);
             }
 
-            for (int j = i; j < _options.Count; j++)
+            for (int j = i; j < optionViews.Count; j++)
             {
-                _options[j].OnSelected(null);
-                _options[j].Hide();
+                optionViews[j].OnSelected(null);
+                optionViews[j].Hide();
             }
         }
 
-        private void DestroyOptions()
+        protected virtual void DestroyOptions()
         {
-            foreach (OptionView option in _options)
+            foreach (OptionView option in optionViews)
                 Destroy(option.gameObject);
                 
-            _options.Clear();
+            optionViews.Clear();
         }
     }
 }

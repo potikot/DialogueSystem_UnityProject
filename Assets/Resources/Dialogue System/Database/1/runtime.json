@@ -1,0 +1,123 @@
+{
+  "Tags": [],
+  "Speakers": [],
+  "LoadResourcesImmediately": false,
+  "id": "1",
+  "nodes": [
+    {
+      "$type": "PotikotTools.DialogueSystem.SingleChoiceNodeData, PotikotTools.DialogueSystem",
+      "SpeakerIndex": -1,
+      "ListenerIndex": 0,
+      "Text": "CMD Examples",
+      "Commands": [
+        {
+          "Text": "DL.Log dialogue started",
+          "ExecutionOrder": 0,
+          "Delay": 0.0
+        }
+      ],
+      "OutputConnections": [
+        {
+          "From": 0,
+          "To": 1
+        }
+      ],
+      "Id": 0
+    },
+    {
+      "$type": "PotikotTools.DialogueSystem.MultipleChoiceNodeData, PotikotTools.DialogueSystem",
+      "SpeakerIndex": -1,
+      "ListenerIndex": 0,
+      "Text": "COMMAND",
+      "Commands": [
+        {
+          "Text": "DL.Log smth",
+          "ExecutionOrder": 0,
+          "Delay": 0.0
+        }
+      ],
+      "OutputConnections": [
+        {
+          "Text": "With delay",
+          "From": 1,
+          "To": 2
+        },
+        {
+          "Text": "Close",
+          "From": 1,
+          "To": 5
+        },
+        {
+          "Text": "4"
+        }
+      ],
+      "Id": 1
+    },
+    {
+      "$type": "PotikotTools.DialogueSystem.SingleChoiceNodeData, PotikotTools.DialogueSystem",
+      "SpeakerIndex": -1,
+      "ListenerIndex": 0,
+      "Text": "CMD with delay 3s",
+      "Commands": [
+        {
+          "Text": "DL.LogWarning warn delay 5",
+          "ExecutionOrder": 0,
+          "Delay": 3.0
+        }
+      ],
+      "OutputConnections": [
+        {
+          "From": 2,
+          "To": 3
+        }
+      ],
+      "Id": 2
+    },
+    {
+      "$type": "PotikotTools.DialogueSystem.SingleChoiceNodeData, PotikotTools.DialogueSystem",
+      "SpeakerIndex": -1,
+      "ListenerIndex": 0,
+      "Text": "1",
+      "Commands": [],
+      "OutputConnections": [
+        {
+          "From": 3,
+          "To": 4
+        }
+      ],
+      "Id": 3
+    },
+    {
+      "$type": "PotikotTools.DialogueSystem.SingleChoiceNodeData, PotikotTools.DialogueSystem",
+      "SpeakerIndex": -1,
+      "ListenerIndex": 0,
+      "Text": "2",
+      "Commands": [],
+      "OutputConnections": [
+        {}
+      ],
+      "Id": 4
+    },
+    {
+      "$type": "PotikotTools.DialogueSystem.MultipleChoiceNodeData, PotikotTools.DialogueSystem",
+      "SpeakerIndex": -1,
+      "ListenerIndex": 0,
+      "Text": "3",
+      "Commands": [],
+      "OutputConnections": [
+        {
+          "Text": "1",
+          "From": 5,
+          "To": 4
+        },
+        {
+          "Text": "2",
+          "From": 5,
+          "To": 4
+        }
+      ],
+      "Id": 5
+    }
+  ],
+  "nextNodeId": 6
+}

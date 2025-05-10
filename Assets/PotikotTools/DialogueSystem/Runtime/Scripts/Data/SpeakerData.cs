@@ -2,7 +2,7 @@ namespace PotikotTools.DialogueSystem
 {
     public class SpeakerData
     {
-        public string Name { get; private set; }
+        public string Name;
 
         public SpeakerData(string name)
         {

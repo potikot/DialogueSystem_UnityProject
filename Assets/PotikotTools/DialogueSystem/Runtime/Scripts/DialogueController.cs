@@ -5,22 +5,22 @@ namespace PotikotTools.DialogueSystem
 {
     public class DialogueController
     {
-        private IDialogueView _dialogueView;
-        private DialogueData _dialogueData;
+        protected IDialogueView currentDialogueView;
+        protected DialogueData currentDialogueData;
 
-        private NodeData _currentNodeData;
-        private Dictionary<Type, INodeHandler> _nodeHandlers;
+        protected NodeData currentNodeData;
+        protected Dictionary<Type, INodeHandler> nodeHandlers;
 
-        private List<CommandData> _commandsToExecuteOnExitNode;
+        protected List<CommandData> commandsToExecuteOnExitNode;
         
-        public bool IsDialogueStarted { get; private set; }
-
-        public void Initialize(DialogueData dialogueData, IDialogueView dialogueView)
+        public bool IsDialogueStarted { get; protected set; }
+        
+        public virtual void Initialize(DialogueData dialogueData, IDialogueView dialogueView)
         {
-            _dialogueView = dialogueView;
-            _commandsToExecuteOnExitNode = new List<CommandData>();
+            currentDialogueView = dialogueView;
+            commandsToExecuteOnExitNode = new List<CommandData>();
             
-            _nodeHandlers = new Dictionary<Type, INodeHandler>
+            nodeHandlers = new Dictionary<Type, INodeHandler>
             {
                 { typeof(SingleChoiceNodeData), new SingleChoiceNodeHandler() },
                 { typeof(MultipleChoiceNodeData), new MultipleChoiceNodeHandler() },
@@ -30,7 +30,7 @@ namespace PotikotTools.DialogueSystem
             SetDialogueData(dialogueData);
         }
 
-        public void AddNodeHandler(Type nodeType, INodeHandler handler)
+        public virtual void AddNodeHandler(Type nodeType, INodeHandler handler)
         {
             if (!nodeType.IsSubclassOf(typeof(NodeData)))
             {
@@ -43,17 +43,17 @@ namespace PotikotTools.DialogueSystem
                 return;
             }
             
-            _nodeHandlers.Add(nodeType, handler);
+            nodeHandlers.Add(nodeType, handler);
         }
         
-        public void StartDialogue()
+        public virtual void StartDialogue()
         {
             if (IsDialogueStarted)
             {
                 DL.LogError("Dialogue is already started");
                 return;
             }
-            if (_dialogueData == null)
+            if (currentDialogueData == null)
             {
                 DL.LogError("Dialogue Data is null");
                 return;
@@ -61,18 +61,18 @@ namespace PotikotTools.DialogueSystem
             
             DL.Log("Start Dialogue");
             IsDialogueStarted = true;
-            _dialogueView.Show();
-            _currentNodeData = _dialogueData.GetFirstNode();
-            HandleNode(_currentNodeData);
+            currentDialogueView.Show();
+            currentNodeData = currentDialogueData.GetFirstNode();
+            HandleNode(currentNodeData);
         }
 
-        public void StartDialogue(DialogueData dialogueData)
+        public virtual void StartDialogue(DialogueData dialogueData)
         {
             SetDialogueData(dialogueData);
             StartDialogue();
         }
         
-        public void EndDialogue()
+        public virtual void EndDialogue()
         {
             if (!IsDialogueStarted)
             {
@@ -81,29 +81,29 @@ namespace PotikotTools.DialogueSystem
             }
             
             DL.Log("End Dialogue");
-            _dialogueView.OnOptionSelected(null);
-            _dialogueView.Hide();
+            currentDialogueView.OnOptionSelected(null);
+            currentDialogueView.Hide();
             IsDialogueStarted = false;
         }
         
-        public void Next(int choice = 0)
+        public virtual void Next(int choice = 0)
         {
             if (!IsDialogueStarted)
                 StartDialogue();
 
-            foreach (var command in _commandsToExecuteOnExitNode)
+            foreach (var command in commandsToExecuteOnExitNode)
                 ExecuteCommandAsync(command);
             
-            if (_currentNodeData.HasOutputConnections)
+            if (currentNodeData.HasOutputConnections)
             {
-                if (_currentNodeData.OutputConnections[choice].To == null)
+                if (currentNodeData.OutputConnections[choice].To == null)
                 {
                     EndDialogue();
                     return;
                 }
 
-                _currentNodeData = _currentNodeData.OutputConnections[choice].To;
-                HandleNode(_currentNodeData);
+                currentNodeData = currentNodeData.OutputConnections[choice].To;
+                HandleNode(currentNodeData);
             }
             else
             {
@@ -111,7 +111,23 @@ namespace PotikotTools.DialogueSystem
             }
         }
 
-        private void SetDialogueData(DialogueData dialogueData)
+        public virtual void HandleCommand(CommandData command)
+        {
+            switch (command.ExecutionOrder)
+            {
+                case CommandExecutionOrder.Immediately:
+                    ExecuteCommandAsync(command);
+                    break;
+                case CommandExecutionOrder.ExitNode:
+                    commandsToExecuteOnExitNode.Add(command);
+                    break;
+                default:
+                    DL.LogError($"Unknown Execution Order: {command.ExecutionOrder}");
+                    break;
+            }
+        }
+        
+        protected virtual void SetDialogueData(DialogueData dialogueData)
         {
             if (dialogueData == null)
             {
@@ -121,36 +137,20 @@ namespace PotikotTools.DialogueSystem
             if (IsDialogueStarted)
                 EndDialogue();
 
-            _dialogueData = dialogueData;
+            currentDialogueData = dialogueData;
         }
         
-        private void HandleNode(NodeData node)
+        protected virtual void HandleNode(NodeData node)
         {
             Type nodeType = node.GetType();
 
-            if (_nodeHandlers.TryGetValue(nodeType, out var handler))
-                handler.Handle(node, this, _dialogueView);
+            if (nodeHandlers.TryGetValue(nodeType, out var handler))
+                handler.Handle(node, this, currentDialogueView);
             else
                 DL.LogError($"Unknown Node Type: {nodeType}");
         }
         
-        public void HandleCommand(CommandData command)
-        {
-            switch (command.ExecutionOrder)
-            {
-                case CommandExecutionOrder.Immediately:
-                    ExecuteCommandAsync(command);
-                    break;
-                case CommandExecutionOrder.ExitNode:
-                    _commandsToExecuteOnExitNode.Add(command);
-                    break;
-                default:
-                    DL.LogError($"Unknown Execution Order: {command.ExecutionOrder}");
-                    break;
-            }
-        }
-
-        private async void ExecuteCommandAsync(CommandData command)
+        protected virtual async void ExecuteCommandAsync(CommandData command)
         {
             if (command.HasDelay)
                 await Components.CommandHandler.ExecuteWithDelayAsync(command.Text, command.Delay);

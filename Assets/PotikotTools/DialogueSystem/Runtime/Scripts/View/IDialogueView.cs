@@ -9,8 +9,8 @@ namespace PotikotTools.DialogueSystem
         void Show();
         void Hide();
 
-        void SetText(string text);
-        void SetOptions(string[] options);
+        void SetSpeakerText(string text);
+        void SetAnswerOptions(string[] options);
         
         void OnOptionSelected(Action<int> callback);
 
