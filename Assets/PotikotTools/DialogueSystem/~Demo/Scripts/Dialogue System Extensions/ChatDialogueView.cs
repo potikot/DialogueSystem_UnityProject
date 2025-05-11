@@ -13,6 +13,7 @@ namespace PotikotTools.DialogueSystem.Demo
         [SerializeField] private Image _titleAvatarImage;
         [SerializeField] private TextMeshProUGUI _titleNameLabel;
         [SerializeField] private TextMeshProUGUI _titleLastSeenLabel;
+        [SerializeField] private Button _closeButton;
 
         [Header("Messages")]
         [SerializeField] private RectTransform _messagesContainer;
@@ -27,6 +28,11 @@ namespace PotikotTools.DialogueSystem.Demo
             _messages = new List<MessageView>();
         }
 
+        private void Start()
+        {
+            _closeButton.onClick.AddListener(G.Hud.MessengerWindow.CloseChat);
+        }
+        
         public void SetAvatarImage(Sprite avatar)
         {
             _titleAvatarImage.sprite = avatar;

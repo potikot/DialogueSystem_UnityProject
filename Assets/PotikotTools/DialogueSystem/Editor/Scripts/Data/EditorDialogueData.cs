@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -10,6 +11,8 @@ namespace PotikotTools.DialogueSystem.Editor
     // TODO: fix initialization with deserialize from json
     public class EditorDialogueData
     {
+        public event Action<string> OnNameChanged;
+        
         private DialogueData _runtimeData;
         
         public string Description;
@@ -77,10 +80,11 @@ namespace PotikotTools.DialogueSystem.Editor
             };
         }
         
-        public async Task<bool> TrySetId(string value)
+        // TODO: update all editor views with new name
+        public async Task<bool> TrySetName(string value)
         {
             string previousId = Id;
-            if (!RuntimeData.TrySetId(value))
+            if (!RuntimeData.TrySetName(value))
                 return false;
 
             string oldPath = Path.Combine(Components.Database.RelativeRootPath, previousId);
@@ -95,6 +99,7 @@ namespace PotikotTools.DialogueSystem.Editor
             }
 
             await EditorComponents.Database.SaveDialogueAsync(this);
+            OnNameChanged?.Invoke(value);
             return true;
         }
 

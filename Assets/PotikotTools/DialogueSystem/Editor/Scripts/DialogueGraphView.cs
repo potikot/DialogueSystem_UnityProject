@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor.Experimental.GraphView;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace PotikotTools.DialogueSystem.Editor
@@ -24,9 +23,11 @@ namespace PotikotTools.DialogueSystem.Editor
         
         public DialogueGraphView(EditorDialogueData editorDialogueData)
         {
+            editorData = editorDialogueData;
+
             AddGridBackground();
             AddManipulators();
-            AddNodes(editorDialogueData);
+            AddNodes();
 
             this.AddStyleSheets("Styles/DialogueGraph");
             
@@ -63,10 +64,8 @@ namespace PotikotTools.DialogueSystem.Editor
             AddElement(nodeView);
         }
 
-        private void AddNodes(EditorDialogueData editorDialogueData)
+        private void AddNodes()
         {
-            editorData = editorDialogueData;
-
             int nodesCount = editorData.EditorNodeDataList.Count;
             for (int i = 0; i < nodesCount; i++)
             {

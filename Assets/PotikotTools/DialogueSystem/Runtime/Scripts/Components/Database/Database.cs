@@ -68,6 +68,18 @@ namespace PotikotTools.DialogueSystem
             }
         }
 
+        public virtual bool TryChangeDialogueName(string oldName, string newName)
+        {
+            if (!dialogues.TryGetValue(oldName, out DialogueData dialogueData)
+                || ContainsDialogue(newName))
+                return false;
+
+            dialogues.Remove(oldName);
+            dialogues.Add(newName, dialogueData);
+            
+            return true;
+        }
+        
         public virtual async Task<List<string>> GetDialogueTagsAsync(string dialogueName)
         {
             return await loader.LoadTagsAsync(rootPath, dialogueName);

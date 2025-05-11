@@ -63,6 +63,13 @@ namespace PotikotTools.DialogueSystem
             IsDialogueStarted = true;
             currentDialogueView.Show();
             currentNodeData = currentDialogueData.GetFirstNode();
+
+            if (currentNodeData == null)
+            {
+                DL.LogError($"Dialogue graph '{currentDialogueData.Id}' is empty");
+                return;
+            }
+            
             HandleNode(currentNodeData);
         }
 

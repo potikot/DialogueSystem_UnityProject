@@ -22,11 +22,9 @@ namespace PotikotTools.DialogueSystem.Demo
             _rectTransform = transform as RectTransform;
         }
 
-        private void Start()
-        {
-            SetTextWithRowLimit(_textLabel.text);
-        }
-
+        [ContextMenu("SetTextWithRowLimit")]
+        public void f() => SetText(_textLabel.text);
+        
         public void SetText(string text)
         {
             SetTextWithRowLimit(text);
@@ -34,13 +32,12 @@ namespace PotikotTools.DialogueSystem.Demo
 
         public void SetTime(DateTime time)
         {
-            _timeLabel.text = time.TimeOfDay.ToString();
+            _timeLabel.text = time.TimeOfDay.ToString()[..5];
         }
         
         public void SetAvatar(Sprite avatar)
         {
             _avatarImage.sprite = avatar;
-
         }
         
         public void ShowAvatar()
@@ -55,6 +52,9 @@ namespace PotikotTools.DialogueSystem.Demo
         
         private void SetTextWithRowLimit(string text)
         {
+            _textLabel.enableWordWrapping = true;
+            _textLabel.overflowMode = TextOverflowModes.Overflow;
+
             _textLabel.text = ProcessTextWithRowLimit(text, _maxSymbolsPerRow);
             UpdateContainerSize();
         }
@@ -62,24 +62,50 @@ namespace PotikotTools.DialogueSystem.Demo
         private void UpdateContainerSize()
         {
             _textLabel.ForceMeshUpdate();
-            Canvas.ForceUpdateCanvases();
 
-            _rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, _textLabel.preferredWidth + _padding.x);
-            _rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, _textLabel.preferredHeight + _padding.y);
+            float characterWidthEstimate = _textLabel.fontSize * 0.5f;
+            Vector2 preferredValues = _textLabel.GetPreferredValues(_textLabel.text, _maxSymbolsPerRow * characterWidthEstimate, 0);
+
+            preferredValues.x += 115f;
+            preferredValues.y += 10f;
+            
+            _rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, preferredValues.x + _padding.x);
+            _rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, preferredValues.y + _padding.y);
         }
 
-        private string ProcessTextWithRowLimit(string input, int maxPerRow)
+        // TODO: fix bug while single word length more than maxSymbolsPerRow
+        private string ProcessTextWithRowLimit(string text, int maxSymbolsPerRow)
         {
-            StringBuilder result = new();
-            int currentIndex = 0;
+            if (string.IsNullOrEmpty(text) || maxSymbolsPerRow <= 0)
+                return string.Empty;
 
-            while (currentIndex < input.Length)
+            StringBuilder result = new StringBuilder();
+            StringBuilder currentLine = new StringBuilder();
+            int currentLineLength = 0;
+            
+            string[] words = text.Split(' ');
+            foreach (string word in words)
             {
-                int length = Mathf.Min(maxPerRow, input.Length - currentIndex);
-                result.AppendLine(input.Substring(currentIndex, length).TrimEnd());
-                currentIndex += length;
-            }
+                if (currentLineLength + word.Length + 1 > maxSymbolsPerRow)
+                {
+                    result.AppendLine(currentLine.ToString());
+                    currentLine.Clear();
+                    currentLineLength = 0;
+                }
 
+                if (currentLineLength > 0)
+                {
+                    currentLine.Append(' ');
+                    currentLineLength += 1;
+                }
+                
+                currentLine.Append(word);
+                currentLineLength += word.Length;
+            }
+            
+            if (currentLineLength > 0)
+                result.AppendLine(currentLine.ToString());
+            
             return result.ToString().TrimEnd();
         }
     }

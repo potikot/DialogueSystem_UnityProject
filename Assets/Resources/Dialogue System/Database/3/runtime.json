@@ -1,6 +1,8 @@
 {
   "Tags": [],
-  "Speakers": [],
+  "Speakers": [
+    null
+  ],
   "LoadResourcesImmediately": false,
   "id": "3",
   "nodes": [],

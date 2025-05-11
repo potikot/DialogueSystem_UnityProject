@@ -59,11 +59,10 @@ namespace PotikotTools.DialogueSystem.Editor
         private static NodeEditorWindow CreateWindow(EditorDialogueData editorDialogueData)
         {
             var window = ScriptableObject.CreateInstance<NodeEditorWindow>();
-            window.titleContent = new GUIContent($"'{editorDialogueData.Id}' Dialogue Editor");
-            
+
             window.EditorData = editorDialogueData;
             window.OnClose += OnWindowClosed;
-
+            
             Windows.Add(window);
             window.Show();
             window.position = new Rect(DialogueSystemPreferences.InitialDialogueEditorWindowPosition, DialogueSystemPreferences.InitialDialogueEditorWindowSize);

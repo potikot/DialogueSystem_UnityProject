@@ -247,6 +247,8 @@ namespace PotikotTools.DialogueSystem.Editor
             nameInputField.RegisterValueChangedCallback(OnNameValueChanged);
             nameInputField.RegisterCallback<FocusInEvent>(OnFocusIn);
             nameInputField.RegisterCallback<FocusOutEvent>(OnFocusOut);
+
+            editorDialogueData.OnNameChanged += OnNameValueChangedOutside;
             
             // description input
             
@@ -290,6 +292,11 @@ namespace PotikotTools.DialogueSystem.Editor
             
             return c;
 
+            void OnNameValueChangedOutside(string value)
+            {
+                nameInputField.SetValueWithoutNotify(value);
+            }
+            
             async void OnNameValueChanged(ChangeEvent<string> evt)
             {
                 nameInputField.RemoveUSSClasses("dialogue-view__text-input-field--focused");
@@ -302,7 +309,7 @@ namespace PotikotTools.DialogueSystem.Editor
                     return;
                 }
 
-                if (!await editorDialogueData.TrySetId(newName))
+                if (!await editorDialogueData.TrySetName(newName))
                 {
                     DL.LogError($"Failed to change name for dialogue '{editorDialogueData.Id}' with '{newName}'");
                 }
@@ -331,6 +338,7 @@ namespace PotikotTools.DialogueSystem.Editor
                 nameInputField.UnregisterValueChangedCallback(OnNameValueChanged);
                 nameInputField.UnregisterCallback<FocusInEvent>(OnFocusIn);
                 nameInputField.UnregisterCallback<FocusOutEvent>(OnFocusOut);
+                editorDialogueData.OnNameChanged -= OnNameValueChangedOutside;
                 
                 descriptionInputField.UnregisterCallback<FocusInEvent>(OnFocusIn);
                 descriptionInputField.UnregisterCallback<FocusOutEvent>(OnFocusOut);

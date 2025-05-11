@@ -31,7 +31,7 @@ namespace PotikotTools.DialogueSystem
         
         public DialogueData(string id)
         {
-            if (!TrySetId(id))
+            if (!TrySetName(id))
             {
                 // TODO: set unique id
             }
@@ -41,9 +41,9 @@ namespace PotikotTools.DialogueSystem
             nodes = new List<NodeData>();
         }
 
-        public bool TrySetId(string value)
+        public bool TrySetName(string value)
         {
-            if (Components.Database.ContainsDialogue(value))
+            if (!Components.Database.TryChangeDialogueName(id, value))
                 return false;
 
             id = value;
@@ -84,7 +84,7 @@ namespace PotikotTools.DialogueSystem
         
         public NodeData GetFirstNode()
         {
-            return nodes.First(n => !n.HasInputConnection);
+            return nodes.FirstOrDefault(n => !n.HasInputConnection);
         }
 
         public bool HasSpeaker(string name) => Speakers.Any(s => s.Name == name);
