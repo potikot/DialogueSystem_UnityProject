@@ -8,10 +8,10 @@ using UnityEngine;
 
 namespace PotikotTools.DialogueSystem.Editor
 {
-    // TODO: fix initialization with deserialize from json
     public class EditorDialogueData
     {
         public event Action<string> OnNameChanged;
+        public event Action<DialogueData> OnRuntimeDataChanged;
         
         private DialogueData _runtimeData;
         
@@ -25,7 +25,7 @@ namespace PotikotTools.DialogueSystem.Editor
             set => Initialize(value);
         }
 
-        [JsonIgnore] public string Id => RuntimeData.Id;
+        [JsonIgnore] public string Id => RuntimeData.Name;
         
         public EditorDialogueData() { }
         
@@ -39,21 +39,8 @@ namespace PotikotTools.DialogueSystem.Editor
                 return;
             }
 
-            RuntimeData = runtimeData;
             EditorNodeDataList = editorNodeDataList;
-            
-            if (EditorNodeDataList == null)
-                GenerateEditorNodeDatas();
-            else if (runtimeData.Nodes.Count != editorNodeDataList.Count)
-            {
-                DL.LogWarning("Nodes count does not match");
-                GenerateEditorNodeDatas();
-            }
-
-            RuntimeData.OnNodeRemoved += (data, index) =>
-            {
-                EditorNodeDataList.RemoveAt(index);
-            };
+            Initialize(runtimeData);
         }
 
         private void Initialize(DialogueData runtimeData)
@@ -68,7 +55,7 @@ namespace PotikotTools.DialogueSystem.Editor
             
             if (EditorNodeDataList == null)
                 GenerateEditorNodeDatas();
-            else if (runtimeData.Nodes.Count != EditorNodeDataList.Count)
+            else if (_runtimeData.Nodes.Count != EditorNodeDataList.Count)
             {
                 DL.LogWarning("Nodes count does not match");
                 GenerateEditorNodeDatas();
@@ -78,9 +65,10 @@ namespace PotikotTools.DialogueSystem.Editor
             {
                 EditorNodeDataList.RemoveAt(index);
             };
+            
+            OnRuntimeDataChanged?.Invoke(_runtimeData);
         }
         
-        // TODO: update all editor views with new name
         public async Task<bool> TrySetName(string value)
         {
             string previousId = Id;

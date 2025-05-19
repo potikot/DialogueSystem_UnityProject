@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PotikotTools.DialogueSystem.Editor
 {
@@ -13,7 +14,7 @@ namespace PotikotTools.DialogueSystem.Editor
             {
                 if (dialogue.Key.StartsWith(dialogueName, StringComparison.OrdinalIgnoreCase))
                 {
-                    DL.Log("Found Dialogue: " + dialogueName + " : " + dialogue.Value.Id);
+                    DL.Log("Found Dialogue: " + dialogueName + " : " + dialogue.Value.Name);
                     foundDialogues.Add(dialogue.Value);
                 }
             }
@@ -25,6 +26,12 @@ namespace PotikotTools.DialogueSystem.Editor
         {
             DL.Log("Searching Dialogue: " + tag);
             var foundDialogues = new List<DialogueData>();
+
+            // foreach (var kvp in Components.Database.Dialogues)
+            // {
+            //     if (kvp.Value.Tags.Any(t => t.StartsWith(tag)))
+            //         foundDialogues.Add(kvp.Value);
+            // }
             
             foreach (var tagDialogues in Components.Database.Tags) // TODO: update tags when modified
             {

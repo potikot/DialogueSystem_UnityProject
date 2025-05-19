@@ -118,7 +118,7 @@ namespace PotikotTools.DialogueSystem.Editor
                         continue;
                     }
                     
-                    if (foundDialogues.Any(d => d.Id == e.viewDataKey))
+                    if (foundDialogues.Any(d => d.Name == e.viewDataKey))
                     {
                         e.style.display = DisplayStyle.Flex;
                         removeNextSpace = false;
@@ -450,7 +450,7 @@ namespace PotikotTools.DialogueSystem.Editor
                     DL.LogError("Tag deleted or changed from another script");
                     return;
                 }
-                
+
                 tags[changedTagIndex] = evt.newValue;
                 await EditorComponents.Database.SaveDialogueAsync(editorDialogueData);
             }
@@ -459,11 +459,14 @@ namespace PotikotTools.DialogueSystem.Editor
             {
                 tags.Remove(tag);
                 
-                int index = _dialoguesContainer.IndexOf(c);
+                int index = c.parent.IndexOf(c);
                 if (index == 0)
-                    _dialoguesContainer.RemoveAt(1);
+                {
+                    if (c.parent.childCount > 1)
+                        c.parent.RemoveAt(1);
+                }
                 else
-                    _dialoguesContainer.RemoveAt(index - 1);
+                    c.parent.RemoveAt(index - 1);
                 
                 c.RemoveFromHierarchy();
                 
@@ -492,10 +495,10 @@ namespace PotikotTools.DialogueSystem.Editor
             int tagViewIndex = tagsContainer.childCount - 1;
 
             int i = 1;
-            while (tags.Contains(NewTagTemplate + i.ToString()))
+            while (tags.Contains(NewTagTemplate + i))
                 i++;
             
-            tags.Add(NewTagTemplate + i.ToString());
+            tags.Add(NewTagTemplate + i);
             var tagView = CreateTag(editorDialogueData, tags.Count - 1);
 
             tagsContainer.Insert(tagViewIndex, tagView);

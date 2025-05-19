@@ -21,7 +21,7 @@ namespace PotikotTools.DialogueSystem.Editor
 
         private void AddSettings()
         {
-            AddNameInputField();
+            // AddNameInputField();
             AddSpeakersList();
         }
 
@@ -44,7 +44,14 @@ namespace PotikotTools.DialogueSystem.Editor
             });
             
             Add(input);
-            
+
+            editorData.OnNameChanged += OnNameChanged;
+
+            void OnNameChanged(string newName)
+            {
+                
+            }
+                
             async void OnNameValueChanged(ChangeEvent<string> evt)
             {
                 // nameInputField.RemoveUSSClasses("dialogue-view__text-input-field--focused");
@@ -84,7 +91,8 @@ namespace PotikotTools.DialogueSystem.Editor
 
         private void AddSpeakersList()
         {
-            Add(CreateListView("Speakers", editorData.RuntimeData.Speakers));
+            var speakers = new List<SpeakerData>(editorData.RuntimeData.Speakers);
+            Add(CreateListView("Speakers", speakers));
         }
         
         private ListView CreateListView(string headerTitle, List<SpeakerData> source)
@@ -115,20 +123,22 @@ namespace PotikotTools.DialogueSystem.Editor
 
         private void BindListItem(VisualElement element, int index)
         {
-            var speakers = editorData.RuntimeData.Speakers;
-
-            speakers[index] ??= new SpeakerData("New Speaker");
+            if (!editorData.RuntimeData.TryGetSpeaker(index, out var speaker))
+            {
+                speaker = new SpeakerData("New Speaker");
+                editorData.RuntimeData.Speakers.Add(speaker);
+            }
             
             TextField textField = element.Q<TextField>();
             textField.label = $"Element {index}";
-            textField.value = speakers[index].Name; // TODO: index out of range on reset empty list
+            textField.value = speaker.Name; // TODO: index out of range on reset empty list
             
             textField.RegisterValueChangedCallback(OnValueChanged);
             textField.RegisterCallback<DetachFromPanelEvent>(_ => textField.UnregisterValueChangedCallback(OnValueChanged));
 
             async void OnValueChanged(ChangeEvent<string> evt)
             {
-                speakers[index].Name = evt.newValue;
+                editorData.RuntimeData.Speakers[index].Name = evt.newValue;
                 await EditorComponents.Database.SaveDialogueAsync(editorData);
             }
         }

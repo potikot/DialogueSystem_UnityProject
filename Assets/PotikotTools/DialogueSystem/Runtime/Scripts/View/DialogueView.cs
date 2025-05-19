@@ -88,6 +88,8 @@ namespace PotikotTools.DialogueSystem
             int optionsCount = options.Length;
             int i = 0;
 
+            optionsContainer.gameObject.SetActive(optionsCount > 0);
+            
             for (; i < optionsCount; i++)
             {
                 if (optionViews.Count <= i)
@@ -110,8 +112,9 @@ namespace PotikotTools.DialogueSystem
         {
             foreach (OptionView option in optionViews)
                 Destroy(option.gameObject);
-                
+
             optionViews.Clear();
+            optionsContainer.gameObject.SetActive(false);
         }
     }
 }

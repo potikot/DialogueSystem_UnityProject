@@ -8,7 +8,7 @@ namespace PotikotTools.DialogueSystem.Editor
     {
         public bool SaveData(string directoryPath, DialogueData dialogueData, bool refreshAsset = true)
         {
-            string fullPath = Path.Combine(directoryPath, dialogueData.Id, DialogueSystemPreferences.Data.RuntimeDataFilename);
+            string fullPath = Path.Combine(directoryPath, dialogueData.Name, DialogueSystemPreferences.Data.RuntimeDataFilename);
             
             string json = JsonConvert.SerializeObject(dialogueData, serializerSettings);
             return FileUtility.Write(fullPath, json, refreshAsset);
@@ -16,7 +16,7 @@ namespace PotikotTools.DialogueSystem.Editor
 
         public async Task<bool> SaveDataAsync(string directoryPath, DialogueData dialogueData, bool refreshAsset = true)
         {
-            string fullPath = Path.Combine(directoryPath, dialogueData.Id, DialogueSystemPreferences.Data.RuntimeDataFilename);
+            string fullPath = Path.Combine(directoryPath, dialogueData.Name, DialogueSystemPreferences.Data.RuntimeDataFilename);
     
             string json = JsonConvert.SerializeObject(dialogueData, serializerSettings);
             return await FileUtility.WriteAsync(fullPath, json, refreshAsset);

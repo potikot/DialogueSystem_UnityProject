@@ -46,7 +46,7 @@ namespace PotikotTools.DialogueSystem
         public virtual async Task LoadResources()
         {
             if (!string.IsNullOrEmpty(AudioResourceName))
-                AudioResource = await Components.Database.LoadResourceAsync<AudioClip>(DialogueData.Id, AudioResourceName);
+                AudioResource = await Components.Database.LoadResourceAsync<AudioClip>(DialogueData.Name, AudioResourceName);
         }
 
         public void ReleaseResources()

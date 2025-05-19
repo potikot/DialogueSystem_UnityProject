@@ -66,7 +66,7 @@ namespace PotikotTools.DialogueSystem
 
             if (currentNodeData == null)
             {
-                DL.LogError($"Dialogue graph '{currentDialogueData.Id}' is empty");
+                DL.LogError($"Dialogue graph '{currentDialogueData.Name}' is empty");
                 return;
             }
             
@@ -87,8 +87,8 @@ namespace PotikotTools.DialogueSystem
                 return;
             }
             
-            DL.Log("End Dialogue");
             currentDialogueView.OnOptionSelected(null);
+            currentDialogueView.SetAnswerOptions(null);
             currentDialogueView.Hide();
             IsDialogueStarted = false;
         }

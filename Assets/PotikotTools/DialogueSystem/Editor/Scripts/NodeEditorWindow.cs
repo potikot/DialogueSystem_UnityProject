@@ -14,6 +14,8 @@ namespace PotikotTools.DialogueSystem.Editor
         private DialogueGraphView _graph;
         private FloatingSettingsPanel _floatingSettngsPanel;
 
+        private bool _isSubbed;
+        
         public EditorDialogueData EditorData
         {
             get => _editorData;
@@ -25,13 +27,20 @@ namespace PotikotTools.DialogueSystem.Editor
                 _editorData = value;
                 ChangeTitle(_editorData.Id);
                 _editorData.OnNameChanged += ChangeTitle;
+                _isSubbed = true;
                 AddGraphView();
+                AddFloatingSettings();
             }
         }
 
         private void OnDestroy()
         {
-            _editorData.OnNameChanged -= ChangeTitle;
+            if (_isSubbed) // TODO: fix event sub on maximize window
+            {
+                _editorData.OnNameChanged -= ChangeTitle;
+                _isSubbed = false;
+            }
+            
             OnClose?.Invoke(this);
         }
 

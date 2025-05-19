@@ -59,6 +59,9 @@ namespace PotikotTools.DialogueSystem
                 return null;
             }
             
+            if (!File.Exists(absolutePath))
+                return null;
+            
             return File.ReadAllText(absolutePath);
         }
         
@@ -69,6 +72,9 @@ namespace PotikotTools.DialogueSystem
                 DL.LogError($"'{nameof(absolutePath)}' cannot be null or empty.");
                 return null;
             }
+            
+            if (!File.Exists(absolutePath))
+                return null;
             
             return File.ReadAllLines(absolutePath);
         }
@@ -104,6 +110,9 @@ namespace PotikotTools.DialogueSystem
                 return null;
             }
 
+            if (!File.Exists(absolutePath))
+                return null;
+            
             return await File.ReadAllTextAsync(absolutePath);
         }
         

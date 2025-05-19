@@ -1,0 +1,40 @@
+{
+  "id" : 0,
+  "Tags": [
+    "tery"
+  ],
+  "Speakers": [],
+  "LoadResourcesImmediately": false,
+  "name": "tery",
+  "nodes": [
+    {
+      "$type": "PotikotTools.DialogueSystem.SingleChoiceNodeData, PotikotTools.DialogueSystem",
+      "SpeakerIndex": -1,
+      "ListenerIndex": 0,
+      "Text": "1",
+      "Commands": [],
+      "OutputConnections": [
+        {
+          "From": 0,
+          "To": 1
+        }
+      ],
+      "Id": 0
+    },
+    {
+      "$type": "PotikotTools.DialogueSystem.TimerNodeData, PotikotTools.DialogueSystem",
+      "Duration": 5.0,
+      "SpeakerIndex": -1,
+      "ListenerIndex": 0,
+      "Text": "2",
+      "Commands": [],
+      "OutputConnections": [
+        {
+          "Text": "New Choice"
+        }
+      ],
+      "Id": 1
+    }
+  ],
+  "nextNodeId": 2
+}

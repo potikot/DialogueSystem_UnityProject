@@ -27,6 +27,9 @@ namespace PotikotTools.DialogueSystem.Demo
             
             foreach (var chatData in _config.ChatDatas)
             {
+                if (!Components.Database.LoadDialogue(chatData.DialogueName))
+                    continue;
+                
                 ChatPanelView chatPanelView = Instantiate(_chatPanelViewPrefab, _chatsContainer);
                 chatPanelView.SetData(chatData);
             }

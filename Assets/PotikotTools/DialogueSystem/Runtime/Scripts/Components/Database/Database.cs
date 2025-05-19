@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -55,16 +56,10 @@ namespace PotikotTools.DialogueSystem
 
             string[] dialogueDirectories = Directory.GetDirectories(rootPath);
             
-            // TODO: optimize tags saving/loading
             foreach (string dialogueDirectory in dialogueDirectories)
             {
                 string dialogueName = Path.GetFileName(dialogueDirectory);
-
-                List<string> data = await GetDialogueTagsAsync(dialogueName);
-                foreach (string tag in data)
-                {
-                    GetOrAddTag(tag).Add(dialogueName);
-                }
+                await AddDialogueTagsAsync(dialogueName);
             }
         }
 
@@ -115,17 +110,19 @@ namespace PotikotTools.DialogueSystem
         public virtual async Task<bool> LoadDialogueAsync(string dialogueName)
         {
             DialogueData dialogueData = await loader.LoadDataAsync(rootPath, dialogueName);
+            
+            if (dialogueData == null)
+                return false;
+            
             Components.NodeLinker.SetConnections(dialogueData);
             Components.NodeLinker.Clear();
 
-            if (dialogueData != null)
-            {
-                dialogues.TryAdd(dialogueName, dialogueData);
-                foreach (NodeData node in dialogueData.Nodes)
-                    node.DialogueData = dialogueData;
-                
-                return true;
-            }
+            foreach (NodeData node in dialogueData.Nodes)
+                node.DialogueData = dialogueData;
+
+            AddDialogue(dialogueData);
+
+            return true;
 
             DL.LogError($"Dialogue data doesn't exist: {dialogueName}");
             return false;
@@ -134,17 +131,19 @@ namespace PotikotTools.DialogueSystem
         public virtual bool LoadDialogue(string dialogueName)
         {
             DialogueData dialogueData = loader.LoadData(rootPath, dialogueName);
+            
+            if (dialogueData == null)
+                return false;
+            
             Components.NodeLinker.SetConnections(dialogueData);
             Components.NodeLinker.Clear();
 
-            if (dialogueData != null)
-            {
-                dialogues.TryAdd(dialogueName, dialogueData);
-                foreach (NodeData node in dialogueData.Nodes)
-                    node.DialogueData = dialogueData;
+            foreach (NodeData node in dialogueData.Nodes)
+                node.DialogueData = dialogueData;
                 
-                return true;
-            }
+            AddDialogue(dialogueData);
+            
+            return true;
 
             DL.LogError($"Dialogue data doesn't exist: {dialogueName}");
             return false;
@@ -245,16 +244,79 @@ namespace PotikotTools.DialogueSystem
             #endif
         }
 
+        private void RegisterTagsChangedEvents(DialogueData dialogueData)
+        {
+            if (dialogueData == null)
+                return;
+            
+            DL.LogError("dialogueData: " + dialogueData.Name);
+            
+            dialogueData.Tags.OnElementAdded += OnTagAdded;
+            dialogueData.Tags.OnElementChanged += OnTagChanged;
+            dialogueData.Tags.OnElementRemoved += OnTagRemoved;
+            
+            void OnTagAdded(string tag)
+            {
+                var tagDialogues = GetOrAddTag(tag);
+                tagDialogues.Add(dialogueData.Name);
+            }
+            
+            void OnTagChanged(int index, string prevValue, string newValue)
+            {
+                if (prevValue == newValue)
+                    return;
+                
+                DL.LogError("Tag changed");
+                
+                var prevTagDialogues = GetOrAddTag(prevValue);
+                prevTagDialogues.Remove(dialogueData.Name);
+                if (prevTagDialogues.Count == 0)
+                    tags.Remove(prevValue);
+                
+                var newTagDialogues = GetOrAddTag(newValue);
+                newTagDialogues.Add(dialogueData.Name);
+            }
+            
+            void OnTagRemoved(string tag)
+            {
+                if (!tags.TryGetValue(tag, out var tagDialogues))
+                    return;
+                
+                tagDialogues.Remove(dialogueData.Name);
+                if (tagDialogues.Count == 0)
+                    tags.Remove(tag);
+            }
+        }
+        
+        // TODO: check async/await error when changing data from many places
+        private async Task AddDialogueTagsAsync(string dialogueName)
+        {
+            if (dialogues.TryGetValue(dialogueName, out DialogueData dialogueData))
+            {
+                AddDialogueTags(dialogueData);
+                return;
+            }
+            
+            var dialogueTags = await GetDialogueTagsAsync(dialogueName);
+            foreach (string tag in dialogueTags)
+                GetOrAddTag(tag).Add(dialogueName);
+        }
+        
+        private void AddDialogueTags(DialogueData dialogueData)
+        {
+            foreach (string tag in dialogueData.Tags)
+                GetOrAddTag(tag).Add(dialogueData.Name);
+            
+            RegisterTagsChangedEvents(dialogueData);
+        }
+        
         internal void AddDialogue(DialogueData dialogueData)
         {
-            if (dialogueData == null
-                || !dialogues.TryAdd(dialogueData.Id, dialogueData))
+            if (dialogueData?.Name == null)
                 return;
 
-            foreach (string tag in dialogueData.Tags)
-            {
-                GetOrAddTag(tag).Add(dialogueData.Id);
-            }
+            dialogues[dialogueData.Name] = dialogueData;
+            AddDialogueTags(dialogueData);
         }
 
         internal HashSet<string> GetOrAddTag(string tag)

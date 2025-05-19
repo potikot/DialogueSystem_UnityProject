@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -29,16 +30,19 @@ namespace PotikotTools.DialogueSystem
             foreach (string assemblyName in assemblyNames)
                 assemblies.Add(Assembly.Load(assemblyName));
 
-            Debug.Log($"Loaded commands from assemblies({assemblies.Count}):");
+            var log = new StringBuilder()
+                .AppendLine($"Loaded commands from assemblies({assemblies.Count}):");
             foreach (Assembly assembly in assemblies)
             {
-                Debug.Log(assembly.FullName);
+                log.AppendLine(assembly.FullName);
                 foreach (Type type in assembly.GetTypes())
                 {
                     AddMethods(type);
                     AddFields(type);
                 }
             }
+            
+            Debug.Log(log.ToString());
         }
 
         public void Execute(string commandName, object[] parameters)

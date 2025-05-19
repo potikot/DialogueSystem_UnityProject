@@ -1,12 +1,28 @@
+using System;
+
 namespace PotikotTools.DialogueSystem
 {
     public class SpeakerData
     {
-        public string Name;
+        public event Action<string> OnNameChanged;
+        
+        protected string name;
 
+        public string Name
+        {
+            get => name;
+            set
+            {
+                name = value.Trim();
+                OnNameChanged?.Invoke(name);
+            }
+        }
+        
         public SpeakerData(string name)
         {
-            Name = name;
+            this.name = name;
         }
+        
+        
     }
 }

@@ -106,7 +106,7 @@ namespace PotikotTools.DialogueSystem.Demo
             if (currentLineLength > 0)
                 result.AppendLine(currentLine.ToString());
             
-            return result.ToString().TrimEnd();
+            return result.ToString().TrimEnd() + "\n ";
         }
     }
 }

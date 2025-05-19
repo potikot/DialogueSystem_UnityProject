@@ -23,7 +23,7 @@ namespace PotikotTools.DialogueSystem.Demo
 
             if (currentNodeData == null)
             {
-                DL.LogError($"Dialogue graph '{currentDialogueData.Id}' is empty");
+                DL.LogError($"Dialogue graph '{currentDialogueData.Name}' is empty");
                 return;
             }
             
@@ -33,6 +33,12 @@ namespace PotikotTools.DialogueSystem.Demo
             IsDialogueStopped = false;
         }
 
+        public override void EndDialogue()
+        {
+            base.EndDialogue();
+            currentDialogueView.Show();
+        }
+        
         public void StopDialogue()
         {
             currentDialogueView.Hide();

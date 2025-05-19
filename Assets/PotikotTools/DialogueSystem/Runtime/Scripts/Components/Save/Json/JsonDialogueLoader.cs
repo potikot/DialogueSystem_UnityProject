@@ -31,6 +31,10 @@ namespace PotikotTools.DialogueSystem
             string fullPath = Path.Combine(directoryPath, dialogueId, DialogueSystemPreferences.Data.RuntimeDataFilename);
 
             string json = FileUtility.Read(fullPath);
+            
+            if (json == null)
+                return null;
+            
             return JsonConvert.DeserializeObject<DialogueData>(json, serializerSettings);
         }
 
@@ -39,6 +43,10 @@ namespace PotikotTools.DialogueSystem
             string fullPath = Path.Combine(directoryPath, dialogueId, DialogueSystemPreferences.Data.RuntimeDataFilename);
             
             string json = await FileUtility.ReadAsync(fullPath);
+                        
+            if (json == null)
+                return null;
+
             return JsonConvert.DeserializeObject<DialogueData>(json, serializerSettings);
         }
         
