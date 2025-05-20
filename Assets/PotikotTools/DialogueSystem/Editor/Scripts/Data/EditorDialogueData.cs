@@ -11,21 +11,22 @@ namespace PotikotTools.DialogueSystem.Editor
     public class EditorDialogueData
     {
         public event Action<string> OnNameChanged;
-        public event Action<DialogueData> OnRuntimeDataChanged;
+        public event Action OnDeleted;
         
         private DialogueData _runtimeData;
         
         public string Description;
         
         public List<EditorNodeData> EditorNodeDataList;
-
+        public Vector2 FloatingWindowPosition;
+        
         [JsonIgnore] public DialogueData RuntimeData
         {
             get => _runtimeData;
             set => Initialize(value);
         }
 
-        [JsonIgnore] public string Id => RuntimeData.Name;
+        [JsonIgnore] public string Name => RuntimeData.Name;
         
         public EditorDialogueData() { }
         
@@ -65,18 +66,16 @@ namespace PotikotTools.DialogueSystem.Editor
             {
                 EditorNodeDataList.RemoveAt(index);
             };
-            
-            OnRuntimeDataChanged?.Invoke(_runtimeData);
         }
         
         public async Task<bool> TrySetName(string value)
         {
-            string previousId = Id;
+            string previousName = Name;
             if (!RuntimeData.TrySetName(value))
                 return false;
 
-            string oldPath = Path.Combine(Components.Database.RelativeRootPath, previousId);
-            string newPath = Path.Combine(Components.Database.RelativeRootPath, Id);
+            string oldPath = Path.Combine(Components.Database.DialoguesRelativeRootPath, previousName);
+            string newPath = Path.Combine(Components.Database.DialoguesRelativeRootPath, Name);
 
             string error = AssetDatabase.MoveAsset(oldPath, newPath);
 
@@ -85,7 +84,7 @@ namespace PotikotTools.DialogueSystem.Editor
                 DL.LogError(error);
                 return false;
             }
-
+            
             await EditorComponents.Database.SaveDialogueAsync(this);
             OnNameChanged?.Invoke(value);
             return true;
@@ -116,5 +115,7 @@ namespace PotikotTools.DialogueSystem.Editor
                     EditorNodeDataList.Add(new EditorNodeData());
             }
         }
+
+        internal void OnDelete() => OnDeleted?.Invoke();
     }
 }

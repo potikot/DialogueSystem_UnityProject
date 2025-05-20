@@ -22,7 +22,7 @@ namespace PotikotTools.DialogueSystem
         [JsonRequired] protected List<NodeData> nodes;
 
         [JsonRequired] protected int nextNodeId;
-        
+
         [JsonIgnore] public int Id => id;
         [JsonIgnore] public string Name => name;
         [JsonIgnore] public IReadOnlyList<NodeData> Nodes => nodes;

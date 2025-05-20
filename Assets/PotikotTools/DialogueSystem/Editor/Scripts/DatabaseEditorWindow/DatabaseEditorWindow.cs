@@ -226,7 +226,7 @@ namespace PotikotTools.DialogueSystem.Editor
         {
             var c = new VisualElement()
             {
-                viewDataKey = editorDialogueData.Id
+                viewDataKey = editorDialogueData.Name
             };
             
             c.AddUSSClasses("dialogue-view");
@@ -235,7 +235,7 @@ namespace PotikotTools.DialogueSystem.Editor
             
             var nameInputField = new TextField("Name")
             {
-                value = editorDialogueData.Id,
+                value = editorDialogueData.Name,
                 isDelayed = true
             };
 
@@ -303,7 +303,7 @@ namespace PotikotTools.DialogueSystem.Editor
 
                 string newName = evt.newValue.Trim();
                 DL.Log("Trying to rename to: " + newName);
-                if (newName == editorDialogueData.Id)
+                if (newName == editorDialogueData.Name)
                 {
                     nameInputField.SetValueWithoutNotify(newName);
                     return;
@@ -311,10 +311,10 @@ namespace PotikotTools.DialogueSystem.Editor
 
                 if (!await editorDialogueData.TrySetName(newName))
                 {
-                    DL.LogError($"Failed to change name for dialogue '{editorDialogueData.Id}' with '{newName}'");
+                    DL.LogError($"Failed to change name for dialogue '{editorDialogueData.Name}' with '{newName}'");
                 }
                 
-                nameInputField.SetValueWithoutNotify(editorDialogueData.Id);
+                nameInputField.SetValueWithoutNotify(editorDialogueData.Name);
             }
             
             void OnFocusIn(FocusInEvent evt)
@@ -583,7 +583,7 @@ namespace PotikotTools.DialogueSystem.Editor
         
         private void DeleteDialogueButtonCallback(Action onDelete, EditorDialogueData editorDialogueData)
         {
-            if (EditorUtility.DisplayDialog("Delete dialogue", $"Are you really want to delete dialogue: \"{editorDialogueData.Id}\"?", "Yes", "No"))
+            if (EditorUtility.DisplayDialog("Delete dialogue", $"Are you really want to delete dialogue: \"{editorDialogueData.Name}\"?", "Yes", "No"))
             {
                 onDelete?.Invoke();
                 EditorComponents.Database.DeleteDialogue(editorDialogueData);

@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using UnityEditor;
 using UnityEditor.Experimental.GraphView;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -21,7 +24,8 @@ namespace PotikotTools.DialogueSystem.Editor
             this.data = data as T;
 
             RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
-            
+            RegisterCallback<DetachFromPanelEvent>(_ => UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged));
+
             AddManipulators();
         }
 
@@ -61,8 +65,8 @@ namespace PotikotTools.DialogueSystem.Editor
         {
             AddInputPort();
 
-            for (int i = 0; i < data.OutputConnections.Count; i++)
-                AddOutputPort(data.OutputConnections[i]);
+            foreach (ConnectionData connection in data.OutputConnections)
+                AddOutputPort(connection);
         }
 
         protected virtual void CreateSpeakerTextInput()
@@ -84,15 +88,16 @@ namespace PotikotTools.DialogueSystem.Editor
             if (data.DialogueData.Speakers == null)
                 return;
             
+            int i = 1;
             List<string> speakerNames = new(data.DialogueData.Speakers.Count + 1) { "None" };
-            speakerNames.AddRange(data.DialogueData.Speakers.Select(s => s.Name));
-        
+            speakerNames.AddRange(data.DialogueData.Speakers.Select(s => $"{i++}. {s.Name}"));
+
+            string speakerName = data.GetSpeakerName();
             PopupField<string> speakerIndexInput = new
             (
                 "Speaker",
                 speakerNames,
-                data.GetSpeakerName() ?? "None"
-                
+                string.IsNullOrEmpty(speakerName) ? "None" : $"{data.SpeakerIndex + 1}. {speakerName}"
             );
             
             speakerIndexInput.RegisterValueChangedCallback(evt => data.SpeakerIndex = speakerIndexInput.index - 1);
@@ -102,17 +107,54 @@ namespace PotikotTools.DialogueSystem.Editor
 
         protected virtual void CreateAudioInput()
         {
-            TextField audioNameInput = new("Audio Name")
+            ObjectField audioInput = new("Audio Name")
             {
-                value = data.AudioResourceName
+                objectType = typeof(AudioClip),
+                value = Components.Database.LoadResource<AudioClip>(data.AudioResourceName)
             };
 
-            audioNameInput.RegisterValueChangedCallback(evt =>
+            audioInput.RegisterValueChangedCallback(evt =>
             {
-                data.AudioResourceName = evt.newValue;
+                if (evt.newValue == null)
+                    return;
+
+                string relativeFilePath = AssetDatabase.GetAssetPath(evt.newValue);
+                string fileName = Path.GetFileName(relativeFilePath);
+                
+                if (!FileUtility.IsDatabaseRelativePath(relativeFilePath))
+                {
+                    if (EditorUtility.DisplayDialog(
+                            "Move asset",
+                            $"Asset '{fileName}' is not under database directory. Must move into database",
+                            "Ok", "Cancel"))
+                    {
+                        // TODO: dir info easy to break. refactor
+                        string newResourcePath = Components.Database.GetProjectRelativeResourcePath<AudioClip>(fileName);
+                        var dirInfo = new DirectoryInfo(Path.GetDirectoryName(newResourcePath));
+                        
+                        if (!dirInfo.Exists)
+                        {
+                            dirInfo.Create();
+                            AssetDatabase.ImportAsset(FileUtility.GetProjectRelativePath(dirInfo.FullName));
+                        }
+                        
+                        string error = AssetDatabase.MoveAsset(relativeFilePath, newResourcePath);
+                        if (!string.IsNullOrEmpty(error))
+                        {
+                            DL.LogError(error);
+                        }
+                    }
+                    else
+                    {
+                        audioInput.SetValueWithoutNotify(evt.previousValue);
+                        return;
+                    }
+                }
+                
+                data.AudioResourceName = Path.GetFileNameWithoutExtension(fileName);
             });
             
-            extensionContainer.Add(audioNameInput);
+            extensionContainer.Add(audioInput);
         }
 
         protected virtual void CreateCommandsInput()

@@ -1,9 +1,12 @@
 using System.Collections.Generic;
+using System.Linq;
+using UnityEditor.Experimental.GraphView;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace PotikotTools.DialogueSystem.Editor
 {
-    public class FloatingSettingsPanel : VisualElement
+    public class FloatingSettingsPanel : Foldout
     {
         protected EditorDialogueData editorData;
         
@@ -11,25 +14,49 @@ namespace PotikotTools.DialogueSystem.Editor
         {
             editorData = editorDialogueData;
 
-            AddSettings();
+            text = "Settings";
             
-            this.AddManipulator(new DragManipulator());
+            this.Q<Toggle>().Add(new VisualElement() { style={flexGrow = 1f} });
+            
+            Draw();
+            AddManipulators();
             
             this.AddStyleSheets("Styles/FloatingSettings");
             this.AddUSSClasses("panel");
+
+            RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+            RegisterCallback<DetachFromPanelEvent>(_ => UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged));
         }
 
-        private void AddSettings()
+        public virtual void SetPosition(Vector2 desiredPosition)
         {
-            // AddNameInputField();
-            AddSpeakersList();
+            style.left = desiredPosition.x;
+            style.top = desiredPosition.y;
         }
 
-        private void AddNameInputField()
+        private void AddManipulators()
+        {
+            this.AddManipulator(new DragManipulator());
+        }
+        
+        protected virtual void Draw()
+        {
+            AddNameInputField();
+            AddSpeakersList();
+            
+            SetPosition(editorData.FloatingWindowPosition);
+        }
+
+        protected virtual void OnGeometryChanged(GeometryChangedEvent evt)
+        {
+            editorData.FloatingWindowPosition = evt.newRect.position;
+        }
+        
+        protected virtual void AddNameInputField()
         {
             var input = new TextField("Name")
             {
-                value = editorData.Id,
+                value = editorData.Name,
                 isDelayed = true
             };
 
@@ -38,9 +65,15 @@ namespace PotikotTools.DialogueSystem.Editor
             input.RegisterValueChangedCallback(OnNameValueChanged);
             // nameInputField.RegisterCallback<FocusInEvent>(OnFocusIn);
             // nameInputField.RegisterCallback<FocusOutEvent>(OnFocusOut);
+            input.RegisterCallback<AttachToPanelEvent>(_ =>
+            {
+                DL.Log("attaching to panel");
+                input.SetValueWithoutNotify(editorData.Name);
+            });
             input.RegisterCallback<DetachFromPanelEvent>(_ =>
             {
                 input.UnregisterValueChangedCallback(OnNameValueChanged);
+                editorData.OnNameChanged -= OnNameChanged;
             });
             
             Add(input);
@@ -49,7 +82,7 @@ namespace PotikotTools.DialogueSystem.Editor
 
             void OnNameChanged(string newName)
             {
-                
+                input.SetValueWithoutNotify(newName);
             }
                 
             async void OnNameValueChanged(ChangeEvent<string> evt)
@@ -58,7 +91,7 @@ namespace PotikotTools.DialogueSystem.Editor
 
                 string newName = evt.newValue.Trim();
                 DL.Log("Trying to rename to: " + newName);
-                if (newName == editorData.Id)
+                if (newName == editorData.Name)
                 {
                     input.SetValueWithoutNotify(newName);
                     return;
@@ -66,10 +99,10 @@ namespace PotikotTools.DialogueSystem.Editor
 
                 if (!await editorData.TrySetName(newName))
                 {
-                    DL.LogError($"Failed to change name for dialogue '{editorData.Id}' with '{newName}'");
+                    DL.LogError($"Failed to change name for dialogue '{editorData.Name}' with '{newName}'");
                 }
                 
-                input.SetValueWithoutNotify(editorData.Id);
+                input.SetValueWithoutNotify(editorData.Name);
             }
             
             void OnFocusIn(FocusInEvent evt)
@@ -89,13 +122,13 @@ namespace PotikotTools.DialogueSystem.Editor
             }
         }
 
-        private void AddSpeakersList()
+        protected virtual void AddSpeakersList()
         {
             var speakers = new List<SpeakerData>(editorData.RuntimeData.Speakers);
             Add(CreateListView("Speakers", speakers));
         }
         
-        private ListView CreateListView(string headerTitle, List<SpeakerData> source)
+        protected virtual ListView CreateListView(string headerTitle, List<SpeakerData> source)
         {
             ListView listView = new(source)
             {
@@ -103,25 +136,39 @@ namespace PotikotTools.DialogueSystem.Editor
                 showFoldoutHeader = true,
                 showBorder = true,
                 showAddRemoveFooter = true,
-                // reorderable = true,
-                // reorderMode = ListViewReorderMode.Animated,
+                reorderable = false,
+                virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
                 makeItem = MakeListItem,
-                bindItem = BindListItem
+                bindItem = BindListItem,
+                unbindItem = UnbindItem
             };
 
-            listView.itemsAdded += async _ => await EditorComponents.Database.SaveDialogueAsync(editorData);
-            listView.itemsRemoved += async _ => await EditorComponents.Database.SaveDialogueAsync(editorData);
+            listView.itemsAdded += _ => EditorComponents.Database.SaveDialogue(editorData);
+            listView.itemsRemoved += indices =>
+            {
+                foreach (int index in indices)
+                    editorData.RuntimeData.Speakers.RemoveAt(index);
+                
+                EditorComponents.Database.SaveDialogue(editorData);
+            };
 
             return listView;
         }
-        
-        private VisualElement MakeListItem()
+
+        private void UnbindItem(VisualElement element, int index)
         {
-            TextField textField = new() { isDelayed = true };
+            element.Q<TextField>().UnregisterValueChangedCallback(OnValueChanged);
+        }
+
+        protected virtual VisualElement MakeListItem()
+        {
+            TextField textField = new() { isDelayed = true};
+            textField.AddUSSClasses("list-item");
+            textField.Children().Last().AddUSSClasses("list-item__input");
             return textField;
         }
 
-        private void BindListItem(VisualElement element, int index)
+        protected virtual void BindListItem(VisualElement element, int index)
         {
             if (!editorData.RuntimeData.TryGetSpeaker(index, out var speaker))
             {
@@ -131,16 +178,23 @@ namespace PotikotTools.DialogueSystem.Editor
             
             TextField textField = element.Q<TextField>();
             textField.label = $"Element {index}";
-            textField.value = speaker.Name; // TODO: index out of range on reset empty list
+            textField.userData = speaker;
+            textField.SetValueWithoutNotify(speaker.Name);
             
             textField.RegisterValueChangedCallback(OnValueChanged);
             textField.RegisterCallback<DetachFromPanelEvent>(_ => textField.UnregisterValueChangedCallback(OnValueChanged));
-
-            async void OnValueChanged(ChangeEvent<string> evt)
+        }
+        
+        void OnValueChanged(ChangeEvent<string> evt)
+        {
+            if (evt.target is not TextField { userData: SpeakerData speakerData })
             {
-                editorData.RuntimeData.Speakers[index].Name = evt.newValue;
-                await EditorComponents.Database.SaveDialogueAsync(editorData);
+                DL.LogError("Speaker not found");
+                return;
             }
+            
+            speakerData.Name = evt.newValue;
+            EditorComponents.Database.SaveDialogue(editorData);
         }
     }
 }

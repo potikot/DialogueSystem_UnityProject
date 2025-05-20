@@ -1,19 +1,22 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace PotikotTools.DialogueSystem
 {
+    // TODO: mb load dialogues as resources?
     public class Database
     {
         protected IDialogueLoader loader;
         protected string rootPath;
         protected string relativeRootPath;
-
+        protected string dialoguesRootPath;
+        protected string dialoguesRelativeRootPath;
+        protected string resourcesPath;
+        
         // TODO: update tags when tag added to dialogue data after initialization
         protected Dictionary<string, HashSet<string>> tags;
         protected Dictionary<string, DialogueData> dialogues;
@@ -26,6 +29,8 @@ namespace PotikotTools.DialogueSystem
         public IDialogueLoader Loader => loader;
         public string RootPath => rootPath;
         public string RelativeRootPath => relativeRootPath;
+        public string DialoguesRootPath => dialoguesRootPath;
+        public string DialoguesRelativeRootPath => dialoguesRelativeRootPath;
 
         internal IReadOnlyDictionary<string, DialogueData> Dialogues => dialogues;
         
@@ -35,8 +40,12 @@ namespace PotikotTools.DialogueSystem
             isInitialized = true;
 
             loader = new JsonDialogueLoader();
-            rootPath = Path.Combine(Application.dataPath, DialogueSystemPreferences.Data.DatabaseDirectory);
-            relativeRootPath = Path.Combine("Assets", DialogueSystemPreferences.Data.DatabaseDirectory);
+            
+            rootPath = Path.Combine(Application.dataPath, DialogueSystemPreferences.Data.DatabaseDirectory).Replace('\\', '/');
+            relativeRootPath = Path.Combine("Assets", DialogueSystemPreferences.Data.DatabaseDirectory).Replace('\\', '/');
+            dialoguesRootPath = Path.Combine(rootPath, "Dialogues").Replace('\\', '/');
+            dialoguesRelativeRootPath = Path.Combine(relativeRootPath, "Dialogues").Replace('\\', '/');
+            resourcesPath = DialogueSystemPreferences.Data.DatabaseDirectory[10..];
             
             tags = new Dictionary<string, HashSet<string>>();
             dialogues = new Dictionary<string, DialogueData>();
@@ -47,18 +56,16 @@ namespace PotikotTools.DialogueSystem
                 { typeof(Sprite), "Images" },
                 { typeof(Texture), "Images" }
             };
-            
-            if (!Directory.Exists(rootPath))
-            {
-                DL.LogError("Directory doesn't exist: " + rootPath);
-                return;
-            }
 
-            string[] dialogueDirectories = Directory.GetDirectories(rootPath);
+            Directory.CreateDirectory(dialoguesRootPath);
+            string[] dialogueDirectories = Directory.GetDirectories(dialoguesRootPath);
             
             foreach (string dialogueDirectory in dialogueDirectories)
             {
                 string dialogueName = Path.GetFileName(dialogueDirectory);
+                if (dialogueName[0] == '_')
+                    continue;
+                
                 await AddDialogueTagsAsync(dialogueName);
             }
         }
@@ -77,7 +84,7 @@ namespace PotikotTools.DialogueSystem
         
         public virtual async Task<List<string>> GetDialogueTagsAsync(string dialogueName)
         {
-            return await loader.LoadTagsAsync(rootPath, dialogueName);
+            return await loader.LoadTagsAsync(dialoguesRootPath, dialogueName);
         }
 
         public virtual async Task<DialogueData> GetDialogueAsync(string dialogueName)
@@ -109,7 +116,7 @@ namespace PotikotTools.DialogueSystem
 
         public virtual async Task<bool> LoadDialogueAsync(string dialogueName)
         {
-            DialogueData dialogueData = await loader.LoadDataAsync(rootPath, dialogueName);
+            DialogueData dialogueData = await loader.LoadDataAsync(dialoguesRootPath, dialogueName);
             
             if (dialogueData == null)
                 return false;
@@ -130,7 +137,7 @@ namespace PotikotTools.DialogueSystem
 
         public virtual bool LoadDialogue(string dialogueName)
         {
-            DialogueData dialogueData = loader.LoadData(rootPath, dialogueName);
+            DialogueData dialogueData = loader.LoadData(dialoguesRootPath, dialogueName);
             
             if (dialogueData == null)
                 return false;
@@ -205,7 +212,9 @@ namespace PotikotTools.DialogueSystem
         
         public virtual async Task<T> LoadResourceAsync<T>(string dialogueName, string resourceName) where T : Object
         {
-            if (!resourceDirectories.TryGetValue(typeof(T), out string directory))
+            if (string.IsNullOrEmpty(dialogueName)
+                || string.IsNullOrEmpty(resourceName)
+                || !resourceDirectories.TryGetValue(typeof(T), out string directory))
                 return null;
             
             string path = Path.Combine(rootPath, directory, resourceName);
@@ -244,12 +253,35 @@ namespace PotikotTools.DialogueSystem
             #endif
         }
 
+        // TODO: incorrect path
+        public virtual T LoadResource<T>(string resourceName) where T : Object
+        {
+            string path = GetResourcePath<T>(resourceName);
+            return path == null ? null : Resources.Load<T>(path);
+        }
+
+        public virtual string GetResourcePath<T>(string resourceName) where T : Object
+        {
+            if (string.IsNullOrEmpty(resourceName)
+                || !resourceDirectories.TryGetValue(typeof(T), out string directory))
+                return null;
+            
+            return Path.Combine(resourcesPath, directory, resourceName);
+        }
+        
+        public virtual string GetProjectRelativeResourcePath<T>(string resourceName) where T : Object
+        {
+            if (string.IsNullOrEmpty(resourceName)
+                || !resourceDirectories.TryGetValue(typeof(T), out string directory))
+                return null;
+            
+            return Path.Combine(relativeRootPath, directory, resourceName);
+        }
+        
         private void RegisterTagsChangedEvents(DialogueData dialogueData)
         {
             if (dialogueData == null)
                 return;
-            
-            DL.LogError("dialogueData: " + dialogueData.Name);
             
             dialogueData.Tags.OnElementAdded += OnTagAdded;
             dialogueData.Tags.OnElementChanged += OnTagChanged;
@@ -265,8 +297,6 @@ namespace PotikotTools.DialogueSystem
             {
                 if (prevValue == newValue)
                     return;
-                
-                DL.LogError("Tag changed");
                 
                 var prevTagDialogues = GetOrAddTag(prevValue);
                 prevTagDialogues.Remove(dialogueData.Name);

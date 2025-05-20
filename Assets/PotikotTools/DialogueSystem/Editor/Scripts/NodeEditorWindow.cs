@@ -25,8 +25,9 @@ namespace PotikotTools.DialogueSystem.Editor
                     return;
                 
                 _editorData = value;
-                ChangeTitle(_editorData.Id);
+                ChangeTitle(_editorData.Name);
                 _editorData.OnNameChanged += ChangeTitle;
+                _editorData.OnDeleted += Close;
                 _isSubbed = true;
                 AddGraphView();
                 AddFloatingSettings();
@@ -38,6 +39,7 @@ namespace PotikotTools.DialogueSystem.Editor
             if (_isSubbed) // TODO: fix event sub on maximize window
             {
                 _editorData.OnNameChanged -= ChangeTitle;
+                _editorData.OnDeleted -= Close;
                 _isSubbed = false;
             }
             
@@ -88,6 +90,7 @@ namespace PotikotTools.DialogueSystem.Editor
 
         private void ChangeTitle(string value)
         {
+            DL.Log("ChangeTitle");
             titleContent = new GUIContent($"'{value}' Dialogue Editor");
         }
     }

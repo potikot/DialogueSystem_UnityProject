@@ -24,7 +24,7 @@ namespace PotikotTools.DialogueSystem.Editor
         
         public async Task<bool> SaveEditorDataAsync(string directoryPath, EditorDialogueData editorDialogueData, bool refreshAsset = true)
         {
-            string fullPath = Path.Combine(directoryPath, editorDialogueData.Id, DialogueSystemPreferences.Data.EditorDataFilename);
+            string fullPath = Path.Combine(directoryPath, editorDialogueData.Name, DialogueSystemPreferences.Data.EditorDataFilename);
     
             string json = JsonConvert.SerializeObject(editorDialogueData, serializerSettings);
             return await FileUtility.WriteAsync(fullPath, json, refreshAsset);
@@ -32,7 +32,7 @@ namespace PotikotTools.DialogueSystem.Editor
         
         public bool SaveEditorData(string directoryPath, EditorDialogueData editorDialogueData, bool refreshAsset = true)
         {
-            string fullPath = Path.Combine(directoryPath, editorDialogueData.Id, DialogueSystemPreferences.Data.EditorDataFilename);
+            string fullPath = Path.Combine(directoryPath, editorDialogueData.Name, DialogueSystemPreferences.Data.EditorDataFilename);
             
             string json = JsonConvert.SerializeObject(editorDialogueData, serializerSettings);
             return FileUtility.Write(fullPath, json, refreshAsset);
@@ -43,6 +43,10 @@ namespace PotikotTools.DialogueSystem.Editor
             string fullPath = Path.Combine(directoryPath, dialogueId, DialogueSystemPreferences.Data.EditorDataFilename);
 
             string json = await FileUtility.ReadAsync(fullPath);
+                        
+            if (json == null)
+                return null;
+            
             return JsonConvert.DeserializeObject<EditorDialogueData>(json, serializerSettings);
         }
 
@@ -51,6 +55,10 @@ namespace PotikotTools.DialogueSystem.Editor
             string fullPath = Path.Combine(directoryPath, dialogueId, DialogueSystemPreferences.Data.EditorDataFilename);
 
             string json = FileUtility.Read(fullPath);
+            
+            if (json == null)
+                return null;
+            
             return JsonConvert.DeserializeObject<EditorDialogueData>(json, serializerSettings);
         }
     }

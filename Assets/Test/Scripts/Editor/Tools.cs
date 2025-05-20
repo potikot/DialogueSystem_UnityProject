@@ -1,0 +1,24 @@
+using System.Diagnostics;
+using PotikotTools.DialogueSystem.Editor;
+using UnityEditor;
+using UnityEngine;
+using Debug = UnityEngine.Debug;
+
+public static class Tools
+{
+    [MenuItem("Tools/Check Open Handles")]
+    public static void CheckOpenHandles()
+    {
+        var process = Process.GetCurrentProcess();
+        Debug.Log($"Current Unity.exe handle count: {process.HandleCount}");
+    }
+
+    [MenuItem("Tools/Destroy All Dialogue Editors")]
+    public static void DestroyAllDialogueEditors()
+    {
+        foreach (var window in Resources.FindObjectsOfTypeAll<NodeEditorWindow>())
+        {
+            Object.DestroyImmediate(window);
+        }
+    }
+}

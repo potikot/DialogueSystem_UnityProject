@@ -22,21 +22,27 @@ namespace PotikotTools.DialogueSystem.Editor
             Windows = new List<NodeEditorWindow>(nodeEditorWindows.Length);
             
             string[] dialogueNames = FileUtility.ReadAllLines(LaunchConfigFilepath);
-            
+
             foreach (var window in nodeEditorWindows)
             {
                 string dialogueName = dialogueNames.FirstOrDefault(dn => window.titleContent.text.Contains(dn));
-
                 if (string.IsNullOrEmpty(dialogueName))
                 {
-                    window.Close();
+                    window.Close(); // TODO: null ref sometimes (1 window stay open and hided, and there is no names in save file)
                     continue;
                 }
 
                 var editorDialogueData = EditorComponents.Database.LoadDialogue(dialogueName);
+                if (editorDialogueData == null)
+                {
+                    window.Close();
+                    continue;
+                }
+                
                 window.EditorData = editorDialogueData;
                 window.OnClose += OnWindowClosed;
-                
+                editorDialogueData.OnNameChanged += OnDialogueNameChanged;
+
                 Windows.Add(window);
             }
 
@@ -62,6 +68,7 @@ namespace PotikotTools.DialogueSystem.Editor
 
             window.EditorData = editorDialogueData;
             window.OnClose += OnWindowClosed;
+            window.EditorData.OnNameChanged += OnDialogueNameChanged;
             
             Windows.Add(window);
             window.Show();
@@ -72,14 +79,22 @@ namespace PotikotTools.DialogueSystem.Editor
         
         private static void Save()
         {
-            string[] lines = Windows.Select(w => w.EditorData.Id).ToArray();
+            string[] lines = Windows.Select(w => w.EditorData.Name).ToArray();
             FileUtility.WriteAllLines(LaunchConfigFilepath, lines);
         }
 
         private static void OnWindowClosed(NodeEditorWindow window)
         {
             if (Windows.Remove(window))
+            {
+                window.EditorData.OnNameChanged -= OnDialogueNameChanged;
                 Save();
+            }
+        }
+
+        private static void OnDialogueNameChanged(string newName)
+        {
+            Save();
         }
     }
 }

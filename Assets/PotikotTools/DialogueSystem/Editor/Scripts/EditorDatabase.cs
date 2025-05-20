@@ -7,81 +7,122 @@ namespace PotikotTools.DialogueSystem.Editor
 {
     public class EditorDatabase
     {
-        private IEditorDialogueSaverLoader _saverLoader;
-        
-        private Database database => Components.Database;
+        protected IEditorDialogueSaverLoader saverLoader;
+        protected Dictionary<string, EditorDialogueData> dialogues;
 
+        protected Database database => Components.Database;
+        
         public EditorDatabase(IEditorDialogueSaverLoader editorSaverLoader)
         {
-            _saverLoader = editorSaverLoader;
+            saverLoader = editorSaverLoader;
+            dialogues = new Dictionary<string, EditorDialogueData>();
         }
         
         // TODO: Possibility to Save and Load only required things
         
         public async Task<bool> SaveDialogueAsync(EditorDialogueData editorData)
         {
-            bool editorDataSaved = await _saverLoader.SaveEditorDataAsync(database.RootPath, editorData);
-            bool runtimeDataSaved = await _saverLoader.SaveDataAsync(database.RootPath, editorData.RuntimeData);
+            bool editorDataSaved = await saverLoader.SaveEditorDataAsync(database.DialoguesRootPath, editorData);
+            bool runtimeDataSaved = await saverLoader.SaveDataAsync(database.DialoguesRootPath, editorData.RuntimeData);
             
             return editorDataSaved && runtimeDataSaved;
         }
 
         public bool SaveDialogue(EditorDialogueData editorData)
         {
-            bool editorDataSaved = _saverLoader.SaveEditorData(database.RootPath, editorData);
-            bool runtimeDataSaved = _saverLoader.SaveData(database.RootPath, editorData.RuntimeData);
+            bool editorDataSaved = saverLoader.SaveEditorData(database.DialoguesRootPath, editorData);
+            bool runtimeDataSaved = saverLoader.SaveData(database.DialoguesRootPath, editorData.RuntimeData);
             
             return editorDataSaved && runtimeDataSaved;
         }
 
         public async Task<List<EditorDialogueData>> LoadAllDialoguesAsync()
         {
-            string[] dialogueDirectories = Directory.GetDirectories(database.RootPath);
-            List<EditorDialogueData> dialogues = new(dialogueDirectories.Length);
-            
+            string[] dialogueDirectories = Directory.GetDirectories(database.DialoguesRootPath);
+            List<EditorDialogueData> loadedDialogues = new(dialogueDirectories.Length);
+
             foreach (string dialogueDirectory in dialogueDirectories)
-                dialogues.Add(await LoadDialogueAsync(Path.GetFileName(dialogueDirectory)));
+            {
+                var editorData = await LoadDialogueAsync(Path.GetFileName(dialogueDirectory));
+                if (editorData != null)
+                    loadedDialogues.Add(editorData);
+            }
             
-            return dialogues;
+            return loadedDialogues;
         }
         
-        public async Task<EditorDialogueData> LoadDialogueAsync(string dialogueId)
+        public List<EditorDialogueData> LoadAllDialogues()
         {
-            EditorDialogueData editorData = await _saverLoader.LoadEditorDataAsync(database.RootPath, dialogueId);
-            editorData.RuntimeData = await database.GetDialogueAsync(dialogueId);
-            editorData.GenerateEditorNodeDatas();
+            string[] dialogueDirectories = Directory.GetDirectories(database.DialoguesRootPath);
+            List<EditorDialogueData> loadedDialogues = new(dialogueDirectories.Length);
+
+            foreach (string dialogueDirectory in dialogueDirectories)
+            {
+                var editorData = LoadDialogue(Path.GetFileName(dialogueDirectory));
+                if (editorData != null)
+                    loadedDialogues.Add(editorData);
+            }
             
-            return editorData;
+            return loadedDialogues;
         }
         
-        public EditorDialogueData LoadDialogue(string dialogueId)
+        public async Task<EditorDialogueData> LoadDialogueAsync(string dialogueName)
         {
-            EditorDialogueData editorData = _saverLoader.LoadEditorData(database.RootPath, dialogueId);
-            editorData.RuntimeData = database.GetDialogue(dialogueId);
+            if (dialogues.TryGetValue(dialogueName, out var editorData))
+                return editorData;
+            
+            editorData = await saverLoader.LoadEditorDataAsync(database.DialoguesRootPath, dialogueName);
+            
+            if (editorData == null)
+                return null;
+            
+            editorData.RuntimeData = await database.GetDialogueAsync(dialogueName);
             editorData.GenerateEditorNodeDatas();
 
+            if (dialogues.TryGetValue(dialogueName, out var tmp))
+                return tmp;
+
+            dialogues.Add(editorData.Name, editorData);
             return editorData;
         }
 
-        public async Task<EditorDialogueData> CreateDialogue(string dialogueId)
+        public EditorDialogueData LoadDialogue(string dialogueName)
         {
-            string guid = AssetDatabase.CreateFolder(database.RelativeRootPath, dialogueId);
+            if (dialogues.TryGetValue(dialogueName, out var editorData))
+                return editorData;
+            
+            editorData = saverLoader.LoadEditorData(database.DialoguesRootPath, dialogueName);
+
+            if (editorData == null)
+                return null;
+            
+            editorData.RuntimeData = database.GetDialogue(dialogueName);
+            editorData.GenerateEditorNodeDatas();
+            
+            dialogues.Add(editorData.Name, editorData);
+            return editorData;
+        }
+
+        public async Task<EditorDialogueData> CreateDialogue(string dialogueName)
+        {
+            string guid = AssetDatabase.CreateFolder(database.DialoguesRelativeRootPath, dialogueName);
 
             if (string.IsNullOrEmpty(guid))
             {
-                DL.LogError($"Cannot create folder for dialogue with id: {dialogueId}. Relative path: {database.RelativeRootPath}");
+                DL.LogError($"Cannot create folder for dialogue with id: {dialogueName}. Relative path: {database.DialoguesRelativeRootPath}");
                 return null;
             }
 
-            string uniqueDialogueId = Path.GetFileName(AssetDatabase.GUIDToAssetPath(guid));
-            if (string.IsNullOrEmpty(uniqueDialogueId))
+            string uniqueDialogueName = Path.GetFileName(AssetDatabase.GUIDToAssetPath(guid));
+            if (string.IsNullOrEmpty(uniqueDialogueName))
             {
-                DL.LogError($"Cannot create folder for dialogue with id: \"{dialogueId}\". Relative path: \"{database.RelativeRootPath}\"");
+                DL.LogError($"Cannot create folder for dialogue with id: \"{dialogueName}\". Relative path: \"{database.DialoguesRelativeRootPath}\"");
                 return null;
             }
             
-            var runtimeData = new DialogueData(uniqueDialogueId);
+            var runtimeData = new DialogueData(uniqueDialogueName);
             EditorDialogueData editorData = new EditorDialogueData(runtimeData);
+            dialogues.Add(editorData.Name, editorData);
             
             await SaveDialogueAsync(editorData);
             database.AddDialogue(runtimeData);
@@ -89,11 +130,14 @@ namespace PotikotTools.DialogueSystem.Editor
             return editorData;
         }
 
-        public void DeleteDialogue(EditorDialogueData editorData) => DeleteDialogue(editorData.Id);
+        public void DeleteDialogue(EditorDialogueData editorData) => DeleteDialogue(editorData.Name);
         
-        public void DeleteDialogue(string dialogueId)
+        public void DeleteDialogue(string dialogueName)
         {
-            AssetDatabase.DeleteAsset(Path.Combine(database.RelativeRootPath, dialogueId));
+            AssetDatabase.DeleteAsset(Path.Combine(database.DialoguesRelativeRootPath, dialogueName));
+            
+            if (dialogues.Remove(dialogueName, out var editorData))
+                editorData.OnDelete();
         }
     }
 }

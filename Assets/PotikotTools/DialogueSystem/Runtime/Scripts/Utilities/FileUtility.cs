@@ -11,6 +11,8 @@ namespace PotikotTools.DialogueSystem
     /// </summary>
     public static class FileUtility
     {
+        // TODO: paths are too easy to break. Enough to replace '/' by '\'
+        
         #region Sync
 
         public static bool Write(string absolutePath, string data, bool refreshAsset = true)
@@ -126,17 +128,17 @@ namespace PotikotTools.DialogueSystem
                 return null;
             }
             
-            string dataPath = Application.dataPath.Replace("\\", "/");
-            string abs = absolutePath.Replace("\\", "/");
+            string normalizedDataPath = Application.dataPath.Replace("\\", "/");
+            string normalizedAbs = absolutePath.Replace("\\", "/");
 
-            if (!abs.StartsWith(dataPath, StringComparison.OrdinalIgnoreCase))
+            if (!normalizedAbs.StartsWith(normalizedDataPath, StringComparison.OrdinalIgnoreCase))
             {
-                DL.LogError($"'{nameof(absolutePath)}' must be inside the Assets folder.");
+                DL.LogError($"'{nameof(absolutePath)}' must be inside the Assets folder ({absolutePath}).");
                 return null;
             }
 
-            int startIndex = dataPath.Length - "Assets".Length;
-            return abs[startIndex..].TrimStart('/');
+            int startIndex = normalizedDataPath.Length - "Assets".Length;
+            return normalizedAbs[startIndex..].TrimStart('/');
         }
 
         public static string GetAbsolutePath(string relativePath)
@@ -150,11 +152,22 @@ namespace PotikotTools.DialogueSystem
             string normalizedPath = relativePath.Replace("\\", "/").TrimStart('/');
             if (!normalizedPath.StartsWith("Assets"))
             {
-                DL.LogError("Path must start with 'Assets', '/Assets', or '\\Assets'.");
+                DL.LogError($"Path must start with 'Assets', '/Assets', or '\\Assets' ({relativePath}).");
                 return null;
             }
             
             return Path.Combine(Application.dataPath, normalizedPath["Assets".Length..].TrimStart('/'));
+        }
+
+        public static bool IsDatabaseRelativePath(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                DL.LogError($"'{nameof(path)}' cannot be null or empty.");
+                return false;
+            }
+            
+            return path.StartsWith(Components.Database.RelativeRootPath, StringComparison.CurrentCultureIgnoreCase);
         }
     }
 }
