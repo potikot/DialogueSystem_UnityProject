@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,33 +9,30 @@ using UnityEngine.UIElements;
 
 namespace PotikotTools.DialogueSystem.Editor
 {
-    public abstract class NodeView<T> : Node, INodeView
-        where T : NodeData
+    public abstract class NodeView<T> : Node, INodeView where T : NodeData
     {
         protected EditorNodeData editorData;
         protected T data;
+        protected DialogueGraphView graphView;
 
-        public T Data => data;
+        protected virtual string Title => "Dialogue Node";
 
-        public virtual void Initialize(EditorNodeData editorData, NodeData data)
+        public virtual void Initialize(EditorNodeData editorData, NodeData data, DialogueGraphView graphView)
         {
             this.editorData = editorData;
             this.data = data as T;
-
+            this.graphView = graphView;
+            
             RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
-            RegisterCallback<DetachFromPanelEvent>(_ => UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged));
-
-            AddManipulators();
+            RegisterCallback<DetachFromPanelEvent>(OnDetachFromPanel);
         }
 
         public NodeData GetData() => data;
-        
-        public virtual void Delete()
+
+        public virtual void OnDelete()
         {
             data.DialogueData.RemoveNode(data);
         }
-
-        #region Draw
 
         public virtual void Draw()
         {
@@ -47,314 +43,331 @@ namespace PotikotTools.DialogueSystem.Editor
             }
 
             SetPosition(new Rect(editorData.position, Vector2.zero));
-            
-            title = "Dialogue Node";
+            title = Title;
 
-            CreatePorts();
-            CreateAddButton();
-            CreateSpeakerTextInput();
-            CreateSpeakerIndexInput();
-            CreateAudioInput();
-            CreateCommandsInput();
+            DrawChoiceButton();
+            DrawPorts();
+            DrawSpeakerText();
+            DrawSpeakerDropdown();
+            DrawAudioField();
+            DrawCommandList();
 
-            extensionContainer.style.backgroundColor = new Color(0.2470588f, 0.2470588f, 0.2470588f, 0.8039216f);
             RefreshExpandedState();
         }
 
-        protected virtual void CreatePorts()
+        #region Draw Helpers
+
+        protected virtual void DrawChoiceButton()
+        {
+            var container = new VisualElement().AddUSSClasses("node__add-choice-btn");
+            
+            container.Add(new Button(OnAddChoice) { text = "Add Choice" });
+
+            mainContainer.Insert(1, container);
+        }
+
+        protected virtual void DrawPorts()
         {
             AddInputPort();
 
-            foreach (ConnectionData connection in data.OutputConnections)
+            foreach (var connection in data.OutputConnections)
                 AddOutputPort(connection);
+            //
+            // if (outputContainer.childCount == 1)
+            //     outputContainer.Q<Button>().visible = false;
         }
 
-        protected virtual void CreateSpeakerTextInput()
+        protected virtual void AddInputPort()
         {
-            VisualElement speakerTextContainer = new();
-            speakerTextContainer.Add(new Label("Speaker Text"));
-            TextField speakerTextInput = new()
-            {
-                value = data.Text
-            };
-            speakerTextInput.RegisterValueChangedCallback(evt => data.Text = evt.newValue);
-            speakerTextContainer.Add(speakerTextInput);
+            var container = new VisualElement().AddUSSClasses("node__input-port-container");
             
-            extensionContainer.Add(speakerTextContainer);
+            container.Add(InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, null));
+            container.Add(new Label("In"));
+
+            inputContainer.Add(container);
         }
 
-        protected virtual void CreateSpeakerIndexInput()
+        
+        // TODO: port does not connectible
+        protected virtual void AddOutputPort(ConnectionData connection)
+        {
+            var container = new VisualElement().AddUSSClasses("node__output-container");
+
+            // Ports Container
+
+            var portContainer = new VisualElement().AddUSSClasses("node__output-port-container");
+
+            var deleteBtn = new Button(() => OnRemoveChoice(data.OutputConnections.IndexOf(connection)))
+            {
+                text = EditorSymbols.Cross
+            };
+
+            deleteBtn.AddUSSClasses(
+                "round-btn",
+                "node__output-port__delete-btn"
+            );
+
+            var textField = new TextField
+            {
+                value = connection.Text,
+                multiline = true
+            };
+
+            textField.AddUSSClasses("node__output-port__text-field");
+            textField.Children().First().AddUSSClasses("node__output-port__text-input");
+            textField.RegisterValueChangedCallback(evt => connection.Text = evt.newValue);
+
+            var port = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Single, null)
+                .AddUSSClasses("node__output-port");
+
+            portContainer.Add(deleteBtn);
+            portContainer.Add(textField);
+            // container.Add(new VisualElement { style = { flexGrow = 1f } });
+            portContainer.Add(port);
+
+            // CMD Container
+
+            var commandsContainer = new VisualElement().AddUSSClasses("node__output-port-cmd-container");
+            commandsContainer.Add(CreateCommandList(connection.Commands));
+
+            container.Add(portContainer);
+            container.Add(commandsContainer);
+
+            if (outputContainer.childCount > 0)
+                outputContainer.AddVerticalSpace(1f, Color.black);
+
+            outputContainer.Add(container);
+        }
+
+        protected virtual void OnAddChoice()
+        {
+            if (outputContainer.childCount == 1)
+                outputContainer.Q<Button>().style.display = DisplayStyle.Flex;
+            
+            var newConnection = new ConnectionData("New Choice", data, null);
+            data.OutputConnections.Add(newConnection);
+            AddOutputPort(newConnection);
+        }
+        
+        protected virtual void OnRemoveChoice(int index)
+        {
+            if (index < 0 || index >= data.OutputConnections.Count || data.OutputConnections.Count <= 1)
+                return;
+            
+            int viewIndex = index * 2;
+
+            var port = outputContainer.Query<Port>().ToList()[index];
+            if (port.connected)
+            {
+                graphView.DeleteElements(port.connections);
+                // foreach (Edge edge in edgesToRemove)
+                // {
+                //     edge.input.Disconnect(edge);
+                //     edge.output.Disconnect(edge);
+                //     edge.RemoveFromHierarchy();
+                //     graphView.RemoveElement(edge);
+                // }
+            }
+
+            data.OutputConnections.RemoveAt(index);
+            outputContainer.RemoveAt(viewIndex);
+            outputContainer.RemoveAt(viewIndex == 0 ? 0 : viewIndex - 1);
+            
+            if (outputContainer.childCount == 1)
+                outputContainer.Q<Button>().style.display = DisplayStyle.None;
+        }
+        
+        // TODO: text field does not stretch correctly because of multiline, but it works correct in output container
+        protected virtual void DrawSpeakerText()
+        {
+            var container = new VisualElement().AddUSSClasses("node__speaker-text-container");
+            container.Add(new Label("Speaker Text"));
+
+            var textField = new TextField
+            {
+                value = data.Text,
+                multiline = true
+            };
+            
+            textField.AddUSSClasses("node__speaker-text");
+            textField.RegisterValueChangedCallback(evt => data.Text = evt.newValue);
+
+            container.Add(textField);
+            extensionContainer.Add(container);
+        }
+
+        protected virtual void DrawSpeakerDropdown()
         {
             if (data.DialogueData.Speakers == null)
                 return;
-            
-            int i = 1;
-            List<string> speakerNames = new(data.DialogueData.Speakers.Count + 1) { "None" };
-            speakerNames.AddRange(data.DialogueData.Speakers.Select(s => $"{i++}. {s.Name}"));
 
-            string speakerName = data.GetSpeakerName();
-            PopupField<string> speakerIndexInput = new
-            (
-                "Speaker",
-                speakerNames,
-                string.IsNullOrEmpty(speakerName) ? "None" : $"{data.SpeakerIndex + 1}. {speakerName}"
-            );
-            
-            speakerIndexInput.RegisterValueChangedCallback(evt => data.SpeakerIndex = speakerIndexInput.index - 1);
-        
-            extensionContainer.Add(speakerIndexInput);
+            var speakerNames = new List<string> { "None" };
+            speakerNames.AddRange(data.DialogueData.Speakers.Select((s, i) => $"{i + 1}. {s.Name}"));
+
+            string currentSpeaker = data.GetSpeakerName();
+            var popup = new PopupField<string>("Speaker", speakerNames,
+                string.IsNullOrEmpty(currentSpeaker) ? "None" : $"{data.SpeakerIndex + 1}. {currentSpeaker}");
+
+            popup.RegisterValueChangedCallback(_ => data.SpeakerIndex = popup.index - 1);
+            extensionContainer.Add(popup);
         }
 
-        protected virtual void CreateAudioInput()
+        protected virtual void DrawAudioField()
         {
-            ObjectField audioInput = new("Audio Name")
+            var audioField = new ObjectField("Audio")
             {
                 objectType = typeof(AudioClip),
                 value = Components.Database.LoadResource<AudioClip>(data.AudioResourceName)
             };
 
-            audioInput.RegisterValueChangedCallback(evt =>
-            {
-                if (evt.newValue == null)
-                    return;
-
-                string relativeFilePath = AssetDatabase.GetAssetPath(evt.newValue);
-                string fileName = Path.GetFileName(relativeFilePath);
-                
-                if (!FileUtility.IsDatabaseRelativePath(relativeFilePath))
-                {
-                    if (EditorUtility.DisplayDialog(
-                            "Move asset",
-                            $"Asset '{fileName}' is not under database directory. Must move into database",
-                            "Ok", "Cancel"))
-                    {
-                        // TODO: dir info easy to break. refactor
-                        string newResourcePath = Components.Database.GetProjectRelativeResourcePath<AudioClip>(fileName);
-                        var dirInfo = new DirectoryInfo(Path.GetDirectoryName(newResourcePath));
-                        
-                        if (!dirInfo.Exists)
-                        {
-                            dirInfo.Create();
-                            AssetDatabase.ImportAsset(FileUtility.GetProjectRelativePath(dirInfo.FullName));
-                        }
-                        
-                        string error = AssetDatabase.MoveAsset(relativeFilePath, newResourcePath);
-                        if (!string.IsNullOrEmpty(error))
-                        {
-                            DL.LogError(error);
-                        }
-                    }
-                    else
-                    {
-                        audioInput.SetValueWithoutNotify(evt.previousValue);
-                        return;
-                    }
-                }
-                
-                data.AudioResourceName = Path.GetFileNameWithoutExtension(fileName);
-            });
-            
-            extensionContainer.Add(audioInput);
+            audioField.RegisterValueChangedCallback(evt => HandleAudioChange(evt, audioField));
+            extensionContainer.Add(audioField);
         }
 
-        protected virtual void CreateCommandsInput()
+        private void HandleAudioChange(ChangeEvent<Object> evt, ObjectField audioField)
         {
-            Foldout foldout = new()
+            if (evt.newValue == null)
+                return;
+
+            string assetPath = AssetDatabase.GetAssetPath(evt.newValue);
+            string fileName = Path.GetFileName(assetPath);
+
+            if (!FileUtility.IsDatabaseRelativePath(assetPath))
+            {
+                bool moveConfirmed = EditorUtility.DisplayDialog(
+                    "Move asset",
+                    $"Asset '{fileName}' is not under database directory. Must move into database",
+                    "Ok", "Cancel");
+
+                if (!moveConfirmed)
+                {
+                    audioField.SetValueWithoutNotify(evt.previousValue);
+                    return;
+                }
+
+                FileUtility.MoveAssetToDatabase(evt.newValue.GetType(), assetPath, fileName);
+            }
+
+            data.AudioResourceName = Path.GetFileNameWithoutExtension(fileName);
+        }
+
+        protected virtual void DrawCommandList()
+        {
+            extensionContainer.Add(CreateCommandList(data.Commands));
+        }
+
+        protected virtual VisualElement CreateCommandList(ObservableList<CommandData> commands)
+        {
+            var foldout = new Foldout
             {
                 text = "Commands",
                 value = false
             };
 
-            foldout.Add(new Button(() =>
+            var addBtn = new Button(() => 
             {
-                CommandData commandData = new();
-                data.Commands.Add(commandData);
-                int index = data.Commands.Count - 1;
+                commands.Add(new CommandData());
+                foldout.Add(CreateCommandElement(commands, commands.Count - 1));
 
-                foldout.Add(CreateListElement(data.Commands, index, () =>
-                {
-                    int index = data.Commands.IndexOf(commandData);
-                    
-                    data.Commands.RemoveAt(index);
-                    foldout.RemoveAt(index + 1);
-                }));
+                foldout.Q("unity-checkmark").RemoveUSSClasses("node__cmd-foldout-checkmark--hidden");
+                foldout.value = true;
             })
             {
-                text = "Add Command"
-            });
-
-            for (int i = 0; i < data.Commands.Count; i++)
-            {
-                VisualElement el = CreateListElement(data.Commands, i, () =>
-                {
-                    data.Commands.RemoveAt(i);
-                    foldout.RemoveAt(i + 1);
-                });
-                foldout.Add(el);
-            }
-
-            extensionContainer.Add(foldout);
-        }
-
-        private VisualElement CreateListElement(List<CommandData> commands, int index, Action deleteAction)
-        {
-            CommandData commandData = commands[index];
-
-            Foldout foldout = new()
-            {
-                text = commandData.Text ?? $"Command {index + 1}",
-                value = false
+                text = EditorSymbols.Plus
             };
+
+            addBtn.AddUSSClasses("round-btn");
             
-            TextField commandInput = new()
-            {
-                value = commandData.Text
-            };
-
-            commandInput.RegisterValueChangedCallback(evt =>
-            {
-                commandData.Text = evt.newValue;
-
-                if (string.IsNullOrEmpty(evt.newValue))
-                    foldout.text = $"Command {index + 1}";
-                else
-                    foldout.text = evt.newValue;
-            });
-
-            EnumField executionOrderInput = new("Execution Order", commandData.ExecutionOrder);
-            executionOrderInput.RegisterValueChangedCallback(evt => commandData.ExecutionOrder = (CommandExecutionOrder) evt.newValue);
-
-            FloatField delayInput = new("Delay")
-            {
-                value = commandData.Delay,
-                tooltip = "In seconds"
-            };
+            foldout.Q<Toggle>().Add(addBtn);
+            foldout.Q<Label>().AddUSSClasses("node__cmd-label");
             
-            delayInput.RegisterValueChangedCallback(evt =>
-            {
-                if (evt.newValue < 0f)
-                    delayInput.SetValueWithoutNotify(0f);
+            for (int i = 0; i < commands.Count; i++)
+                foldout.Add(CreateCommandElement(commands, i));
 
-                commandData.Delay = delayInput.value;
-            });
-
-            foldout.Add(commandInput);
-            foldout.Add(executionOrderInput);
-            foldout.Add(delayInput);
-            foldout.Q<Toggle>().Add(new Button(deleteAction)
-            {
-                text = "x",
-                style =
-                {
-                    paddingLeft = 5f,
-                    paddingRight = 5f
-                }
-            });
-
+            if (commands.Count == 0)
+                foldout.Q("unity-checkmark").AddUSSClasses("node__cmd-foldout-checkmark--hidden");
+            
             return foldout;
         }
         
-        protected virtual void CreateAddButton()
+        protected virtual VisualElement CreateCommandElement(ObservableList<CommandData> commands, int index)
         {
-            VisualElement c = new()
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Row,
-                    borderTopWidth = 1f,
-                    borderTopColor = new Color(0.2f, 0.2f, 0.2f),
-                    backgroundColor = new Color(0.2470588f, 0.2470588f, 0.2470588f, 0.8039216f)
-                }
-            };
-
-            c.Add(new Button(AddButtonCallback)
-            {
-                text = "Add",
-                style = { flexGrow = 1f }
-            });
+            var cmd = commands[index];
             
-            mainContainer.Insert(1, c);
-        }
-
-        protected virtual void AddInputPort()
-        {
-            VisualElement c = new()
+            var foldout = new Foldout
             {
-                style =
-                {
-                    flexDirection = FlexDirection.Row
-                }
+                text = string.IsNullOrEmpty(cmd.Text) ? GetCommandName(index + 1) : cmd.Text,
+                value = false
             };
 
-            c.Add(InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, null));
-            c.Add(new Label("In")
+            var cmdInput = new TextField { value = cmd.Text };
+            cmdInput.RegisterValueChangedCallback(evt =>
             {
-                style =
-                {
-                    unityTextAlign = TextAnchor.MiddleCenter
-                }
+                cmd.Text = evt.newValue;
+                foldout.text = string.IsNullOrEmpty(evt.newValue) ? GetCommandName(commands.IndexOf(cmd) + 1) : evt.newValue;
             });
 
-            inputContainer.Add(c);
-        }
-        
-        protected virtual void AddOutputPort(ConnectionData connectionData)
-        {
-            VisualElement c = new()
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Row
-                }
-            };
+            var execOrder = new EnumField("Execution Order", cmd.ExecutionOrder);
+            execOrder.RegisterValueChangedCallback(evt => cmd.ExecutionOrder = (CommandExecutionOrder)evt.newValue);
 
-            c.Add(new Button(() => RemoveButtonCallback(data.OutputConnections.IndexOf(connectionData)))
+            var delayField = new FloatField("Delay")
             {
-                text = "x"
+                value = cmd.Delay,
+                tooltip = "In seconds"
+            };
+            delayField.RegisterValueChangedCallback(evt =>
+            {
+                float newDelay = Mathf.Max(0f, evt.newValue);
+                delayField.SetValueWithoutNotify(newDelay);
+                cmd.Delay = newDelay;
             });
 
-            TextField textField = new()
+            var deleteBtn = new Button(() =>
             {
-                value = connectionData.Text
+                commands.Remove(cmd);
+                if (commands.Count == 0 && foldout.parent is Foldout f)
+                {
+                    f.value = false;
+                    f.Q("unity-checkmark").AddUSSClasses("node__cmd-foldout-checkmark--hidden");
+                }
+                
+                foldout.RemoveFromHierarchy();
+            })
+            {
+                text = EditorSymbols.Cross
             };
-            
-            textField.RegisterValueChangedCallback(evt => connectionData.Text = evt.newValue);
-            
-            c.Add(textField);
 
-            c.Add(new VisualElement() { style = { flexGrow = 1f } });
-            c.Add(InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Single, null));
+            deleteBtn.AddUSSClasses("round-btn");
             
-            outputContainer.Add(c);
+            foldout.Add(cmdInput);
+            foldout.Add(execOrder);
+            foldout.Add(delayField);
+            foldout.Q<Toggle>().Add(deleteBtn);
+
+            commands.OnElementRemoved += OnCommandRemoved;
+            foldout.RegisterCallback<DetachFromPanelEvent>(_ => commands.OnElementRemoved -= OnCommandRemoved);
+            
+            return foldout;
+
+            void OnCommandRemoved(CommandData c)
+            {
+                if (string.IsNullOrEmpty(cmd.Text))
+                    foldout.text = GetCommandName(commands.IndexOf(cmd) + 1);
+            }
+            
+            string GetCommandName(int i) => $"Command {i}";
         }
-        
+
         #endregion
 
         protected virtual void OnGeometryChanged(GeometryChangedEvent evt)
         {
             editorData.position = evt.newRect.position;
         }
-        
-        protected virtual void AddButtonCallback()
-        {
-            ConnectionData connectionData = new("New Choice", data, null);
-            data.OutputConnections.Add(connectionData);
 
-            AddOutputPort(connectionData);
-        }
-
-        protected virtual void RemoveButtonCallback(int index)
+        protected virtual void OnDetachFromPanel(DetachFromPanelEvent evt)
         {
-            if (index < 0 || index >= data.OutputConnections.Count || data.OutputConnections.Count <= 1)
-                return;
-
-            data.OutputConnections.RemoveAt(index);
-            outputContainer.RemoveAt(index);
-        }
-        
-        protected virtual void AddManipulators()
-        {
-            this.AddManipulator(new Dragger());
+            UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged);
         }
     }
 }

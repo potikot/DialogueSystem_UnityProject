@@ -18,7 +18,9 @@ namespace PotikotTools.DialogueSystem.Editor
         public string Description;
         
         public List<EditorNodeData> EditorNodeDataList;
-        public Vector2 FloatingWindowPosition;
+        
+        public bool SettingsPanelOpened;
+        public Vector2 SettingsPanelPosition;
         
         [JsonIgnore] public DialogueData RuntimeData
         {

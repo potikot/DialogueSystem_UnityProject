@@ -6,20 +6,11 @@ namespace PotikotTools.DialogueSystem.Editor
 {
     public class SingleChoiceNodeView : NodeView<SingleChoiceNodeData>
     {
-        public override void Draw()
-        {
-            base.Draw();
-            title = "Single Choice Node";
-        }
-        
-        protected override void CreateAddButton() { }
+        protected override string Title => "No Choice Node";
 
         protected override void AddOutputPort(ConnectionData connectionData)
         {
-            // if (outputContainer.childCount >= 1)
-            //     return;
-
-            VisualElement c = new()
+            VisualElement container = new()
             {
                 style =
                 {
@@ -27,8 +18,8 @@ namespace PotikotTools.DialogueSystem.Editor
                 }
             };
 
-            c.Add(InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Single, null));
-            c.Add(new Label("Out")
+            container.Add(InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Single, null));
+            container.Add(new Label("Out")
             {
                 style =
                 {
@@ -36,7 +27,9 @@ namespace PotikotTools.DialogueSystem.Editor
                 }
             });
             
-            outputContainer.Add(c);
+            outputContainer.Add(container);
         }
+        
+        protected override void DrawChoiceButton() { }
     }
 }

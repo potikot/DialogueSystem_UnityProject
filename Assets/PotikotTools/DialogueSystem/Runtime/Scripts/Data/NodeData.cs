@@ -16,7 +16,7 @@ namespace PotikotTools.DialogueSystem
         public AudioClip AudioResource;
         public string AudioResourceName;
         
-        public List<CommandData> Commands;
+        public ObservableList<CommandData> Commands;
 
         [JsonIgnore] public ConnectionData InputConnection;
         public List<ConnectionData> OutputConnections;
@@ -32,7 +32,7 @@ namespace PotikotTools.DialogueSystem
 
             SpeakerIndex = -1;
             OutputConnections = new List<ConnectionData>();
-            Commands = new List<CommandData>();
+            Commands = new ObservableList<CommandData>();
         }
 
         public virtual string GetSpeakerName()

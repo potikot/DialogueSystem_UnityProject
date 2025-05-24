@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor.Experimental.GraphView;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace PotikotTools.DialogueSystem.Editor
@@ -29,9 +30,16 @@ namespace PotikotTools.DialogueSystem.Editor
             AddManipulators();
             AddNodes();
 
-            this.AddStyleSheets("Styles/DialogueGraph");
+            this.AddStyleSheets("Styles/DialogueGraph", "Styles/Variables");
+            
+            RegisterCallback<KeyDownEvent>(evt =>
+            {
+                if (evt.ctrlKey && evt.keyCode == KeyCode.S)
+                    EditorComponents.Database.SaveDialogue(editorData);
+            });
             
             graphViewChanged += HandleGraphViewChanged;
+            // deleteSelection = HandleDeleteSelection;
         }
 
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter)
@@ -58,7 +66,7 @@ namespace PotikotTools.DialogueSystem.Editor
             
             EditorData.EditorNodeDataList.Add(editorNodeData);
             
-            nodeView.Initialize(editorNodeData, RuntimeData.AddNode<TData>(dataArgs));
+            nodeView.Initialize(editorNodeData, RuntimeData.AddNode<TData>(dataArgs), this);
             nodeView.Draw();
             
             AddElement(nodeView);
@@ -70,8 +78,8 @@ namespace PotikotTools.DialogueSystem.Editor
             for (int i = 0; i < nodesCount; i++)
             {
                 NodeData nodeData = editorData.RuntimeData.Nodes[i];
-                INodeView nodeView = Activator.CreateInstance(nodeTypes[nodeData.GetType()]) as INodeView;
-                nodeView.Initialize(editorData.EditorNodeDataList[i], nodeData);
+                INodeView nodeView = (INodeView)Activator.CreateInstance(nodeTypes[nodeData.GetType()]);
+                nodeView.Initialize(editorData.EditorNodeDataList[i], nodeData, this);
                 nodeView.Draw();
 
                 Node node = nodeView as Node;
@@ -90,7 +98,7 @@ namespace PotikotTools.DialogueSystem.Editor
                     NodeData toNodeData = fromNodeData.OutputConnections[i].To;
                     if (toNodeData != null)
                     {
-                        Node toNode = nodes.First(n => toNodeData.Id == (n as INodeView).GetData().Id);
+                        Node toNode = nodes.First(n => toNodeData.Id == ((INodeView)n).GetData().Id);
                         
                         Port toPort = toNode.inputContainer.Q<Port>();
                         Port fromPort = fromNode.outputContainer.Query<Port>().ToList()[i];
@@ -105,6 +113,7 @@ namespace PotikotTools.DialogueSystem.Editor
         {
             this.AddManipulator(new ContentZoomer() { maxScale = 2f });
             this.AddManipulator(new ContentDragger());
+            this.AddManipulator(new SelectionDragger());
             this.AddManipulator(new RectangleSelector());
         }
         
@@ -116,9 +125,9 @@ namespace PotikotTools.DialogueSystem.Editor
             Insert(0, grid);
         }
 
-        #region OnGraphViewChanged
-
-        private static GraphViewChange HandleGraphViewChanged(GraphViewChange change)
+        #region Callbacks
+        
+        protected virtual GraphViewChange HandleGraphViewChanged(GraphViewChange change)
         {
             // TODO: optimize algorithm
 
@@ -128,7 +137,7 @@ namespace PotikotTools.DialogueSystem.Editor
             return change;
         }
 
-        private static void CreateEdges(List<Edge> elements)
+        private void CreateEdges(List<Edge> elements)
         {
             if (elements == null)
                 return;
@@ -149,26 +158,26 @@ namespace PotikotTools.DialogueSystem.Editor
             }
         }
         
-        private static void RemoveElements(List<GraphElement> elements)
+        private void RemoveElements(List<GraphElement> elements)
         {
             if (elements == null)
                 return;
 
-            foreach (GraphElement element in elements)
+            for (int i = 0; i < elements.Count; i++)
             {
-                switch (element)
+                switch (elements[i])
                 {
                     case Edge edge:
                     {
                         if (!TryGetNodeData(edge, out var data))
                         {
                             DL.LogError("Edge data could not be parsed");
-                            continue;
+                            return;
                         }
-                        
+
                         data.from.OutputConnections[data.optionIndex].To = null;
                         data.to.InputConnection = null;
-                        
+
                         DL.Log($"Disconnected: {edge.output.node.title} -> {edge.input.node.title}");
                         break;
                     }
@@ -176,11 +185,12 @@ namespace PotikotTools.DialogueSystem.Editor
                     {
                         if (nodeView is Node node)
                         {
-                            node.inputContainer.Q<Port>().DisconnectAll();
-                            node.outputContainer.Query<Port>().ForEach(p => p.DisconnectAll());
+                            DeleteElements(node.inputContainer.Q<Port>().connections);
+                            node.outputContainer.Query<Port>().ForEach(p => DeleteElements(p.connections));
+                            RemoveElement(node);
                         }
-                        
-                        nodeView.Delete();
+
+                        nodeView.OnDelete();
                         break;
                     }
                 }
@@ -211,6 +221,22 @@ namespace PotikotTools.DialogueSystem.Editor
             }
 
             return true;
+        }
+        
+        protected virtual void HandleDeleteSelection(string operationName, AskUser askuser)
+        {
+            foreach (var selectable in selection)
+            {
+                switch (selectable)
+                {
+                    case INodeView nodeView:
+                        
+                        break;
+                    case Edge edge:
+                        
+                        break;
+                }
+            }
         }
         
         #endregion

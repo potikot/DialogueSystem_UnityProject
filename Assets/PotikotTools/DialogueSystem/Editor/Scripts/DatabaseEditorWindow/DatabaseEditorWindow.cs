@@ -10,7 +10,6 @@ namespace PotikotTools.DialogueSystem.Editor
 {
     public class DatabaseEditorWindow : EditorWindow
     {
-        private const string CrossSymbol = "\u2715";
         private const string NewTagTemplate = "tag-";
         private const float SpaceBetweenDialogueContainers = 10f;
 
@@ -270,7 +269,7 @@ namespace PotikotTools.DialogueSystem.Editor
             
             var deleteButton = new Button(() => DeleteDialogueButtonCallback(OnDelete, editorDialogueData))
             {
-                text = CrossSymbol
+                text = EditorSymbols.Cross
             };
             
             deleteButton.AddUSSClasses(
@@ -423,7 +422,7 @@ namespace PotikotTools.DialogueSystem.Editor
 
             var deleteButton = new Button(OnDelete)
             {
-                text = CrossSymbol
+                text = EditorSymbols.Cross
             };
 
             deleteButton.AddUSSClasses(

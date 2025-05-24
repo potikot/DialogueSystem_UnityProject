@@ -4,11 +4,17 @@ namespace PotikotTools.DialogueSystem.Editor
 {
     public class TimerNodeView : NodeView<TimerNodeData>
     {
+        protected override string Title => "Timer Node";
+
+        public override void Initialize(EditorNodeData editorData, NodeData data, DialogueGraphView graphView)
+        {
+            base.Initialize(editorData, data, graphView);
+            this.AddUSSClasses("choice-node");
+        }
+        
         public override void Draw()
         {
             base.Draw();
-            title = "Timer Node";
-            
             CreateTimerInput();
         }
 
@@ -30,7 +36,7 @@ namespace PotikotTools.DialogueSystem.Editor
                     data.Duration = evt.newValue;
             });
             
-            extensionContainer.Add(timerInput);
+            extensionContainer.Insert(extensionContainer.childCount - 1, timerInput);
         }
     }
 }

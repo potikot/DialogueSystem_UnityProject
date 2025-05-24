@@ -2,8 +2,8 @@
   "EditorNodeDataList": [
     {
       "position": {
-        "x": -66.0,
-        "y": 40.0
+        "x": -668.0,
+        "y": 14.0
       }
     },
     {
@@ -14,13 +14,14 @@
     },
     {
       "position": {
-        "x": 618.0,
-        "y": 24.0
+        "x": 1378.0,
+        "y": 14.0
       }
     }
   ],
-  "FloatingWindowPosition": {
-    "x": 410.0,
-    "y": 150.0
+  "SettingsPanelOpened": false,
+  "SettingsPanelPosition": {
+    "x": 0.0,
+    "y": 0.0
   }
 }

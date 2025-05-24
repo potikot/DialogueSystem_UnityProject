@@ -12,7 +12,7 @@ namespace PotikotTools.DialogueSystem.Editor
         private EditorDialogueData _editorData;
         
         private DialogueGraphView _graph;
-        private FloatingSettingsPanel _floatingSettngsPanel;
+        private SettingsPanel _settngsPanel;
 
         private bool _isSubbed;
         
@@ -82,10 +82,10 @@ namespace PotikotTools.DialogueSystem.Editor
             if (_editorData == null)
                 return;
 
-            _floatingSettngsPanel?.RemoveFromHierarchy();
-            _floatingSettngsPanel = new FloatingSettingsPanel(_editorData);
+            _settngsPanel?.RemoveFromHierarchy();
+            _settngsPanel = new SettingsPanel(_editorData);
             
-            rootVisualElement.Add(_floatingSettngsPanel);
+            rootVisualElement.Add(_settngsPanel);
         }
 
         private void ChangeTitle(string value)

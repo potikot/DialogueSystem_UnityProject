@@ -11,7 +11,7 @@ namespace PotikotTools.DialogueSystem
     /// </summary>
     public static class FileUtility
     {
-        // TODO: paths are too easy to break. Enough to replace '/' by '\'
+        // TODO: paths are too easy to break. Example - replace '/' by '\'
         
         #region Sync
 
@@ -168,6 +168,37 @@ namespace PotikotTools.DialogueSystem
             }
             
             return path.StartsWith(Components.Database.RelativeRootPath, StringComparison.CurrentCultureIgnoreCase);
+        }
+        
+        // TODO: manage extensions
+        public static bool MoveAssetToDatabase(Type assetType, string oldPath, string newFileName = null)
+        {
+            newFileName ??= Path.GetFileName(oldPath);
+            string newPath = Components.Database.GetProjectRelativeResourcePath(assetType, newFileName);
+            string newFolder = Path.GetDirectoryName(newPath);
+            
+            if (!AssetDatabase.IsValidFolder(newFolder))
+            {
+                Directory.CreateDirectory(newFolder);
+                AssetDatabase.ImportAsset(GetProjectRelativePath(newFolder));
+            }
+
+            string error = AssetDatabase.MoveAsset(oldPath, newPath);
+            if (!string.IsNullOrEmpty(error))
+            {
+                DL.LogError(error);
+                return false;
+            }
+            
+            return true;
+        }
+        
+        public static bool MoveAssetToDatabase(UnityEngine.Object asset, string newFileName = null)
+        {
+            if (!asset)
+                return false;
+            
+            return MoveAssetToDatabase(asset.GetType(), AssetDatabase.GetAssetPath(asset), newFileName);
         }
     }
 }

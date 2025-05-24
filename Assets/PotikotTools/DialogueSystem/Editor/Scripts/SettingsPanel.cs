@@ -1,22 +1,20 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace PotikotTools.DialogueSystem.Editor
 {
-    public class FloatingSettingsPanel : Foldout
+    public class SettingsPanel : Foldout
     {
         protected EditorDialogueData editorData;
         
-        public FloatingSettingsPanel(EditorDialogueData editorDialogueData)
+        public SettingsPanel(EditorDialogueData editorDialogueData)
         {
             editorData = editorDialogueData;
 
             text = "Settings";
-            
-            this.Q<Toggle>().Add(new VisualElement() { style={flexGrow = 1f} });
+            SetValueWithoutNotify(editorData.SettingsPanelOpened);
             
             Draw();
             AddManipulators();
@@ -24,8 +22,9 @@ namespace PotikotTools.DialogueSystem.Editor
             this.AddStyleSheets("Styles/FloatingSettings");
             this.AddUSSClasses("panel");
 
+            RegisterCallback<ChangeEvent<bool>>(OnValueChanged);
             RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
-            RegisterCallback<DetachFromPanelEvent>(_ => UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged));
+            RegisterCallback<DetachFromPanelEvent>(OnDetachFromPanel);
         }
 
         public virtual void SetPosition(Vector2 desiredPosition)
@@ -44,12 +43,24 @@ namespace PotikotTools.DialogueSystem.Editor
             AddNameInputField();
             AddSpeakersList();
             
-            SetPosition(editorData.FloatingWindowPosition);
+            SetPosition(editorData.SettingsPanelPosition);
         }
 
+        protected virtual void OnValueChanged(ChangeEvent<bool> evt)
+        {
+            editorData.SettingsPanelOpened = evt.newValue;
+        }
+        
         protected virtual void OnGeometryChanged(GeometryChangedEvent evt)
         {
-            editorData.FloatingWindowPosition = evt.newRect.position;
+            editorData.SettingsPanelPosition = evt.newRect.position;
+        }
+
+        protected virtual void OnDetachFromPanel(DetachFromPanelEvent evt)
+        {
+            DL.Log($"DetachFromPanel: {editorData.Name}");
+            UnregisterCallback<ChangeEvent<bool>>(OnValueChanged);
+            UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged);
         }
         
         protected virtual void AddNameInputField()
@@ -84,7 +95,7 @@ namespace PotikotTools.DialogueSystem.Editor
             {
                 input.SetValueWithoutNotify(newName);
             }
-                
+
             async void OnNameValueChanged(ChangeEvent<string> evt)
             {
                 // nameInputField.RemoveUSSClasses("dialogue-view__text-input-field--focused");

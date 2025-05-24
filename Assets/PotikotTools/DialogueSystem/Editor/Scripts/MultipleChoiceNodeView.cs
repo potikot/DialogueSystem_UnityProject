@@ -2,10 +2,12 @@ namespace PotikotTools.DialogueSystem.Editor
 {
     public class MultipleChoiceNodeView : NodeView<MultipleChoiceNodeData>
     {
-        public override void Draw()
+        protected override string Title => "Choice Node";
+        
+        public override void Initialize(EditorNodeData editorData, NodeData data, DialogueGraphView graphView)
         {
-            base.Draw();
-            title = "Multiple Choice Node";
+            base.Initialize(editorData, data, graphView);
+            this.AddUSSClasses("choice-node");
         }
     }
 }

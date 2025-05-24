@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace PotikotTools.DialogueSystem
 {
     public class ConnectionData
@@ -6,9 +8,14 @@ namespace PotikotTools.DialogueSystem
         public NodeData From;
         public NodeData To;
 
-        public ConnectionData() { }
+        public ObservableList<CommandData> Commands;
 
-        public ConnectionData(string text, NodeData from, NodeData to)
+        public ConnectionData()
+        {
+            Commands = new ObservableList<CommandData>();
+        }
+
+        public ConnectionData(string text, NodeData from, NodeData to) : this()
         {
             Text = text;
             From = from;

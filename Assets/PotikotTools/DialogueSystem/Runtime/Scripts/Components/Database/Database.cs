@@ -253,29 +253,38 @@ namespace PotikotTools.DialogueSystem
             #endif
         }
 
-        // TODO: incorrect path
         public virtual T LoadResource<T>(string resourceName) where T : Object
         {
             string path = GetResourcePath<T>(resourceName);
             return path == null ? null : Resources.Load<T>(path);
         }
 
-        public virtual string GetResourcePath<T>(string resourceName) where T : Object
+        public virtual string GetResourcePath(Type resourceType, string resourceName)
         {
             if (string.IsNullOrEmpty(resourceName)
-                || !resourceDirectories.TryGetValue(typeof(T), out string directory))
+                || !resourceDirectories.TryGetValue(resourceType, out string directory))
                 return null;
             
             return Path.Combine(resourcesPath, directory, resourceName);
         }
         
-        public virtual string GetProjectRelativeResourcePath<T>(string resourceName) where T : Object
+        public virtual string GetResourcePath<T>(string resourceName) where T : Object
+        {
+            return GetResourcePath(typeof(T), resourceName);
+        }
+        
+        public virtual string GetProjectRelativeResourcePath(Type resourceType, string resourceName)
         {
             if (string.IsNullOrEmpty(resourceName)
-                || !resourceDirectories.TryGetValue(typeof(T), out string directory))
+                || !resourceDirectories.TryGetValue(resourceType, out string directory))
                 return null;
             
             return Path.Combine(relativeRootPath, directory, resourceName);
+        }
+        
+        public virtual string GetProjectRelativeResourcePath<T>(string resourceName) where T : Object
+        {
+            return GetProjectRelativeResourcePath(typeof(T), resourceName);
         }
         
         private void RegisterTagsChangedEvents(DialogueData dialogueData)
