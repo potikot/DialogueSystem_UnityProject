@@ -9,6 +9,9 @@ namespace PotikotTools.DialogueSystem.Editor
     {
         private static EditorDatabase _database;
 
+        private static NodeEditorWindowsManager _nodeEditorWM;
+        private static DialogueTestWindowsManager _dialogueTestWM;
+        
         public static EditorDatabase Database
         {
             get => _database;
@@ -21,10 +24,19 @@ namespace PotikotTools.DialogueSystem.Editor
             }
         }
         
+        public static NodeEditorWindowsManager NodeEditorWM => _nodeEditorWM;
+        public static DialogueTestWindowsManager DialogueTestWM => _dialogueTestWM;
+
         static EditorComponents()
         {
             IEditorDialogueSaverLoader saverLoader = new EditorJsonDialogueLoader();
             Database = new EditorDatabase(saverLoader);
+
+            EditorApplication.delayCall += () =>
+            {
+                _nodeEditorWM = new NodeEditorWindowsManager();
+                _dialogueTestWM = new DialogueTestWindowsManager();
+            };
         }
     }
 }

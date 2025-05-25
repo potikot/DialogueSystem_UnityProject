@@ -1,0 +1,78 @@
+{
+  "Tags": [
+    "tag-1",
+    "tag-2",
+    "tag-3",
+    "tag-4"
+  ],
+  "Speakers": [
+    {
+      "Name": "Sallivan"
+    },
+    {
+      "Name": "Player"
+    }
+  ],
+  "LoadResourcesImmediately": false,
+  "id": 0,
+  "name": "test",
+  "nodes": [
+    {
+      "$type": "PotikotTools.DialogueSystem.TimerNodeData, PotikotTools.DialogueSystem",
+      "Duration": 5.0,
+      "SpeakerIndex": 0,
+      "ListenerIndex": 0,
+      "Text": "Hello, my friend!",
+      "AudioResourceName": "bum",
+      "Commands": [],
+      "OutputConnections": [
+        {
+          "Text": "Oh, good to see you, amigo",
+          "From": 1,
+          "To": 2
+        },
+        {
+          "Text": "Nah, I'm not your friend, Sallivan",
+          "From": 1,
+          "To": 3
+        }
+      ],
+      "Id": 1
+    },
+    {
+      "$type": "PotikotTools.DialogueSystem.SingleChoiceNodeData, PotikotTools.DialogueSystem",
+      "SpeakerIndex": 0,
+      "ListenerIndex": 0,
+      "Text": "Yeah!",
+      "Commands": [
+        {
+          "Text": "DL.Log Ok",
+          "ExecutionOrder": 0,
+          "Delay": 0.0
+        }
+      ],
+      "OutputConnections": [
+        {}
+      ],
+      "Id": 2
+    },
+    {
+      "$type": "PotikotTools.DialogueSystem.SingleChoiceNodeData, PotikotTools.DialogueSystem",
+      "SpeakerIndex": 0,
+      "ListenerIndex": 0,
+      "Text": "WHAT ARE YOU SAYING MOTHERFUCKER!!!",
+      "Commands": [
+        {
+          "Text": "DL.LogWarning Something went wrong",
+          "ExecutionOrder": 0,
+          "Delay": 0.0
+        }
+      ],
+      "OutputConnections": [
+        {}
+      ],
+      "Id": 3
+    }
+  ],
+  "nextNodeId": 4
+}

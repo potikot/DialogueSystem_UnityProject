@@ -81,7 +81,7 @@ namespace PotikotTools.DialogueSystem
             
             return true;
         }
-        
+
         public virtual async Task<List<string>> GetDialogueTagsAsync(string dialogueName)
         {
             return await loader.LoadTagsAsync(dialoguesRootPath, dialogueName);

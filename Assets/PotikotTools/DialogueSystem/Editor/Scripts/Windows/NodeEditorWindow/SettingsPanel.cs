@@ -35,7 +35,6 @@ namespace PotikotTools.DialogueSystem.Editor
 
         private void AddManipulators()
         {
-            this.AddManipulator(new DragManipulator());
         }
         
         protected virtual void Draw()

@@ -9,6 +9,8 @@ namespace PotikotTools.DialogueSystem.Editor
 {
     public class DialogueGraphView : GraphView
     {
+        public event Action OnChanged;
+        
         protected EditorDialogueData editorData;
 
         protected readonly Dictionary<Type, Type> nodeTypes = new()
@@ -67,8 +69,9 @@ namespace PotikotTools.DialogueSystem.Editor
             EditorData.EditorNodeDataList.Add(editorNodeData);
             
             nodeView.Initialize(editorNodeData, RuntimeData.AddNode<TData>(dataArgs), this);
+            nodeView.OnChanged += Internal_OnGraphChanged;
             nodeView.Draw();
-            
+
             AddElement(nodeView);
         }
 
@@ -80,6 +83,7 @@ namespace PotikotTools.DialogueSystem.Editor
                 NodeData nodeData = editorData.RuntimeData.Nodes[i];
                 INodeView nodeView = (INodeView)Activator.CreateInstance(nodeTypes[nodeData.GetType()]);
                 nodeView.Initialize(editorData.EditorNodeDataList[i], nodeData, this);
+                nodeView.OnChanged += Internal_OnGraphChanged;
                 nodeView.Draw();
 
                 Node node = nodeView as Node;
@@ -125,6 +129,11 @@ namespace PotikotTools.DialogueSystem.Editor
             Insert(0, grid);
         }
 
+        private void Internal_OnGraphChanged()
+        {
+            OnChanged?.Invoke();
+        }
+        
         #region Callbacks
         
         protected virtual GraphViewChange HandleGraphViewChanged(GraphViewChange change)
@@ -189,7 +198,8 @@ namespace PotikotTools.DialogueSystem.Editor
                             node.outputContainer.Query<Port>().ForEach(p => DeleteElements(p.connections));
                             RemoveElement(node);
                         }
-
+                        
+                        nodeView.OnChanged -= Internal_OnGraphChanged;
                         nodeView.OnDelete();
                         break;
                     }

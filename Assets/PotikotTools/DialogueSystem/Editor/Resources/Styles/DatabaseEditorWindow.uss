@@ -210,12 +210,17 @@
     justify-content: space-between;
 }
 
-/* Edit Dialogue Button */
+.dialogue-view__footer__button-container
+{
+    flex-direction: row;
+}
 
-.dialogue-view__edit-dialogue-button
+.dialogue-view__footer-button
 {
     padding-left: 3px;
     padding-right: 3px;
+    
+    width: 60px;
 }
 
 /* Tags View */

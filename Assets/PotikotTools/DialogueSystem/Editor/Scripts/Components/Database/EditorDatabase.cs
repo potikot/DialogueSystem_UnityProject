@@ -22,6 +22,9 @@ namespace PotikotTools.DialogueSystem.Editor
         
         public async Task<bool> SaveDialogueAsync(EditorDialogueData editorData)
         {
+            if (editorData == null)
+                return false;
+            
             bool editorDataSaved = await saverLoader.SaveEditorDataAsync(database.DialoguesRootPath, editorData);
             bool runtimeDataSaved = await saverLoader.SaveDataAsync(database.DialoguesRootPath, editorData.RuntimeData);
             
@@ -30,6 +33,9 @@ namespace PotikotTools.DialogueSystem.Editor
 
         public bool SaveDialogue(EditorDialogueData editorData)
         {
+            if (editorData == null)
+                return false;
+
             bool editorDataSaved = saverLoader.SaveEditorData(database.DialoguesRootPath, editorData);
             bool runtimeDataSaved = saverLoader.SaveData(database.DialoguesRootPath, editorData.RuntimeData);
             
@@ -68,6 +74,9 @@ namespace PotikotTools.DialogueSystem.Editor
         
         public async Task<EditorDialogueData> LoadDialogueAsync(string dialogueName)
         {
+            if (string.IsNullOrEmpty(dialogueName))
+                return null;
+
             if (dialogues.TryGetValue(dialogueName, out var editorData))
                 return editorData;
             
@@ -83,11 +92,15 @@ namespace PotikotTools.DialogueSystem.Editor
                 return tmp;
 
             dialogues.Add(editorData.Name, editorData);
+
             return editorData;
         }
 
         public EditorDialogueData LoadDialogue(string dialogueName)
         {
+            if (string.IsNullOrEmpty(dialogueName))
+                return null;
+            
             if (dialogues.TryGetValue(dialogueName, out var editorData))
                 return editorData;
             
@@ -100,11 +113,15 @@ namespace PotikotTools.DialogueSystem.Editor
             editorData.GenerateEditorNodeDatas();
             
             dialogues.Add(editorData.Name, editorData);
+
             return editorData;
         }
 
         public async Task<EditorDialogueData> CreateDialogue(string dialogueName)
         {
+            if (string.IsNullOrEmpty(dialogueName))
+                return null;
+
             string guid = AssetDatabase.CreateFolder(database.DialoguesRelativeRootPath, dialogueName);
 
             if (string.IsNullOrEmpty(guid))
@@ -126,14 +143,23 @@ namespace PotikotTools.DialogueSystem.Editor
             
             await SaveDialogueAsync(editorData);
             database.AddDialogue(runtimeData);
-            
+
             return editorData;
         }
 
-        public void DeleteDialogue(EditorDialogueData editorData) => DeleteDialogue(editorData.Name);
+        public void DeleteDialogue(EditorDialogueData editorData)
+        {
+            if (editorData == null)
+                return;
+            
+            DeleteDialogue(editorData.Name);
+        }
         
         public void DeleteDialogue(string dialogueName)
         {
+            if (string.IsNullOrEmpty(dialogueName))
+                return;
+            
             AssetDatabase.DeleteAsset(Path.Combine(database.DialoguesRelativeRootPath, dialogueName));
             
             if (dialogues.Remove(dialogueName, out var editorData))

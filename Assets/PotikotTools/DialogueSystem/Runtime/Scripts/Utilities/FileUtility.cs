@@ -118,6 +118,20 @@ namespace PotikotTools.DialogueSystem
             return await File.ReadAllTextAsync(absolutePath);
         }
         
+        public static async Task<string[]> ReadAllLinesAsync(string absolutePath)
+        {
+            if (string.IsNullOrEmpty(absolutePath))
+            {
+                DL.LogError($"'{nameof(absolutePath)}' cannot be null or empty.");
+                return null;
+            }
+
+            if (!File.Exists(absolutePath))
+                return null;
+            
+            return await File.ReadAllLinesAsync(absolutePath);
+        }
+        
         #endregion
         
         public static string GetProjectRelativePath(string absolutePath)

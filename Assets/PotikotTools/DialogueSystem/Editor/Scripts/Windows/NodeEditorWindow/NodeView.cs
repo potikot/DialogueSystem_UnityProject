@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,11 +7,14 @@ using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 namespace PotikotTools.DialogueSystem.Editor
 {
     public abstract class NodeView<T> : Node, INodeView where T : NodeData
     {
+        public event Action OnChanged;
+        
         protected EditorNodeData editorData;
         protected T data;
         protected DialogueGraphView graphView;
@@ -147,6 +151,8 @@ namespace PotikotTools.DialogueSystem.Editor
             var newConnection = new ConnectionData("New Choice", data, null);
             data.OutputConnections.Add(newConnection);
             AddOutputPort(newConnection);
+            
+            OnChanged?.Invoke();
         }
         
         protected virtual void OnRemoveChoice(int index)

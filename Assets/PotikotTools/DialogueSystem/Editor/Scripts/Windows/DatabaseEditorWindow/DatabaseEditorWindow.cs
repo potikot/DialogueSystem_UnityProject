@@ -359,21 +359,40 @@ namespace PotikotTools.DialogueSystem.Editor
         {
             var c = new VisualElement()
                 .AddUSSClasses("dialogue-view__footer");
-            
+
+            var buttonContainer = new VisualElement()
+                .AddUSSClasses("dialogue-view__footer__button-container");
+
             // edit dialogue button
 
-            var editDialogueButton = new Button(() => NodeEditorWindowsManager.Open(editorDialogueData))
+            var editDialogueButton = new Button(() => EditorComponents.NodeEditorWM.Open(editorDialogueData))
             {
-                text = "Open in node editor"
+                text = "Edit"
             };
 
             editDialogueButton.AddUSSClasses(
                 "dialogue-view__button",
-                "dialogue-view__edit-dialogue-button"
+                "dialogue-view__footer-button"
             );
 
+            // test dialogue button
+            
+            var testDialogueButton = new Button(() => EditorComponents.DialogueTestWM.Open(editorDialogueData))
+            {
+                text = "Test"
+            };
+
+            testDialogueButton.AddUSSClasses(
+                "dialogue-view__button",
+                "dialogue-view__footer-button"
+            );
+            
+            buttonContainer.Add(testDialogueButton);
+            buttonContainer.AddHorizontalSpace(5f);
+            buttonContainer.Add(editDialogueButton);
+            
             c.Add(CreateTagsContainer(editorDialogueData));
-            c.Add(editDialogueButton);
+            c.Add(buttonContainer);
             
             return c;
         }
