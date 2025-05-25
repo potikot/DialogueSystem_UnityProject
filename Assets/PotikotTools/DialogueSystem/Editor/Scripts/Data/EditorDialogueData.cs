@@ -19,6 +19,9 @@ namespace PotikotTools.DialogueSystem.Editor
         
         public List<EditorNodeData> EditorNodeDataList;
         
+        public Vector3 GraphViewPosition;
+        public Vector3 GraphViewScale;
+        
         public bool SettingsPanelOpened;
         public Vector2 SettingsPanelPosition;
         

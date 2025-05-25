@@ -24,6 +24,7 @@ namespace PotikotTools.DialogueSystem
             
             serializerSettings.Converters.Add(new ConnectionDataConverter());
             serializerSettings.Converters.Add(new Vector2Converter());
+            serializerSettings.Converters.Add(new Vector3Converter());
         }
 
         public DialogueData LoadData(string directoryPath, string dialogueId)

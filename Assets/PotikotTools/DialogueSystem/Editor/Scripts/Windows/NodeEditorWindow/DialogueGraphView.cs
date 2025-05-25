@@ -41,7 +41,9 @@ namespace PotikotTools.DialogueSystem.Editor
             });
             
             graphViewChanged += HandleGraphViewChanged;
-            // deleteSelection = HandleDeleteSelection;
+            
+            if (editorData.GraphViewPosition != Vector3.zero && editorData.GraphViewScale != Vector3.zero)
+                UpdateViewTransform(editorData.GraphViewPosition, editorData.GraphViewScale);
         }
 
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter)
@@ -115,7 +117,7 @@ namespace PotikotTools.DialogueSystem.Editor
         
         private void AddManipulators()
         {
-            this.AddManipulator(new ContentZoomer() { maxScale = 2f });
+            this.AddManipulator(new ContentZoomer { minScale = 0.1f, maxScale = 2f });
             this.AddManipulator(new ContentDragger());
             this.AddManipulator(new SelectionDragger());
             this.AddManipulator(new RectangleSelector());

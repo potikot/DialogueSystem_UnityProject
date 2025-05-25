@@ -9,10 +9,12 @@ namespace PotikotTools.DialogueSystem
     {
         public override void WriteJson(JsonWriter writer, Vector2 value, JsonSerializer serializer)
         {
-            JObject obj = new();
-            obj["x"] = value.x;
-            obj["y"] = value.y;
-            
+            var obj = new JObject()
+            {
+                ["x"] = value.x,
+                ["y"] = value.y
+            };
+
             obj.WriteTo(writer);
         }
 
