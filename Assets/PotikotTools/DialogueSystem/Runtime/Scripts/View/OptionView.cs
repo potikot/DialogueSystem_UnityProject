@@ -11,7 +11,7 @@ namespace PotikotTools.DialogueSystem
         [SerializeField] private Button _button;
         
         private Action _onSelected;
-
+        
         private void Start()
         {
             _button.onClick.AddListener(() => _onSelected?.Invoke());

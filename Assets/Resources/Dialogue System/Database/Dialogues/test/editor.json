@@ -20,18 +20,18 @@
     }
   ],
   "GraphViewPosition": {
-    "x": -124.0,
-    "y": 20.0,
+    "x": 320.0,
+    "y": 153.0,
     "z": 0.0
   },
   "GraphViewScale": {
-    "x": 0.8695652,
-    "y": 0.8695652,
+    "x": 0.497176737,
+    "y": 0.497176737,
     "z": 1.0
   },
-  "SettingsPanelOpened": false,
+  "SettingsPanelOpened": true,
   "SettingsPanelPosition": {
-    "x": 0.0,
-    "y": 0.0
+    "x": 729.0,
+    "y": 41.0
   }
 }

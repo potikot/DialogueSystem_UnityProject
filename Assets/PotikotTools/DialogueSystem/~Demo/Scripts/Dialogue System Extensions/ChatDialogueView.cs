@@ -38,7 +38,7 @@ namespace PotikotTools.DialogueSystem.Demo
             _titleAvatarImage.sprite = avatar;
         }
         
-        public override void SetSpeakerText(string text)
+        public override void SetText(string text)
         {
             var message = Instantiate(_messageViewPrefab, _messagesContainer);
             

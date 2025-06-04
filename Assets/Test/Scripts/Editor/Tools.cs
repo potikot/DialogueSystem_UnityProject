@@ -21,4 +21,10 @@ public static class Tools
             Object.DestroyImmediate(window);
         }
     }
+    
+    [MenuItem("Tools/Check Inspector Window")]
+    public static void CheckInspectorWindow()
+    {
+        InspectorUtility.CreateInspectorWindow(new GameObject().AddComponent<DialogueStarter>());
+    }
 }

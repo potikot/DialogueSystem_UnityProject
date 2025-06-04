@@ -34,8 +34,8 @@ namespace PotikotTools.DialogueSystem.Editor
 
                 editorData.GraphViewPosition = _graph.contentViewContainer.transform.position;
                 editorData.GraphViewScale = _graph.contentViewContainer.transform.scale;
-                
-                EditorComponents.Database.SaveDialogue(editorData);
+
+                SaveChanges();
 
             }) { text = "Save Dialogue" });
 

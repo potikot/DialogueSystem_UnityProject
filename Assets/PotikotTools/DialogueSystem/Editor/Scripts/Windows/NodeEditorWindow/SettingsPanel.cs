@@ -22,8 +22,9 @@ namespace PotikotTools.DialogueSystem.Editor
             this.AddStyleSheets("Styles/FloatingSettings");
             this.AddUSSClasses("panel");
 
-            RegisterCallback<ChangeEvent<bool>>(OnValueChanged);
-            RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+            // RegisterCallback<ChangeEvent<bool>>(OnValueChanged);
+            // RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+            RegisterCallback<AttachToPanelEvent>(OnAttachToPanel);
             RegisterCallback<DetachFromPanelEvent>(OnDetachFromPanel);
         }
 
@@ -35,18 +36,20 @@ namespace PotikotTools.DialogueSystem.Editor
 
         private void AddManipulators()
         {
+            this.AddManipulator(new DragManipulator());
         }
         
         protected virtual void Draw()
         {
             AddNameInputField();
             AddSpeakersList();
-            
+
             SetPosition(editorData.SettingsPanelPosition);
         }
 
-        protected virtual void OnValueChanged(ChangeEvent<bool> evt)
+        protected virtual void OnFoldoutValueChanged(ChangeEvent<bool> evt)
         {
+            DL.Log("value changed");
             editorData.SettingsPanelOpened = evt.newValue;
         }
         
@@ -55,10 +58,17 @@ namespace PotikotTools.DialogueSystem.Editor
             editorData.SettingsPanelPosition = evt.newRect.position;
         }
 
+        protected virtual void OnAttachToPanel(AttachToPanelEvent evt)
+        {
+            // DL.Log($"AttachToPanel: {editorData.Name}");
+            RegisterCallback<ChangeEvent<bool>>(OnFoldoutValueChanged);
+            RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+        }
+        
         protected virtual void OnDetachFromPanel(DetachFromPanelEvent evt)
         {
-            DL.Log($"DetachFromPanel: {editorData.Name}");
-            UnregisterCallback<ChangeEvent<bool>>(OnValueChanged);
+            // DL.Log($"DetachFromPanel: {editorData.Name}");
+            UnregisterCallback<ChangeEvent<bool>>(OnFoldoutValueChanged);
             UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged);
         }
         
@@ -72,23 +82,26 @@ namespace PotikotTools.DialogueSystem.Editor
 
             input.AddPlaceholder("Enter name...");
 
-            input.RegisterValueChangedCallback(OnNameValueChanged);
+            // input.RegisterValueChangedCallback(OnNameValueChanged);
             // nameInputField.RegisterCallback<FocusInEvent>(OnFocusIn);
             // nameInputField.RegisterCallback<FocusOutEvent>(OnFocusOut);
             input.RegisterCallback<AttachToPanelEvent>(_ =>
             {
-                DL.Log("attaching to panel");
-                input.SetValueWithoutNotify(editorData.Name);
+                // DL.Log("Attach name input");
+                // input.SetValueWithoutNotify(editorData.Name);
+                input.RegisterValueChangedCallback(OnNameValueChanged);
             });
             input.RegisterCallback<DetachFromPanelEvent>(_ =>
             {
-                input.UnregisterValueChangedCallback(OnNameValueChanged);
+                // DL.Log("Detach name input");
                 editorData.OnNameChanged -= OnNameChanged;
+                input.UnregisterValueChangedCallback(OnNameValueChanged);
             });
             
             Add(input);
 
             editorData.OnNameChanged += OnNameChanged;
+            return;
 
             void OnNameChanged(string newName)
             {
@@ -99,8 +112,8 @@ namespace PotikotTools.DialogueSystem.Editor
             {
                 // nameInputField.RemoveUSSClasses("dialogue-view__text-input-field--focused");
 
+                // DL.Log("Trying to rename to: " + evt.newValue);
                 string newName = evt.newValue.Trim();
-                DL.Log("Trying to rename to: " + newName);
                 if (newName == editorData.Name)
                 {
                     input.SetValueWithoutNotify(newName);
@@ -115,21 +128,21 @@ namespace PotikotTools.DialogueSystem.Editor
                 input.SetValueWithoutNotify(editorData.Name);
             }
             
-            void OnFocusIn(FocusInEvent evt)
-            {
-                if (evt.target is VisualElement targetElement)
-                {
-                    targetElement.AddUSSClasses("dialogue-view__text-input-field--focused");
-                }
-            }
-
-            void OnFocusOut(FocusOutEvent evt)
-            {
-                if (evt.target is VisualElement targetElement)
-                {
-                    targetElement.RemoveUSSClasses("dialogue-view__text-input-field--focused");
-                }
-            }
+            // void OnFocusIn(FocusInEvent evt)
+            // {
+            //     if (evt.target is VisualElement targetElement)
+            //     {
+            //         targetElement.AddUSSClasses("dialogue-view__text-input-field--focused");
+            //     }
+            // }
+            //
+            // void OnFocusOut(FocusOutEvent evt)
+            // {
+            //     if (evt.target is VisualElement targetElement)
+            //     {
+            //         targetElement.RemoveUSSClasses("dialogue-view__text-input-field--focused");
+            //     }
+            // }
         }
 
         protected virtual void AddSpeakersList()
@@ -192,11 +205,13 @@ namespace PotikotTools.DialogueSystem.Editor
             textField.SetValueWithoutNotify(speaker.Name);
             
             textField.RegisterValueChangedCallback(OnValueChanged);
+            textField.RegisterCallback<AttachToPanelEvent>(_ => textField.RegisterValueChangedCallback(OnValueChanged));
             textField.RegisterCallback<DetachFromPanelEvent>(_ => textField.UnregisterValueChangedCallback(OnValueChanged));
         }
         
         void OnValueChanged(ChangeEvent<string> evt)
         {
+            DL.Log("ValueChanged");
             if (evt.target is not TextField { userData: SpeakerData speakerData })
             {
                 DL.LogError("Speaker not found");

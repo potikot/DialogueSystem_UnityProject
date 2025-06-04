@@ -12,7 +12,7 @@ namespace PotikotTools.DialogueSystem
     {
         private const int InitialCommandsListCapacity = 20;
 
-        private List<ICommandInfo> _commands;
+        private readonly List<ICommandInfo> _commands;
 
         public IReadOnlyList<ICommandInfo> Commands => _commands;
 
@@ -45,13 +45,19 @@ namespace PotikotTools.DialogueSystem
             Debug.Log(log.ToString());
         }
 
-        public void Execute(string commandName, object[] parameters)
+        public void Execute(string commandName, params object[] parameters)
         {
-            if (TryGet(commandName, out ICommandInfo commandInfo)
-                || commandInfo.ParameterTypes.Length > 0
-                && (parameters == null || commandInfo.ParameterTypes.Length != parameters.Length))
+            if (!TryGet(commandName, out ICommandInfo commandInfo))
+            {
+                Debug.LogWarning("[Console] Command not found: " + commandName);
                 return;
-
+            }
+            if (commandInfo.HasParameters && (parameters == null || commandInfo.ParameterTypes.Length != parameters.Length))
+            {
+                Debug.LogWarning("[Console] Incorrect input parameters for command: " + commandName);
+                return;
+            }
+            
             commandInfo.Invoke(parameters);
         }
 
@@ -66,13 +72,13 @@ namespace PotikotTools.DialogueSystem
             string[] splittedCommand = inputCommand.Split(' ');
             if (!TryGet(splittedCommand[0], out ICommandInfo commandInfo))
             {
-                Debug.LogError("[Console] Command not found: " + inputCommand);
+                Debug.LogWarning("[Console] Command not found: " + inputCommand);
                 return;
             }
 
             if (!TryParseParameters(inputCommand, splittedCommand, commandInfo, out object[] parameters))
             {
-                Debug.LogError("[Console] Incorrect input parameters");
+                Debug.LogWarning("[Console] Incorrect input parameters");
                 return;
             }
 
@@ -171,7 +177,7 @@ namespace PotikotTools.DialogueSystem
                 && parameterTypes.Length == 1
                 && (parameterTypes[0] == typeof(string) || parameterTypes[0] == typeof(object)))
             {
-                parameters = new object[1] { inputCommand[(splittedCommand[0].Length + 1)..] };
+                parameters = new object[] { inputCommand[(splittedCommand[0].Length + 1)..] };
                 return true;
             }
             if (splittedCommand.Length - 1 != parameterTypes.Length)

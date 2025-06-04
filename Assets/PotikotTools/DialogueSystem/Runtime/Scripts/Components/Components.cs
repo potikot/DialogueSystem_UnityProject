@@ -8,7 +8,7 @@ namespace PotikotTools.DialogueSystem
     public static class Components
     {
         private static Database _database;
-        private static NodeLinker _nodeLinker;
+        private static NodeBinder _nodeBinder;
         private static CommandHandler _commandHandler;
         
         public static Database Database
@@ -24,15 +24,15 @@ namespace PotikotTools.DialogueSystem
             }
         }
         
-        public static NodeLinker NodeLinker
+        public static NodeBinder NodeBinder
         {
-            get => _nodeLinker;
+            get => _nodeBinder;
             set
             {
                 if (value == null)
                     return;
                 
-                _nodeLinker = value;
+                _nodeBinder = value;
             }
         }
         
@@ -51,7 +51,7 @@ namespace PotikotTools.DialogueSystem
         static Components()
         {
             Database = new Database();
-            NodeLinker = new NodeLinker();
+            NodeBinder = new NodeBinder();
             CommandHandler = new CommandHandler();
         }
     }

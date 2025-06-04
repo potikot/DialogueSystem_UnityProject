@@ -1,0 +1,110 @@
+.dialogue-view
+{
+    flex-grow: 1;
+    flex-direction: row;
+}
+
+.dialogue-history-container
+{
+    padding: 5px 3px 5px 3px;
+
+    flex-grow: 1;
+    width: 20%;
+
+    border-right-width: var(--ds-border-width-1px);
+    border-color: black;
+}
+
+.dialogue-preview-container
+{
+    padding: 5px 10% 5px 10%;
+
+    flex-grow: 1;
+    width: 50%;
+}
+
+.dialogue-info-container
+{
+    padding: 5px 3px 5px 3px;
+
+    flex-grow: 1;
+    width: 30%;
+
+    border-left-width: var(--ds-border-width-1px);
+    border-color: black;
+}
+
+/* Dialogue Text */
+
+.text-container
+{
+    margin: 10px 0 10px 0;
+}
+
+.speaker-label
+{
+    padding: 2px 3px 1px 3px;
+    align-self: flex-start;
+    
+    border-radius: var(--ds-border-radius-5px) var(--ds-border-radius-5px) 0 0;
+    border-width: var(--ds-border-width-1px) var(--ds-border-width-1px) 0 var(--ds-border-width-1px);
+    border-color: var(--ds-border-color-default);
+
+    background-color: var(--ds-button-color-default);
+}
+
+.text-label
+{
+    white-space: normal;
+    
+    padding: 5px 3px 5px 3px;
+    border-radius: 0 var(--ds-border-radius-5px) var(--ds-border-radius-5px) var(--ds-border-radius-5px);
+    border-width: var(--ds-border-width-1px);
+    border-color: var(--ds-border-color-default);
+
+    background-color: var(--ds-button-color-default);
+}
+
+/* Option Views Container */
+
+.option-view-container
+{
+    flex-grow: 1;
+}
+
+/* Option View */
+
+.option-view
+{
+    margin-bottom: 5px;
+    padding: 5px;
+    
+    border-radius: var(--ds-border-radius-5px);
+    border-width: var(--ds-border-width-1px) var(--ds-border-width-1px) 0 var(--ds-border-width-1px);
+    border-color: var(--ds-border-color-default);
+    
+    background-color: var(--ds-button-color-default);
+}
+
+.option-view:hover
+{
+    background-color: var(--ds-button-color-selected);
+    
+    transition: 100ms;
+}
+
+.option-view.option-view--pressed
+{
+    background-color: var(--ds-button-color-pressed);
+    
+    transition: 100ms;
+}
+
+.option-view__label
+{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+    
+    max-height: 60px;
+}

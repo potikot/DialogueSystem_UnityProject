@@ -9,11 +9,13 @@ namespace PotikotTools.DialogueSystem.Editor
         private Label _label;
         private Action _onSelected;
 
+        private bool _isMouseClicked;
+        
         public EditorOptionView()
         {
             this.AddUSSClasses("option-view");
             
-            _label = new Label();
+            _label = new Label().AddUSSClasses("option-view__label");
             Add(_label);
             
             RegisterCallback<AttachToPanelEvent>(_ =>
@@ -49,14 +51,17 @@ namespace PotikotTools.DialogueSystem.Editor
             if (evt.button != 0)
                 return;
 
+            _isMouseClicked = true;
             this.CaptureMouse();
             this.AddUSSClasses("option-view--pressed");
         }
         
         private void MouseUpEventCallback(MouseUpEvent evt)
         {
-            if (evt.button != 0)
+            if (evt.button != 0 || !_isMouseClicked)
                 return;
+
+            _isMouseClicked = false;
             
             this.ReleaseMouse();
             this.RemoveUSSClasses("option-view--pressed");

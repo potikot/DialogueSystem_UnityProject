@@ -3,14 +3,9 @@ using System.Linq;
 
 namespace PotikotTools.DialogueSystem
 {
-    public class NodeLinker
+    public class NodeBinder
     {
-        private Dictionary<int, List<int>> _connections;
-
-        public NodeLinker()
-        {
-            _connections = new Dictionary<int, List<int>>();
-        }
+        private readonly Dictionary<int, List<int>> _connections = new();
 
         public void AddConnection(int from, int to)
         {
@@ -20,10 +15,18 @@ namespace PotikotTools.DialogueSystem
                 _connections.Add(from, new List<int> { to });
         }
         
-        public void SetConnections(DialogueData data)
+        public void Bind(DialogueData data)
         {
             IReadOnlyList<NodeData> nodes = data.Nodes;
 
+            foreach (var nodeData in nodes)
+            {
+                foreach (var connection in nodeData.OutputConnections)
+                    connection.OnChanged += nodeData.Internal_OnChanged;
+                foreach (var command in nodeData.Commands)
+                    command.OnChanged += nodeData.Internal_OnChanged;
+            }
+            
             foreach (var connection in _connections)
             {
                 NodeData node = nodes.First(n => n.Id == connection.Key);

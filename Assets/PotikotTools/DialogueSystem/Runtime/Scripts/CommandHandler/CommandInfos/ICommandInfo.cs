@@ -9,10 +9,12 @@ namespace PotikotTools.DialogueSystem
         object Context { get; }
         string HintText { get; }
 
-        public Type[] ParameterTypes { get; }
+        Type[] ParameterTypes { get; }
 
-        public bool IsValid { get; }
+        bool IsValid { get; }
 
+        virtual bool HasParameters => ParameterTypes is { Length: > 0 };
+        
         void Invoke(object[] parameters);
     }
 }

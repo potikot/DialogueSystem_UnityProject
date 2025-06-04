@@ -1,10 +1,24 @@
 using System.Threading.Tasks;
+using UnityEditor;
+using UnityEngine;
 
 namespace PotikotTools.DialogueSystem
 {
     public static class DialogueSystemAPI
     {
-        public static DialogueController StartDialogue(string id, IDialogueView view) => StartDialogue(GetDialogue(id), view);
+        public static async Task<DialogueController> StartDialogueAsync(string id, IDialogueView view) =>
+            StartDialogue(await GetDialogueAsync(id), view);
+
+        public static DialogueController StartDialogue(string id, IDialogueView view) =>
+            StartDialogue(GetDialogue(id), view);
+
+        [Command]
+        public static DialogueController StartDialogue(string id)
+        {
+            var view = Object.FindObjectOfType<DialogueView>();
+            return view == null ? null : StartDialogue(GetDialogue(id), view);
+        }
+
         
         public static DialogueController StartDialogue(DialogueData data, IDialogueView view)
         {

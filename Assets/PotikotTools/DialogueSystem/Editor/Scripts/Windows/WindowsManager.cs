@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -8,11 +9,14 @@ namespace PotikotTools.DialogueSystem.Editor
     public abstract class WindowsManager<T> where T : BaseDialogueSystemEditorWindow
     {
         protected readonly List<T> windows;
+        protected readonly Type[] desiredDockNextTo;
         
         protected WindowsManager()
         {
             var nodeEditorWindows = Resources.FindObjectsOfTypeAll<T>();
+            
             windows = new List<T>(nodeEditorWindows.Length);
+            desiredDockNextTo = new[] { typeof(T), typeof(SceneView), typeof(DatabaseEditorWindow) };
             
             foreach (var window in nodeEditorWindows)
             {
@@ -32,7 +36,7 @@ namespace PotikotTools.DialogueSystem.Editor
             
             window.Focus();
         }
-        
+
         protected virtual bool TryRestoreWindow(T window)
         {
             var editorDialogueData = EditorComponents.Database.LoadDialogue(window.DialogueName);
@@ -43,10 +47,10 @@ namespace PotikotTools.DialogueSystem.Editor
             
             return true;
         }
-        
+
         private T CreateWindow(EditorDialogueData editorDialogueData)
         {
-            var window = EditorWindow.CreateWindow<T>(typeof(T), typeof(SceneView));
+            var window = EditorWindow.CreateWindow<T>(desiredDockNextTo);
             windows.Add(window);
 
             window.EditorData = editorDialogueData;

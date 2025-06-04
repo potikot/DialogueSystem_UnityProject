@@ -35,7 +35,7 @@ namespace PotikotTools.DialogueSystem
                 int fromId = (int)from;
                 int toId = (int)to;
 
-                Components.NodeLinker.AddConnection(fromId, toId);
+                Components.NodeBinder.AddConnection(fromId, toId);
             }
 
             return connectionData;

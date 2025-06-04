@@ -5,6 +5,8 @@ namespace PotikotTools.DialogueSystem
 {
     public class DialogueController
     {
+        public event Action<DialogueData, DialogueData> OnDialogueDataChanged;
+        
         protected IDialogueView currentDialogueView;
         protected DialogueData currentDialogueData;
 
@@ -14,7 +16,8 @@ namespace PotikotTools.DialogueSystem
         protected List<CommandData> commandsToExecuteOnExitNode;
         
         public bool IsDialogueStarted { get; protected set; }
-        
+        public DialogueData CurrentDialogueData => currentDialogueData;
+
         public virtual void Initialize(DialogueData dialogueData, IDialogueView dialogueView)
         {
             currentDialogueView = dialogueView;
@@ -34,12 +37,12 @@ namespace PotikotTools.DialogueSystem
         {
             if (!nodeType.IsSubclassOf(typeof(NodeData)))
             {
-                DL.LogError($"{nameof(nodeType)} should be a subclass of {nameof(NodeData)}");
+                DL.LogWarning($"{nameof(nodeType)} should be a subclass of {nameof(NodeData)}");
                 return;
             }
             if (!handler.CanHandle(nodeType))
             {
-                DL.LogError($"{nameof(handler)} can't handle node type {nodeType}");
+                DL.LogWarning($"{nameof(handler)} can't handle node type {nodeType}");
                 return;
             }
             
@@ -50,23 +53,22 @@ namespace PotikotTools.DialogueSystem
         {
             if (IsDialogueStarted)
             {
-                DL.LogError("Dialogue is already started");
+                DL.LogWarning("Dialogue is already started");
                 return;
             }
             if (currentDialogueData == null)
             {
-                DL.LogError("Dialogue Data is null");
+                DL.LogWarning("Dialogue Data is null");
                 return;
             }
             
-            DL.Log("Start Dialogue");
             IsDialogueStarted = true;
             currentDialogueView.Show();
             currentNodeData = currentDialogueData.GetFirstNode();
 
             if (currentNodeData == null)
             {
-                DL.LogError($"Dialogue graph '{currentDialogueData.Name}' is empty");
+                DL.LogWarning($"Dialogue graph '{currentDialogueData.Name}' is empty");
                 return;
             }
             
@@ -83,7 +85,7 @@ namespace PotikotTools.DialogueSystem
         {
             if (!IsDialogueStarted)
             {
-                DL.LogError("Dialogue is not started");
+                DL.LogWarning("Dialogue is not started");
                 return;
             }
             
@@ -141,10 +143,14 @@ namespace PotikotTools.DialogueSystem
                 DL.LogError("Dialogue Data is null");
                 return;
             }
+            if (dialogueData == currentDialogueData)
+                return;
             if (IsDialogueStarted)
                 EndDialogue();
 
+            var prevDialogueData = currentDialogueData;
             currentDialogueData = dialogueData;
+            OnDialogueDataChanged?.Invoke(prevDialogueData, currentDialogueData);
         }
         
         protected virtual void HandleNode(NodeData node)

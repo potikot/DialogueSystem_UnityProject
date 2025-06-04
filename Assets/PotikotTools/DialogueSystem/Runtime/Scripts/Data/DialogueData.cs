@@ -6,41 +6,46 @@ using Newtonsoft.Json;
 
 namespace PotikotTools.DialogueSystem
 {
-    // TODO: add way to sync many systems that can change similar fields
-    public class DialogueData
+    public class DialogueData : IChangeNotifier
     {
+        public event Action OnChanged;
         public event Action<NodeData, int> OnNodeAdded;
         public event Action<NodeData, int> OnNodeRemoved;
         
-        public ObservableList<string> Tags;
-        public ObservableList<SpeakerData> Speakers;
+        public readonly ObservableList<string> Tags;
+        public readonly ObservableList<SpeakerData> Speakers;
         
         public bool LoadResourcesImmediately;
 
-        [JsonRequired] protected int id;
-        [JsonRequired] protected string name;
-        [JsonRequired] protected List<NodeData> nodes;
+        [JsonProperty("Id")] protected int id;
+        [JsonProperty("Name")] protected string name;
+        [JsonProperty("Nodes")] protected List<NodeData> nodes;
 
-        [JsonRequired] protected int nextNodeId;
+        [JsonProperty("NextNodeId")] protected int nextNodeId;
 
+        internal readonly Action Internal_OnChanged;
+        
         [JsonIgnore] public int Id => id;
         [JsonIgnore] public string Name => name;
         [JsonIgnore] public IReadOnlyList<NodeData> Nodes => nodes;
 
         [JsonIgnore] public bool IsResourcesLoaded { get; protected set; }
+
+        public DialogueData()
+        {
+            Internal_OnChanged += () => OnChanged?.Invoke();
+            
+            Tags = new ObservableList<string>();
+            Speakers = new ObservableList<SpeakerData>();
+            nodes = new List<NodeData>();
+        }
         
-        public DialogueData() { }
-        
-        public DialogueData(string name)
+        public DialogueData(string name) : this()
         {
             if (!TrySetName(name))
             {
                 // TODO: set unique id
             }
-            
-            Tags = new ObservableList<string>();
-            Speakers = new ObservableList<SpeakerData>();
-            nodes = new List<NodeData>();
         }
 
         public bool TrySetName(string value)
@@ -71,7 +76,8 @@ namespace PotikotTools.DialogueSystem
 
             T node = (T)Activator.CreateInstance(typeof(T), args);
             node.DialogueData = this;
-
+            node.OnChanged += OnChanged;
+            
             nodes.Add(node);
             OnNodeAdded?.Invoke(node, nodes.Count - 1);
             
@@ -206,7 +212,7 @@ namespace PotikotTools.DialogueSystem
         public async Task LoadResources()
         {
             foreach (NodeData node in nodes)
-                await node.LoadResources();
+                await node.LoadResourcesAsync();
 
             IsResourcesLoaded = true;
         }

@@ -20,7 +20,8 @@ namespace PotikotTools.DialogueSystem
             foreach (var command in castedData.Commands)
                 controller.HandleCommand(command);
             
-            dialogueView.SetSpeakerText(castedData.Text);
+            dialogueView.SetSpeaker(castedData.GetSpeaker());
+            dialogueView.SetText(castedData.Text);
             dialogueView.SetAnswerOptions(_options);
             dialogueView.OnOptionSelected(controller.Next);
         }

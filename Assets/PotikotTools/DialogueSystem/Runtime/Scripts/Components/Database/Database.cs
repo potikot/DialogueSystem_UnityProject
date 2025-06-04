@@ -117,43 +117,45 @@ namespace PotikotTools.DialogueSystem
         public virtual async Task<bool> LoadDialogueAsync(string dialogueName)
         {
             DialogueData dialogueData = await loader.LoadDataAsync(dialoguesRootPath, dialogueName);
-            
             if (dialogueData == null)
+            {
+                DL.LogError($"Dialogue data doesn't exist: {dialogueName}");
                 return false;
+            }
             
-            Components.NodeLinker.SetConnections(dialogueData);
-            Components.NodeLinker.Clear();
+            Components.NodeBinder.Bind(dialogueData);
+            Components.NodeBinder.Clear();
 
             foreach (NodeData node in dialogueData.Nodes)
+            {
                 node.DialogueData = dialogueData;
+                node.OnChanged += dialogueData.Internal_OnChanged;
+            }
 
             AddDialogue(dialogueData);
-
             return true;
-
-            DL.LogError($"Dialogue data doesn't exist: {dialogueName}");
-            return false;
         }
 
         public virtual bool LoadDialogue(string dialogueName)
         {
             DialogueData dialogueData = loader.LoadData(dialoguesRootPath, dialogueName);
-            
             if (dialogueData == null)
+            {
+                DL.LogError($"Dialogue data doesn't exist: {dialogueName}");
                 return false;
+            }
             
-            Components.NodeLinker.SetConnections(dialogueData);
-            Components.NodeLinker.Clear();
+            Components.NodeBinder.Bind(dialogueData);
+            Components.NodeBinder.Clear();
 
             foreach (NodeData node in dialogueData.Nodes)
+            {
                 node.DialogueData = dialogueData;
-                
-            AddDialogue(dialogueData);
-            
-            return true;
+                node.OnChanged += dialogueData.Internal_OnChanged;
+            }
 
-            DL.LogError($"Dialogue data doesn't exist: {dialogueName}");
-            return false;
+            AddDialogue(dialogueData);
+            return true;
         }
 
         public virtual async Task<bool> LoadDialoguesByTagAsync(string tag)
@@ -210,14 +212,13 @@ namespace PotikotTools.DialogueSystem
                 ReleaseDialogue(dialogueName);
         }
         
-        public virtual async Task<T> LoadResourceAsync<T>(string dialogueName, string resourceName) where T : Object
+        public virtual async Task<T> LoadResourceAsync<T>(string resourceName) where T : Object
         {
-            if (string.IsNullOrEmpty(dialogueName)
-                || string.IsNullOrEmpty(resourceName)
-                || !resourceDirectories.TryGetValue(typeof(T), out string directory))
+            string path = GetResourcePath<T>(resourceName);
+            
+            if (path == null)
                 return null;
             
-            string path = Path.Combine(rootPath, directory, resourceName);
             ResourceRequest request = Resources.LoadAsync<T>(path);
             
             #if UNITY_2023_1_OR_NEWER

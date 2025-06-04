@@ -22,9 +22,10 @@ namespace PotikotTools.DialogueSystem
                 TypeNameHandling = TypeNameHandling.Auto
             };
             
-            serializerSettings.Converters.Add(new ConnectionDataConverter());
             serializerSettings.Converters.Add(new Vector2Converter());
             serializerSettings.Converters.Add(new Vector3Converter());
+            serializerSettings.Converters.Add(new ConnectionDataConverter());
+            // serializerSettings.Converters.Add(new NodeDataConverter());
         }
 
         public DialogueData LoadData(string directoryPath, string dialogueId)

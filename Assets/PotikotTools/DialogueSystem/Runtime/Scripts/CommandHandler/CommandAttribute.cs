@@ -5,7 +5,7 @@ namespace PotikotTools.DialogueSystem
     /// <summary>
     /// Works only with static methods / fields
     /// </summary>
-    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Field)]
     public class CommandAttribute : Attribute
     {
         public string Name;

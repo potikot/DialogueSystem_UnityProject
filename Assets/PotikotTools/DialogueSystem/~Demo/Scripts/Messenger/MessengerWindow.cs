@@ -18,7 +18,9 @@ namespace PotikotTools.DialogueSystem.Demo
         
         private void Start()
         {
-            Initialize();
+            Debug.Log("Execute Command");
+            Components.CommandHandler.Execute("DialogueSystemAPI.StartDialogue", "test");
+            // Initialize();
         }
 
         private void Initialize()

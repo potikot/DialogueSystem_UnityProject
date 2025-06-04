@@ -24,7 +24,8 @@ namespace PotikotTools.DialogueSystem.Demo
             foreach (var command in castedData.Commands)
                 controller.HandleCommand(command);
             
-            dialogueView.SetSpeakerText(castedData.Text);
+            dialogueView.SetSpeaker(castedData.GetSpeaker());
+            dialogueView.SetText(castedData.Text);
             dialogueView.SetAnswerOptions(castedData.OutputConnections.Select(oc => oc.Text).ToArray());
             dialogueView.OnOptionSelected(controller.Next);
         }

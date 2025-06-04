@@ -5,16 +5,23 @@ using UnityEngine.UIElements;
 
 namespace PotikotTools.DialogueSystem.Editor
 {
-    public class EditorDialogueView : VisualElement, IDialogueView
+    public class EditorDialogueView : VisualElement, IEditorDialogueView
     {
         private List<VisualElement> _menus;
         
-        private Label _label;
+        private Label _textLabel;
+        private Label _speakerLabel;
 
         private VisualElement _optionsContainer;
         private List<EditorOptionView> _optionViews;
         
         private Action<int> _onOptionSelected;
+
+        private VisualElement _historyContainer;
+        private VisualElement _previewContainer;
+        private VisualElement _infoContainer;
+
+        private NodeData _data;
         
         public bool IsEnabled { get; private set; }
 
@@ -25,11 +32,26 @@ namespace PotikotTools.DialogueSystem.Editor
 
             this.AddUSSClasses("dialogue-view");
 
-            _label = new Label("Dialogue Text");
-            Add(_label);
+            _historyContainer = new ScrollView().AddUSSClasses("dialogue-history-container");
+            _previewContainer = new VisualElement().AddUSSClasses("dialogue-preview-container");
+            _infoContainer = new ScrollView().AddUSSClasses("dialogue-info-container");
+            
+            Add(_historyContainer);
+            Add(_previewContainer);
+            Add(_infoContainer);
+        }
 
-            _optionsContainer = new VisualElement().AddUSSClasses("option-view-container");
-            Add(_optionsContainer);
+        public void Rebuild()
+        {
+            CreatePreviewContainer();
+            CreateInfoContainer();
+        }
+        
+        public void SetData(NodeData data)
+        {
+            _data = data;
+            CreatePreviewContainer();
+            CreateInfoContainer();
         }
         
         public void Show()
@@ -48,9 +70,15 @@ namespace PotikotTools.DialogueSystem.Editor
             style.display = DisplayStyle.None;
         }
 
-        public void SetSpeakerText(string text)
+        public void SetSpeaker(SpeakerData speakerData)
         {
-            _label.text = $"<color=red>Dialogue Text:</color> {text}";
+            if (speakerData != null)
+                _speakerLabel.text = speakerData.Name;
+        }
+        
+        public void SetText(string text)
+        {
+            _textLabel.text = text;
         }
 
         public void SetAnswerOptions(string[] options)
@@ -82,7 +110,7 @@ namespace PotikotTools.DialogueSystem.Editor
         {
             int optionsCount = options.Length;
             int i = 0;
-
+            
             for (; i < optionsCount; i++)
             {
                 if (_optionViews.Count <= i)
@@ -92,8 +120,8 @@ namespace PotikotTools.DialogueSystem.Editor
                     _optionsContainer.Add(optionView);
                 }
                 
-                int optionIndex = i;
-                _optionViews[i].OnSelected(() => _onOptionSelected?.Invoke(optionIndex));
+                int optionIdx = i;
+                _optionViews[i].OnSelected(() => _onOptionSelected?.Invoke(optionIdx));
                 _optionViews[i].SetText(options[i]);
                 _optionViews[i].Show();
             }
@@ -107,13 +135,38 @@ namespace PotikotTools.DialogueSystem.Editor
         
         protected virtual void RemoveOptions()
         {
-            _optionViews.RemoveAll(ov =>
-            {
-                ov.RemoveFromHierarchy();
-                return true;
-            });
-            
+            _optionsContainer.Clear();
             _optionViews.Clear();
+        }
+        
+        private void CreatePreviewContainer()
+        {
+            _previewContainer.Clear();
+            _optionViews.Clear();
+            
+            _speakerLabel = new Label(_data == null ? "Speaker" : _data.GetSpeakerName()).AddUSSClasses("speaker-label");
+            _textLabel = new Label(_data == null ? "Dialogue Text" : _data.Text).AddUSSClasses("text-label");
+            _optionsContainer = new ScrollView().AddUSSClasses("option-view-container");
+            
+            if (_data != null)
+                GenerateOptions(_data.OutputConnections.Select(o => o.Text).ToArray());
+
+            var textContainer = new VisualElement().AddUSSClasses("text-container");
+
+            textContainer.Add(_speakerLabel);
+            textContainer.Add(_textLabel);
+
+            _previewContainer.Add(textContainer);
+            _previewContainer.Add(_optionsContainer);
+        }
+
+        private void CreateInfoContainer()
+        {
+            _infoContainer.Clear();
+            if (_data == null)
+                return;
+
+            InspectorUtility.CreateInspectorWindow(_data, _infoContainer);
         }
     }
 }

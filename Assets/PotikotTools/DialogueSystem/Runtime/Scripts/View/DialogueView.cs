@@ -48,7 +48,12 @@ namespace PotikotTools.DialogueSystem
             container.SetActive(false);
         }
 
-        public virtual void SetSpeakerText(string text)
+        public void SetSpeaker(SpeakerData speakerData)
+        {
+            
+        }
+        
+        public virtual void SetText(string text)
         {
             label.text = text;
         }

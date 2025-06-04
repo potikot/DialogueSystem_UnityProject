@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 
@@ -11,17 +12,17 @@ namespace PotikotTools.DialogueSystem
         public event Action<int, T, T> OnElementChanged;
         public event Action OnCollectionCleared;
 
-        public ObservableList() : base()
+        public ObservableList()
         {
             Initialize();
         }
 
-        public ObservableList(System.Collections.Generic.IEnumerable<T> collection) : base(collection)
+        public ObservableList(IEnumerable<T> collection) : base(collection)
         {
             Initialize();
         }
 
-        public ObservableList(System.Collections.Generic.List<T> list) : base(list)
+        public ObservableList(List<T> list) : base(list)
         {
             Initialize();
         }
