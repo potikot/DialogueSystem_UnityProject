@@ -1,9 +1,10 @@
 using System;
-using System.Linq;
+using MessagePack;
 
 namespace PotikotTools.UniTalks.Demo
 {
-    public class ChatNodeData : NodeData
+    [MessagePackObject(AllowPrivate = true)]
+    public partial class ChatNodeData : NodeData
     {
         public ChatNodeData(int id) : base(id) { }
     }
@@ -21,13 +22,13 @@ namespace PotikotTools.UniTalks.Demo
                 return;
             }
 
-            foreach (var command in castedData.Commands)
-                controller.HandleCommand(command);
-            
-            dialogueView.SetSpeaker(castedData.GetSpeaker());
-            dialogueView.SetText(castedData.Text);
-            dialogueView.SetAnswerOptions(castedData.OutputConnections.Select(oc => oc.Text).ToArray());
-            dialogueView.OnOptionSelected(controller.Next);
+            // foreach (var command in castedData.Commands)
+            //     controller.HandleCommand(command);
+            //
+            // dialogueView.SetSpeaker(castedData.GetSpeaker());
+            // dialogueView.SetText(castedData.Text);
+            // dialogueView.SetAnswerOptions(castedData.OutputConnections.Select(oc => oc.Text).ToArray());
+            // dialogueView.OnOptionSelected(controller.Next);
         }
     }
 }

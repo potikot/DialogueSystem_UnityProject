@@ -29,8 +29,8 @@ namespace PotikotTools.UniTalks.Editor
 
         static EditorUniTalksComponents()
         {
-            IEditorDialoguePersistence editorPersistence = new JsonEditorDialoguePersistence();
-            IDialoguePersistence runtimePersistence = new JsonDialoguePersistence();
+            IEditorDialoguePersistence editorPersistence = new MessagePackEditorDialoguePersistence();
+            IDialoguePersistence runtimePersistence = new MessagePackDialoguePersistence();
             Database = new EditorDialogueDatabase(editorPersistence, runtimePersistence);
 
             EditorApplication.delayCall += () =>

@@ -1,18 +1,22 @@
 using System;
+using MessagePack;
 
 namespace PotikotTools.UniTalks
 {
+    [MessagePackObject]
     public class ConnectionData : IChangeNotifier
     {
         public event Action OnChanged;
         
-        public NodeData From;
-        public NodeData To;
+        [IgnoreMember] public NodeData From;
+        [Key(0)] public NodeData To;
 
+        [Key(2)]
         public ObservableList<CommandData> Commands;
 
         private string _text;
 
+        [Key(1)]
         public string Text
         {
             get => _text;

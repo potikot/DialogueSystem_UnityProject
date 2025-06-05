@@ -2,34 +2,44 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MessagePack;
 using Newtonsoft.Json;
 
 namespace PotikotTools.UniTalks
 {
-    public class DialogueData : IChangeNotifier
+    [MessagePackObject(AllowPrivate = true)]
+    public partial class DialogueData : IChangeNotifier
     {
         public event Action OnChanged;
         public event Action<NodeData, int> OnNodeAdded;
         public event Action<NodeData, int> OnNodeRemoved;
         
+        [Key(0)]
         public readonly ObservableList<string> Tags;
+        [Key(1)]
         public readonly ObservableList<SpeakerData> Speakers;
         
+        [Key(2)]
         public bool LoadResourcesImmediately;
 
-        [JsonProperty("Id")] protected int id;
-        [JsonProperty("Name")] protected string name;
-        [JsonProperty("Nodes")] protected List<NodeData> nodes;
+        [Key(3), JsonProperty("Id")] protected int id;
+        [Key(4), JsonProperty("Name")] protected string name;
+        [Key(5), JsonProperty("Nodes")] protected List<NodeData> nodes;
 
-        [JsonProperty("NextNodeId")] protected int nextNodeId;
+        [Key(6), JsonProperty("NextNodeId")] protected int nextNodeId;
 
+        [IgnoreMember]
         internal readonly Action Internal_OnChanged;
         
-        [JsonIgnore] public int Id => id;
-        [JsonIgnore] public string Name => name;
-        [JsonIgnore] public IReadOnlyList<NodeData> Nodes => nodes;
+        [JsonIgnore, IgnoreMember]
+        public int Id => id;
+        [JsonIgnore, IgnoreMember]
+        public string Name => name;
+        [JsonIgnore, IgnoreMember]
+        public IReadOnlyList<NodeData> Nodes => nodes;
 
-        [JsonIgnore] public bool IsResourcesLoaded { get; protected set; }
+        [JsonIgnore, IgnoreMember]
+        public bool IsResourcesLoaded { get; protected set; }
 
         public DialogueData()
         {

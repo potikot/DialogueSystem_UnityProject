@@ -1,4 +1,5 @@
 using System;
+using MessagePack;
 using Newtonsoft.Json;
 
 namespace PotikotTools.UniTalks
@@ -9,6 +10,7 @@ namespace PotikotTools.UniTalks
         ExitNode
     }
     
+    [MessagePackObject]
     public class CommandData : IChangeNotifier
     {
         public event Action OnChanged;
@@ -17,6 +19,7 @@ namespace PotikotTools.UniTalks
         private CommandExecutionOrder _executionOrder;
         private float _delay;
 
+        [Key(0)]
         public string Text
         {
             get => _text;
@@ -27,6 +30,7 @@ namespace PotikotTools.UniTalks
             }
         }
         
+        [Key(1)]
         public CommandExecutionOrder ExecutionOrder
         {
             get => _executionOrder;
@@ -37,6 +41,7 @@ namespace PotikotTools.UniTalks
             }
         }
         
+        [Key(2)]
         public float Delay
         {
             get => _delay;
@@ -46,6 +51,8 @@ namespace PotikotTools.UniTalks
                 OnChanged?.Invoke();
             }
         }
-        [JsonIgnore] public bool HasDelay => Delay > 0;
+        
+        [JsonIgnore, IgnoreMember]
+        public bool HasDelay => Delay > 0;
     }
 }

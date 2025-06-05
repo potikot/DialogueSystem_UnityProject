@@ -1,6 +1,9 @@
+using MessagePack;
+
 namespace PotikotTools.UniTalks
 {
-    public class MultipleChoiceNodeData : NodeData
+    [MessagePackObject(AllowPrivate = true)]
+    public partial class MultipleChoiceNodeData : NodeData
     {
         public MultipleChoiceNodeData(int id) : base(id)
         {

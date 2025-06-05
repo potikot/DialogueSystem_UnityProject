@@ -1,34 +1,43 @@
 using System;
 using System.Collections.Specialized;
 using System.Threading.Tasks;
+using MessagePack;
 using Newtonsoft.Json;
 using UnityEngine;
 
 namespace PotikotTools.UniTalks
 {
-    public abstract class NodeData : IChangeNotifier
+    [MessagePackObject(AllowPrivate = true)]
+    public partial class NodeData : IChangeNotifier
     {
         public event Action OnChanged;
         
+        [Key(0)]
         public readonly int Id;
         
-        [JsonIgnore] public AudioClip AudioResource;
+        [JsonIgnore, IgnoreMember]
+        public AudioClip AudioResource;
         
+        [Key(1)]
         public ObservableList<CommandData> Commands;
 
-        [JsonIgnore] public ConnectionData InputConnection;
+        [JsonIgnore, IgnoreMember]
+        public ConnectionData InputConnection;
+        [Key(2)]
         public ObservableList<ConnectionData> OutputConnections;
 
-        [JsonIgnore] public DialogueData DialogueData;
+        [JsonIgnore, IgnoreMember]
+        public DialogueData DialogueData;
 
-        [JsonProperty("SpeakerIndex")] private int _speakerIndex;
-        [JsonProperty("ListenerIndex")] private int _listenerIndex;
-        [JsonProperty("Text")] private string _text;
-        [JsonProperty("AudioResourceName")] private string _audioResourceName;
+        [JsonProperty("SpeakerIndex"), IgnoreMember] private int _speakerIndex;
+        [JsonProperty("ListenerIndex"), IgnoreMember] private int _listenerIndex;
+        [JsonProperty("Text"), IgnoreMember] private string _text;
+        [JsonProperty("AudioResourceName"), IgnoreMember] private string _audioResourceName;
         
+        [IgnoreMember]
         internal readonly Action Internal_OnChanged;
         
-        [JsonIgnore]
+        [JsonIgnore, Key(3)]
         public int SpeakerIndex
         {
             get => _speakerIndex;
@@ -42,7 +51,7 @@ namespace PotikotTools.UniTalks
             }
         }
         
-        [JsonIgnore]
+        [JsonIgnore, Key(4)]
         public int ListenerIndex
         {
             get => _listenerIndex;
@@ -56,7 +65,7 @@ namespace PotikotTools.UniTalks
             }
         }
         
-        [JsonIgnore]
+        [JsonIgnore, Key(5)]
         public string Text
         {
             get => _text;
@@ -70,7 +79,7 @@ namespace PotikotTools.UniTalks
             }
         }
 
-        [JsonIgnore]
+        [JsonIgnore, Key(6)]
         public string AudioResourceName
         {
             get => _audioResourceName;
@@ -84,8 +93,10 @@ namespace PotikotTools.UniTalks
             }
         }
 
-        [JsonIgnore] public bool HasInputConnection => InputConnection != null;
-        [JsonIgnore] public bool HasOutputConnections => OutputConnections.Count > 0;
+        [JsonIgnore, IgnoreMember]
+        public bool HasInputConnection => InputConnection != null;
+        [JsonIgnore, IgnoreMember]
+        public bool HasOutputConnections => OutputConnections.Count > 0;
 
         protected NodeData()
         {

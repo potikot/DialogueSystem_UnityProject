@@ -39,7 +39,7 @@ namespace PotikotTools.UniTalks
             if (isInitialized) return;
             isInitialized = true;
 
-            persistence = new JsonDialoguePersistence();
+            persistence = new MessagePackDialoguePersistence();
             
             rootPath = Path.Combine(Application.dataPath, UniTalksPreferences.Data.DatabaseDirectory).Replace('\\', '/');
             relativeRootPath = Path.Combine("Assets", UniTalksPreferences.Data.DatabaseDirectory).Replace('\\', '/');

@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using MessagePack;
 using Newtonsoft.Json;
 using UnityEditor;
 using UnityEngine;
 
 namespace PotikotTools.UniTalks.Editor
 {
+    [MessagePackObject]
     public class EditorDialogueData
     {
         public event Action<string> OnNameChanged;
@@ -15,23 +17,31 @@ namespace PotikotTools.UniTalks.Editor
         
         private DialogueData _runtimeData;
         
+        [Key(0)]
         public string Description;
         
+        [Key(1)]
         public List<EditorNodeData> EditorNodeDataList;
         
+        [Key(2)]
         public Vector3 GraphViewPosition;
+        [Key(3)]
         public Vector3 GraphViewScale;
         
+        [Key(4)]
         public bool SettingsPanelOpened;
+        [Key(5)]
         public Vector2 SettingsPanelPosition;
         
-        [JsonIgnore] public DialogueData RuntimeData
+        [JsonIgnore, IgnoreMember]
+        public DialogueData RuntimeData
         {
             get => _runtimeData;
             set => Initialize(value);
         }
 
-        [JsonIgnore] public string Name => RuntimeData.Name;
+        [JsonIgnore, IgnoreMember]
+        public string Name => RuntimeData.Name;
         
         public EditorDialogueData() { }
         

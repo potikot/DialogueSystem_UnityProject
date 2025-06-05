@@ -1,10 +1,16 @@
+using MessagePack;
+
 namespace PotikotTools.UniTalks
 {
-    public class TimerNodeData : MultipleChoiceNodeData
+    [MessagePackObject(AllowPrivate = true)]
+    public partial class TimerNodeData : MultipleChoiceNodeData
     {
+        [Key(7)]
         public float Duration;
+
+        public TimerNodeData(int id) : base(id) { }
         
-        public TimerNodeData(int id, float duration = 0f) : base(id)
+        public TimerNodeData(int id, float duration) : this(id)
         {
             Duration = duration;
         }

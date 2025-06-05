@@ -34,6 +34,25 @@ namespace PotikotTools.UniTalks
             return true;
         }
         
+        public static bool WriteAllBytes(string absolutePath, byte[] data, bool refreshAsset = true)
+        {
+            if (string.IsNullOrEmpty(absolutePath))
+            {
+                DL.LogError($"'{nameof(absolutePath)}' cannot be null or empty.");
+                return false;
+            }
+
+            string directoryPath = Path.GetDirectoryName(absolutePath);
+            Directory.CreateDirectory(directoryPath);
+            
+            File.WriteAllBytes(absolutePath, data ?? Array.Empty<byte>());
+            
+            if (refreshAsset)
+                AssetDatabase.ImportAsset(GetProjectRelativePath(absolutePath));
+            
+            return true;
+        }
+        
         public static bool WriteAllLines(string absolutePath, string[] data, bool refreshAsset = true)
         {
             if (string.IsNullOrEmpty(absolutePath))
@@ -65,6 +84,20 @@ namespace PotikotTools.UniTalks
                 return null;
             
             return File.ReadAllText(absolutePath);
+        }
+        
+        public static byte[] ReadAllBytes(string absolutePath)
+        {
+            if (string.IsNullOrEmpty(absolutePath))
+            {
+                DL.LogError($"'{nameof(absolutePath)}' cannot be null or empty.");
+                return null;
+            }
+            
+            if (!File.Exists(absolutePath))
+                return null;
+            
+            return File.ReadAllBytes(absolutePath);
         }
         
         public static string[] ReadAllLines(string absolutePath)
@@ -104,6 +137,25 @@ namespace PotikotTools.UniTalks
             return true;
         }
         
+        public static async Task<bool> WriteAllBytesAsync(string absolutePath, byte[] data, bool refreshAsset = true)
+        {
+            if (string.IsNullOrEmpty(absolutePath))
+            {
+                DL.LogError($"'{nameof(absolutePath)}' cannot be null or empty.");
+                return false;
+            }
+
+            string directoryPath = Path.GetDirectoryName(absolutePath);
+            Directory.CreateDirectory(directoryPath);
+            
+            await File.WriteAllBytesAsync(absolutePath, data ?? Array.Empty<byte>());
+            
+            if (refreshAsset)
+                AssetDatabase.ImportAsset(GetProjectRelativePath(absolutePath));
+            
+            return true;
+        }
+        
         public static async Task<string> ReadAsync(string absolutePath)
         {
             if (string.IsNullOrEmpty(absolutePath))
@@ -116,6 +168,20 @@ namespace PotikotTools.UniTalks
                 return null;
             
             return await File.ReadAllTextAsync(absolutePath);
+        }
+        
+        public static async Task<byte[]> ReadAllBytesAsync(string absolutePath)
+        {
+            if (string.IsNullOrEmpty(absolutePath))
+            {
+                DL.LogError($"'{nameof(absolutePath)}' cannot be null or empty.");
+                return null;
+            }
+            
+            if (!File.Exists(absolutePath))
+                return null;
+            
+            return await File.ReadAllBytesAsync(absolutePath);
         }
         
         public static async Task<string[]> ReadAllLinesAsync(string absolutePath)

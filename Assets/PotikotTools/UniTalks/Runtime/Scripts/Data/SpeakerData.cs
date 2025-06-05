@@ -1,13 +1,17 @@
 using System;
+using MessagePack;
 
 namespace PotikotTools.UniTalks
 {
-    public class SpeakerData
+    [MessagePackObject(AllowPrivate = true)]
+    public partial class SpeakerData
     {
         public event Action<string> OnNameChanged;
         
+        [Key(0)]
         protected string name;
 
+        [IgnoreMember]
         public string Name
         {
             get => name;
