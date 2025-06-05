@@ -8,7 +8,7 @@ namespace PotikotTools.DialogueSystem.Editor
     public class NodeEditorWindow : BaseDialogueSystemEditorWindow
     {
         private DialogueGraphView _graph;
-        private SettingsPanel _settngsPanel;
+        private DialogueSettingsPanel _settngsPanel;
 
         protected override void OnEditorDataChanged()
         {
@@ -71,7 +71,7 @@ namespace PotikotTools.DialogueSystem.Editor
                 return;
 
             _settngsPanel?.RemoveFromHierarchy();
-            _settngsPanel = new SettingsPanel(editorData);
+            _settngsPanel = new DialogueSettingsPanel(editorData);
             
             rootVisualElement.Add(_settngsPanel);
         }

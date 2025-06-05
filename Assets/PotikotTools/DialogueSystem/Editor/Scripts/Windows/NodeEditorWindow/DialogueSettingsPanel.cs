@@ -5,11 +5,11 @@ using UnityEngine.UIElements;
 
 namespace PotikotTools.DialogueSystem.Editor
 {
-    public class SettingsPanel : Foldout
+    public class DialogueSettingsPanel : Foldout
     {
         protected EditorDialogueData editorData;
         
-        public SettingsPanel(EditorDialogueData editorDialogueData)
+        public DialogueSettingsPanel(EditorDialogueData editorDialogueData)
         {
             editorData = editorDialogueData;
 
