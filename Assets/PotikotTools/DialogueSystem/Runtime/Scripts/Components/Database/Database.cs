@@ -10,7 +10,7 @@ namespace PotikotTools.DialogueSystem
     // TODO: mb load dialogues as resources?
     public class Database
     {
-        protected IDialogueLoader loader;
+        protected IDialoguePersistence persistence;
         protected string rootPath;
         protected string relativeRootPath;
         protected string dialoguesRootPath;
@@ -26,7 +26,7 @@ namespace PotikotTools.DialogueSystem
         protected bool isInitialized;
 
         public IReadOnlyDictionary<string, HashSet<string>> Tags => tags;
-        public IDialogueLoader Loader => loader;
+        public IDialoguePersistence Persistence => persistence;
         public string RootPath => rootPath;
         public string RelativeRootPath => relativeRootPath;
         public string DialoguesRootPath => dialoguesRootPath;
@@ -39,7 +39,7 @@ namespace PotikotTools.DialogueSystem
             if (isInitialized) return;
             isInitialized = true;
 
-            loader = new JsonDialogueLoader();
+            persistence = new JsonDialoguePersistence();
             
             rootPath = Path.Combine(Application.dataPath, DialogueSystemPreferences.Data.DatabaseDirectory).Replace('\\', '/');
             relativeRootPath = Path.Combine("Assets", DialogueSystemPreferences.Data.DatabaseDirectory).Replace('\\', '/');
@@ -84,7 +84,7 @@ namespace PotikotTools.DialogueSystem
 
         public virtual async Task<List<string>> GetDialogueTagsAsync(string dialogueName)
         {
-            return await loader.LoadTagsAsync(dialoguesRootPath, dialogueName);
+            return await persistence.LoadTagsAsync(dialoguesRootPath, dialogueName);
         }
 
         public virtual async Task<DialogueData> GetDialogueAsync(string dialogueName)
@@ -116,7 +116,7 @@ namespace PotikotTools.DialogueSystem
 
         public virtual async Task<bool> LoadDialogueAsync(string dialogueName)
         {
-            DialogueData dialogueData = await loader.LoadDataAsync(dialoguesRootPath, dialogueName);
+            DialogueData dialogueData = await persistence.LoadAsync(dialoguesRootPath, dialogueName);
             if (dialogueData == null)
             {
                 DL.LogError($"Dialogue data doesn't exist: {dialogueName}");
@@ -138,7 +138,7 @@ namespace PotikotTools.DialogueSystem
 
         public virtual bool LoadDialogue(string dialogueName)
         {
-            DialogueData dialogueData = loader.LoadData(dialoguesRootPath, dialogueName);
+            DialogueData dialogueData = persistence.Load(dialoguesRootPath, dialogueName);
             if (dialogueData == null)
             {
                 DL.LogError($"Dialogue data doesn't exist: {dialogueName}");

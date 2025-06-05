@@ -4,25 +4,29 @@ using Newtonsoft.Json;
 
 namespace PotikotTools.DialogueSystem.Editor
 {
-    public class EditorJsonDialogueLoader : JsonDialogueLoader, IEditorDialogueSaverLoader, IDialogueSaver
+    public class JsonEditorDialoguePersistence : IEditorDialoguePersistence
     {
-        public bool SaveData(string directoryPath, DialogueData dialogueData, bool refreshAsset = true)
+        protected readonly JsonSerializerSettings serializerSettings;
+        
+        public JsonEditorDialoguePersistence()
         {
-            string fullPath = Path.Combine(directoryPath, dialogueData.Name, DialogueSystemPreferences.Data.RuntimeDataFilename);
-            
-            string json = JsonConvert.SerializeObject(dialogueData, serializerSettings);
-            return FileUtility.Write(fullPath, json, refreshAsset);
-        }
+            // TODO: initialize with preferences
 
-        public async Task<bool> SaveDataAsync(string directoryPath, DialogueData dialogueData, bool refreshAsset = true)
-        {
-            string fullPath = Path.Combine(directoryPath, dialogueData.Name, DialogueSystemPreferences.Data.RuntimeDataFilename);
-    
-            string json = JsonConvert.SerializeObject(dialogueData, serializerSettings);
-            return await FileUtility.WriteAsync(fullPath, json, refreshAsset);
+            serializerSettings = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                NullValueHandling = NullValueHandling.Ignore,
+                TypeNameHandling = TypeNameHandling.Auto
+            };
+            
+            serializerSettings.Converters.Add(new Vector2Converter());
+            serializerSettings.Converters.Add(new Vector3Converter());
+            serializerSettings.Converters.Add(new ConnectionDataConverter());
+            // serializerSettings.Converters.Add(new NodeDataConverter());
         }
         
-        public async Task<bool> SaveEditorDataAsync(string directoryPath, EditorDialogueData editorDialogueData, bool refreshAsset = true)
+        public async Task<bool> SaveAsync(string directoryPath, EditorDialogueData editorDialogueData, bool refreshAsset = true)
         {
             string fullPath = Path.Combine(directoryPath, editorDialogueData.Name, DialogueSystemPreferences.Data.EditorDataFilename);
     
@@ -30,7 +34,7 @@ namespace PotikotTools.DialogueSystem.Editor
             return await FileUtility.WriteAsync(fullPath, json, refreshAsset);
         }
         
-        public bool SaveEditorData(string directoryPath, EditorDialogueData editorDialogueData, bool refreshAsset = true)
+        public bool Save(string directoryPath, EditorDialogueData editorDialogueData, bool refreshAsset = true)
         {
             string fullPath = Path.Combine(directoryPath, editorDialogueData.Name, DialogueSystemPreferences.Data.EditorDataFilename);
             
@@ -38,7 +42,7 @@ namespace PotikotTools.DialogueSystem.Editor
             return FileUtility.Write(fullPath, json, refreshAsset);
         }
 
-        public async Task<EditorDialogueData> LoadEditorDataAsync(string directoryPath, string dialogueId)
+        public async Task<EditorDialogueData> LoadAsync(string directoryPath, string dialogueId)
         {
             string fullPath = Path.Combine(directoryPath, dialogueId, DialogueSystemPreferences.Data.EditorDataFilename);
 
@@ -50,7 +54,7 @@ namespace PotikotTools.DialogueSystem.Editor
             return JsonConvert.DeserializeObject<EditorDialogueData>(json, serializerSettings);
         }
 
-        public EditorDialogueData LoadEditorData(string directoryPath, string dialogueId)
+        public EditorDialogueData Load(string directoryPath, string dialogueId)
         {
             string fullPath = Path.Combine(directoryPath, dialogueId, DialogueSystemPreferences.Data.EditorDataFilename);
 

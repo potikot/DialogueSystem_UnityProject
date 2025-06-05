@@ -29,8 +29,9 @@ namespace PotikotTools.DialogueSystem.Editor
 
         static EditorComponents()
         {
-            IEditorDialogueSaverLoader saverLoader = new EditorJsonDialogueLoader();
-            Database = new EditorDatabase(saverLoader);
+            IEditorDialoguePersistence editorPersistence = new JsonEditorDialoguePersistence();
+            IDialoguePersistence runtimePersistence = new JsonDialoguePersistence();
+            Database = new EditorDatabase(editorPersistence, runtimePersistence);
 
             EditorApplication.delayCall += () =>
             {

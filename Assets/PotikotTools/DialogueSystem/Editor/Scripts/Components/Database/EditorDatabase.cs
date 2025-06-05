@@ -7,14 +7,16 @@ namespace PotikotTools.DialogueSystem.Editor
 {
     public class EditorDatabase
     {
-        protected IEditorDialogueSaverLoader saverLoader;
+        protected IEditorDialoguePersistence editorPersistence;
+        protected IDialoguePersistence runtimePersistence;
         protected Dictionary<string, EditorDialogueData> dialogues;
 
         protected Database database => Components.Database;
         
-        public EditorDatabase(IEditorDialogueSaverLoader editorSaverLoader)
+        public EditorDatabase(IEditorDialoguePersistence editorPersistence, IDialoguePersistence runtimePersistence)
         {
-            saverLoader = editorSaverLoader;
+            this.editorPersistence = editorPersistence;
+            this.runtimePersistence = runtimePersistence;
             dialogues = new Dictionary<string, EditorDialogueData>();
         }
         
@@ -25,8 +27,8 @@ namespace PotikotTools.DialogueSystem.Editor
             if (editorData == null)
                 return false;
             
-            bool editorDataSaved = await saverLoader.SaveEditorDataAsync(database.DialoguesRootPath, editorData);
-            bool runtimeDataSaved = await saverLoader.SaveDataAsync(database.DialoguesRootPath, editorData.RuntimeData);
+            bool editorDataSaved = await editorPersistence.SaveAsync(database.DialoguesRootPath, editorData);
+            bool runtimeDataSaved = await runtimePersistence.SaveAsync(database.DialoguesRootPath, editorData.RuntimeData);
             
             return editorDataSaved && runtimeDataSaved;
         }
@@ -36,8 +38,8 @@ namespace PotikotTools.DialogueSystem.Editor
             if (editorData == null)
                 return false;
 
-            bool editorDataSaved = saverLoader.SaveEditorData(database.DialoguesRootPath, editorData);
-            bool runtimeDataSaved = saverLoader.SaveData(database.DialoguesRootPath, editorData.RuntimeData);
+            bool editorDataSaved = editorPersistence.Save(database.DialoguesRootPath, editorData);
+            bool runtimeDataSaved = runtimePersistence.Save(database.DialoguesRootPath, editorData.RuntimeData);
             
             return editorDataSaved && runtimeDataSaved;
         }
@@ -80,7 +82,7 @@ namespace PotikotTools.DialogueSystem.Editor
             if (dialogues.TryGetValue(dialogueName, out var editorData))
                 return editorData;
             
-            editorData = await saverLoader.LoadEditorDataAsync(database.DialoguesRootPath, dialogueName);
+            editorData = await editorPersistence.LoadAsync(database.DialoguesRootPath, dialogueName);
             
             if (editorData == null)
                 return null;
@@ -104,7 +106,7 @@ namespace PotikotTools.DialogueSystem.Editor
             if (dialogues.TryGetValue(dialogueName, out var editorData))
                 return editorData;
             
-            editorData = saverLoader.LoadEditorData(database.DialoguesRootPath, dialogueName);
+            editorData = editorPersistence.Load(database.DialoguesRootPath, dialogueName);
 
             if (editorData == null)
                 return null;

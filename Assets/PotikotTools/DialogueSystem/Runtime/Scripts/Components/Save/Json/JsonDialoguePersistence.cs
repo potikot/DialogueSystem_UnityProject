@@ -6,11 +6,11 @@ using Newtonsoft.Json.Linq;
 
 namespace PotikotTools.DialogueSystem
 {
-    public class JsonDialogueLoader : IDialogueLoader
+    public class JsonDialoguePersistence : IDialoguePersistence
     {
         protected readonly JsonSerializerSettings serializerSettings;
         
-        public JsonDialogueLoader()
+        public JsonDialoguePersistence()
         {
             // TODO: initialize with preferences
 
@@ -28,7 +28,23 @@ namespace PotikotTools.DialogueSystem
             // serializerSettings.Converters.Add(new NodeDataConverter());
         }
 
-        public DialogueData LoadData(string directoryPath, string dialogueId)
+        public bool Save(string directoryPath, DialogueData dialogueData, bool refreshAsset = true)
+        {
+            string fullPath = Path.Combine(directoryPath, dialogueData.Name, DialogueSystemPreferences.Data.RuntimeDataFilename);
+            
+            string json = JsonConvert.SerializeObject(dialogueData, serializerSettings);
+            return FileUtility.Write(fullPath, json, refreshAsset);
+        }
+
+        public async Task<bool> SaveAsync(string directoryPath, DialogueData dialogueData, bool refreshAsset = true)
+        {
+            string fullPath = Path.Combine(directoryPath, dialogueData.Name, DialogueSystemPreferences.Data.RuntimeDataFilename);
+    
+            string json = JsonConvert.SerializeObject(dialogueData, serializerSettings);
+            return await FileUtility.WriteAsync(fullPath, json, refreshAsset);
+        }
+        
+        public DialogueData Load(string directoryPath, string dialogueId)
         {
             string fullPath = Path.Combine(directoryPath, dialogueId, DialogueSystemPreferences.Data.RuntimeDataFilename);
 
@@ -40,7 +56,7 @@ namespace PotikotTools.DialogueSystem
             return JsonConvert.DeserializeObject<DialogueData>(json, serializerSettings);
         }
 
-        public async Task<DialogueData> LoadDataAsync(string directoryPath, string dialogueId)
+        public async Task<DialogueData> LoadAsync(string directoryPath, string dialogueId)
         {
             string fullPath = Path.Combine(directoryPath, dialogueId, DialogueSystemPreferences.Data.RuntimeDataFilename);
             
