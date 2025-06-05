@@ -1,6 +1,6 @@
 using UnityEditor;
 
-namespace PotikotTools.DialogueSystem
+namespace PotikotTools.UniTalks
 {
     public static class DomainReloadUtility
     {

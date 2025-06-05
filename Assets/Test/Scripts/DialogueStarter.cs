@@ -1,4 +1,4 @@
-using PotikotTools.DialogueSystem;
+using PotikotTools.UniTalks;
 using UnityEngine;
 
 public class DialogueStarter : MonoBehaviour
@@ -8,8 +8,8 @@ public class DialogueStarter : MonoBehaviour
     
     private async void Start()
     {
-        await DialogueSystemAPI.LoadDialogueGroupAsync("fefee");
+        await UniTalksAPI.LoadDialogueGroupAsync("fefee");
         
-        DialogueSystemAPI.StartDialogue(_dialogueId, _dialogueView);
+        UniTalksAPI.StartDialogue(_dialogueId, _dialogueView);
     }
 }

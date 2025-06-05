@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using PotikotTools.DialogueSystem.Editor;
+using PotikotTools.UniTalks.Editor;
 using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -16,7 +16,7 @@ public static class Tools
     [MenuItem("Tools/Destroy All Dialogue Editors")]
     public static void DestroyAllDialogueEditors()
     {
-        foreach (var window in Resources.FindObjectsOfTypeAll<NodeEditorWindow>())
+        foreach (var window in Resources.FindObjectsOfTypeAll<DialogueEditorWindow>())
         {
             Object.DestroyImmediate(window);
         }
