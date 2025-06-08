@@ -15,6 +15,7 @@ namespace PotikotTools.UniTalks
         
         void OnOptionSelected(Action<int> callback);
 
+        void AddMenu(object menu);
         T GetMenu<T>();
     }
 }

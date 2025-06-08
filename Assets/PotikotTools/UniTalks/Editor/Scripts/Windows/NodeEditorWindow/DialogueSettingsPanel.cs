@@ -166,13 +166,13 @@ namespace PotikotTools.UniTalks.Editor
                 unbindItem = UnbindItem
             };
 
-            listView.itemsAdded += _ => EditorUniTalksComponents.Database.SaveDialogue(editorData);
+            listView.itemsAdded += _ => EditorDialogueComponents.Database.SaveDialogue(editorData);
             listView.itemsRemoved += indices =>
             {
                 foreach (int index in indices)
                     editorData.RuntimeData.Speakers.RemoveAt(index);
                 
-                EditorUniTalksComponents.Database.SaveDialogue(editorData);
+                EditorDialogueComponents.Database.SaveDialogue(editorData);
             };
 
             return listView;
@@ -219,7 +219,7 @@ namespace PotikotTools.UniTalks.Editor
             }
             
             speakerData.Name = evt.newValue;
-            EditorUniTalksComponents.Database.SaveDialogue(editorData);
+            EditorDialogueComponents.Database.SaveDialogue(editorData);
         }
     }
 }

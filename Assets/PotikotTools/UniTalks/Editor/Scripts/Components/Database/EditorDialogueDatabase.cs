@@ -11,7 +11,7 @@ namespace PotikotTools.UniTalks.Editor
         protected IDialoguePersistence runtimePersistence;
         protected Dictionary<string, EditorDialogueData> dialogues;
 
-        protected DialogueDatabase database => UniTalksComponents.Database;
+        protected DialogueDatabase database => DialoguesComponents.Database;
         
         public EditorDialogueDatabase(IEditorDialoguePersistence editorPersistence, IDialoguePersistence runtimePersistence)
         {

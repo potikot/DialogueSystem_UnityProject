@@ -2,11 +2,12 @@ using UnityEngine;
 
 namespace PotikotTools.UniTalks
 {
-    public static class UniTalksComponents
+    public static class DialoguesComponents
     {
         private static DialogueDatabase _database;
         private static NodeBinder _nodeBinder;
         private static CommandHandler _commandHandler;
+        private static IAudioHandler _audioHandler;
         
         private static bool _isInitialized;
         
@@ -47,7 +48,19 @@ namespace PotikotTools.UniTalks
             }
         }
 
-        static UniTalksComponents() => Initialize();
+        public static IAudioHandler AudioHandler
+        {
+            get => _audioHandler;
+            set
+            {
+                if (value == null)
+                    return;
+                
+                _audioHandler = value;
+            }
+        }
+        
+        static DialoguesComponents() => Initialize();
         
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Initialize()

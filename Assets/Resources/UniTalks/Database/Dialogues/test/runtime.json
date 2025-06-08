@@ -1,9 +1,7 @@
 {
   "Tags": [
     "tag-1",
-    "tag-2",
-    "tag-3",
-    "tag-4"
+    "test-tag"
   ],
   "Speakers": [
     {
@@ -20,6 +18,7 @@
     {
       "$type": "PotikotTools.UniTalks.TimerNodeData, PotikotTools.UniTalks",
       "Duration": 5.0,
+      "Id": 1,
       "Commands": [
         {
           "Text": "aaa",
@@ -42,11 +41,11 @@
       "SpeakerIndex": 0,
       "ListenerIndex": 0,
       "Text": "Hello, my friend!",
-      "AudioResourceName": "bum",
-      "Id": 1
+      "AudioResourceName": "bum"
     },
     {
       "$type": "PotikotTools.UniTalks.SingleChoiceNodeData, PotikotTools.UniTalks",
+      "Id": 2,
       "Commands": [
         {
           "Text": "DL.Log Ok",
@@ -60,11 +59,11 @@
       "SpeakerIndex": 0,
       "ListenerIndex": 0,
       "Text": "Yeah! 2",
-      "AudioResourceName": "bum",
-      "Id": 2
+      "AudioResourceName": "bum"
     },
     {
       "$type": "PotikotTools.UniTalks.SingleChoiceNodeData, PotikotTools.UniTalks",
+      "Id": 3,
       "Commands": [
         {
           "Text": "DL.LogWarning Something went wrong",
@@ -77,8 +76,7 @@
       ],
       "SpeakerIndex": 0,
       "ListenerIndex": 0,
-      "Text": "WHAT ARE YOU SAYING MOTHERFUCKER!!!",
-      "Id": 3
+      "Text": "..."
     }
   ],
   "NextNodeId": 4

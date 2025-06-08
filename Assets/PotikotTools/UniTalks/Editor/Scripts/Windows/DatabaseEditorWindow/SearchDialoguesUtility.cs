@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace PotikotTools.UniTalks.Editor
 {
@@ -10,11 +9,11 @@ namespace PotikotTools.UniTalks.Editor
         {
             var foundDialogues = new List<DialogueData>();
             
-            foreach (var dialogue in UniTalksComponents.Database.Dialogues) // TODO: update dialogues when modified
+            foreach (var dialogue in DialoguesComponents.Database.Dialogues) // TODO: update dialogues when modified
             {
                 if (dialogue.Key.StartsWith(dialogueName, StringComparison.OrdinalIgnoreCase))
                 {
-                    DL.Log("Found Dialogue: " + dialogueName + " : " + dialogue.Value.Name);
+                    // DL.Log("Found Dialogue: " + dialogueName + " : " + dialogue.Value.Name);
                     foundDialogues.Add(dialogue.Value);
                 }
             }
@@ -24,7 +23,7 @@ namespace PotikotTools.UniTalks.Editor
         
         public static List<DialogueData> SearchDialoguesByTag(string tag)
         {
-            DL.Log("Searching Dialogue: " + tag);
+            // DL.Log("Searching Dialogue: " + tag);
             var foundDialogues = new List<DialogueData>();
 
             // foreach (var kvp in Components.Database.Dialogues)
@@ -33,11 +32,11 @@ namespace PotikotTools.UniTalks.Editor
             //         foundDialogues.Add(kvp.Value);
             // }
             
-            foreach (var tagDialogues in UniTalksComponents.Database.Tags) // TODO: update tags when modified
+            foreach (var tagDialogues in DialoguesComponents.Database.Tags) // TODO: update tags when modified
             {
                 if (tagDialogues.Key.StartsWith(tag))
                     foreach (string dialogueName in tagDialogues.Value)
-                        foundDialogues.Add(UniTalksComponents.Database.GetDialogue(dialogueName));
+                        foundDialogues.Add(DialoguesComponents.Database.GetDialogue(dialogueName));
             }
             
             return foundDialogues;

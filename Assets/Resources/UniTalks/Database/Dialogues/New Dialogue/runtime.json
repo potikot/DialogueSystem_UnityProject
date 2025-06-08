@@ -1,0 +1,39 @@
+{
+  "Tags": [
+    "new tag"
+  ],
+  "Speakers": [],
+  "LoadResourcesImmediately": false,
+  "Id": 0,
+  "Name": "New Dialogue",
+  "Nodes": [
+    {
+      "$type": "PotikotTools.UniTalks.SingleChoiceNodeData, PotikotTools.UniTalks",
+      "Id": 0,
+      "Commands": [],
+      "OutputConnections": [
+        {
+          "From": 0,
+          "To": 1
+        }
+      ],
+      "SpeakerIndex": -1,
+      "ListenerIndex": 0,
+      "Text": "ауаыуа"
+    },
+    {
+      "$type": "PotikotTools.UniTalks.MultipleChoiceNodeData, PotikotTools.UniTalks",
+      "Id": 1,
+      "Commands": [],
+      "OutputConnections": [
+        {
+          "Text": "New Choice"
+        }
+      ],
+      "SpeakerIndex": -1,
+      "ListenerIndex": 0,
+      "Text": "ыуаы"
+    }
+  ],
+  "NextNodeId": 2
+}

@@ -3,7 +3,7 @@ using UnityEngine.UIElements;
 
 namespace PotikotTools.UniTalks.Editor
 {
-    public class DialogueEditorWindowsManager : WindowsManager<DialogueEditorWindow> { }
+    public class DialogueEditorWindowsManager : UniTalksWindowsManager<DialogueEditorWindow> { }
 
     public class DialogueEditorWindow : BaseUniTalksEditorWindow
     {
@@ -16,6 +16,7 @@ namespace PotikotTools.UniTalks.Editor
             AddFloatingSettings();
         }
 
+        // Смена названия
         protected override void ChangeTitle(string value)
         {
             titleContent = new GUIContent($"'{value}' Dialogue Editor");
@@ -37,7 +38,7 @@ namespace PotikotTools.UniTalks.Editor
 
                 SaveChanges();
 
-            }) { text = "Save Dialogue" });
+            }) { text = "Save Dialogue", style = { alignSelf = Align.FlexEnd }});
 
             rootVisualElement.Add(c);
         }
@@ -85,7 +86,7 @@ namespace PotikotTools.UniTalks.Editor
 
         public override void SaveChanges()
         {
-            EditorUniTalksComponents.Database.SaveDialogue(EditorData);
+            EditorDialogueComponents.Database.SaveDialogue(EditorData);
             hasUnsavedChanges = false;
         }
     }

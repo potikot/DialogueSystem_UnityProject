@@ -79,8 +79,8 @@ namespace PotikotTools.UniTalks.Editor
             if (!RuntimeData.TrySetName(value))
                 return false;
 
-            string oldPath = Path.Combine(UniTalksComponents.Database.DialoguesRelativeRootPath, previousName);
-            string newPath = Path.Combine(UniTalksComponents.Database.DialoguesRelativeRootPath, Name);
+            string oldPath = Path.Combine(DialoguesComponents.Database.DialoguesRelativeRootPath, previousName);
+            string newPath = Path.Combine(DialoguesComponents.Database.DialoguesRelativeRootPath, Name);
 
             string error = AssetDatabase.MoveAsset(oldPath, newPath);
 
@@ -90,7 +90,7 @@ namespace PotikotTools.UniTalks.Editor
                 return false;
             }
             
-            await EditorUniTalksComponents.Database.SaveDialogueAsync(this);
+            await EditorDialogueComponents.Database.SaveDialogueAsync(this);
             OnNameChanged?.Invoke(value);
             return true;
         }

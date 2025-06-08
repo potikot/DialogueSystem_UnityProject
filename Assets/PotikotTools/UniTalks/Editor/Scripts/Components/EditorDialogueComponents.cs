@@ -5,9 +5,10 @@ namespace PotikotTools.UniTalks.Editor
 {
     [InitializeOnLoad]
     [DefaultExecutionOrder(-1000)]
-    public static class EditorUniTalksComponents
+    public static class EditorDialogueComponents
     {
         private static EditorDialogueDatabase _database;
+        private static IAudioHandler _audioHandler;
 
         private static DialogueEditorWindowsManager _dialogueEditorWM;
         private static DialoguePreviewWindowsManager _dialoguePreviewWM;
@@ -24,10 +25,22 @@ namespace PotikotTools.UniTalks.Editor
             }
         }
         
+        public static IAudioHandler AudioHandler
+        {
+            get => _audioHandler;
+            set
+            {
+                if (value == null)
+                    return;
+                
+                _audioHandler = value;
+            }
+        }
+        
         public static DialogueEditorWindowsManager DialogueEditorWM => _dialogueEditorWM;
         public static DialoguePreviewWindowsManager DialoguePreviewWM => _dialoguePreviewWM;
 
-        static EditorUniTalksComponents()
+        static EditorDialogueComponents()
         {
             IEditorDialoguePersistence editorPersistence = new JsonEditorDialoguePersistence();
             IDialoguePersistence runtimePersistence = new JsonDialoguePersistence();

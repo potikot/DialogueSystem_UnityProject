@@ -130,17 +130,23 @@ namespace PotikotTools.UniTalks.Editor
                 isList = gtd == listType || gtd == typeof(ObservableList<>);
             }
 
+            string fieldName = field.Name.TrimStart('_');
+            if (fieldName.Length > 0)
+                fieldName = char.ToUpper(fieldName[0]) + fieldName[1..];
+            else
+                fieldName = field.FieldType.Name;
+            
             if (isList)
             {
                 if (Renderers.TryGetValue(listType, out var renderer))
-                    return DefaultRenderer(renderer(field.Name, field.FieldType, field.GetValue(target), null));
+                    return DefaultRenderer(renderer(fieldName, field.FieldType, field.GetValue(target), null));
             }
             else
             {
                 if (field.FieldType.IsEnum)
                 {
                     if (Renderers.TryGetValue(typeof(Enum), out var enumRenderer))
-                        return DefaultRenderer(enumRenderer(field.Name, field.FieldType, field.GetValue(target), null));
+                        return DefaultRenderer(enumRenderer(fieldName, field.FieldType, field.GetValue(target), null));
                 }
                 else
                 {
@@ -149,7 +155,7 @@ namespace PotikotTools.UniTalks.Editor
                     Type rendererType = isUnityObject ? unityObjectType : field.FieldType;
 
                     if (Renderers.TryGetValue(rendererType, out var renderer))
-                        return DefaultRenderer(renderer(field.Name, field.FieldType, field.GetValue(target), null));
+                        return DefaultRenderer(renderer(fieldName, field.FieldType, field.GetValue(target), null));
                 }
             }
 

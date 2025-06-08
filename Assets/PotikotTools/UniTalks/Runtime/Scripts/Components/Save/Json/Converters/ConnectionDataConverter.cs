@@ -35,7 +35,7 @@ namespace PotikotTools.UniTalks
                 int fromId = (int)from;
                 int toId = (int)to;
 
-                UniTalksComponents.NodeBinder.AddConnection(fromId, toId);
+                DialoguesComponents.NodeBinder.AddConnection(fromId, toId);
             }
 
             return connectionData;

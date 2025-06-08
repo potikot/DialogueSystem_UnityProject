@@ -5,17 +5,17 @@ namespace PotikotTools.UniTalks
 {
     public static class UniTalksAPI
     {
-        public static async Task<DialogueController> StartDialogueAsync(string id, IDialogueView view) =>
-            StartDialogue(await GetDialogueAsync(id), view);
+        public static async Task<DialogueController> StartDialogueAsync(string name, IDialogueView view) =>
+            StartDialogue(await GetDialogueAsync(name), view);
 
-        public static DialogueController StartDialogue(string id, IDialogueView view) =>
-            StartDialogue(GetDialogue(id), view);
+        public static DialogueController StartDialogue(string name, IDialogueView view) =>
+            StartDialogue(GetDialogue(name), view);
 
         [Command]
-        public static DialogueController StartDialogue(string id)
+        public static DialogueController StartDialogue(string name)
         {
             var view = Object.FindObjectOfType<DialogueView>();
-            return view == null ? null : StartDialogue(GetDialogue(id), view);
+            return view == null ? null : StartDialogue(GetDialogue("name"), view);
         }
 
         
@@ -27,12 +27,12 @@ namespace PotikotTools.UniTalks
             return controller;
         }
         
-        public static Task<DialogueData> GetDialogueAsync(string id) => UniTalksComponents.Database.GetDialogueAsync(id);
-        public static Task<bool> LoadDialogueAsync(string id) => UniTalksComponents.Database.LoadDialogueAsync(id);
-        public static Task<bool> LoadDialogueGroupAsync(string tag) => UniTalksComponents.Database.LoadDialoguesByTagAsync(tag);
+        public static Task<DialogueData> GetDialogueAsync(string id) => DialoguesComponents.Database.GetDialogueAsync(id);
+        public static Task<bool> LoadDialogueAsync(string id) => DialoguesComponents.Database.LoadDialogueAsync(id);
+        public static Task<bool> LoadDialogueGroupAsync(string tag) => DialoguesComponents.Database.LoadDialoguesByTagAsync(tag);
         
-        public static DialogueData GetDialogue(string id) => UniTalksComponents.Database.GetDialogue(id);
-        public static bool LoadDialogue(string id) => UniTalksComponents.Database.LoadDialogue(id);
-        public static bool LoadDialogueGroup(string tag) => UniTalksComponents.Database.LoadDialoguesByTag(tag);
+        public static DialogueData GetDialogue(string id) => DialoguesComponents.Database.GetDialogue(id);
+        public static bool LoadDialogue(string id) => DialoguesComponents.Database.LoadDialogue(id);
+        public static bool LoadDialogueGroup(string tag) => DialoguesComponents.Database.LoadDialoguesByTag(tag);
     }
 }

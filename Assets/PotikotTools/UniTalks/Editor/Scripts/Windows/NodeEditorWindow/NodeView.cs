@@ -207,15 +207,23 @@ namespace PotikotTools.UniTalks.Editor
             if (data.DialogueData.Speakers == null)
                 return;
 
-            var speakerNames = new List<string> { "None" };
-            speakerNames.AddRange(data.DialogueData.Speakers.Select((s, i) => $"{i + 1}. {s.Name}"));
-
-            string currentSpeaker = data.GetSpeakerName();
-            var popup = new PopupField<string>("Speaker", speakerNames,
-                string.IsNullOrEmpty(currentSpeaker) ? "None" : $"{data.SpeakerIndex + 1}. {currentSpeaker}");
-
+            var popup = GeneratePopup();
             popup.RegisterValueChangedCallback(_ => data.SpeakerIndex = popup.index - 1);
+            // data.DialogueData.Speakers.CollectionChanged += (_, _) =>
+            // {
+            //     
+            // };
             extensionContainer.Add(popup);
+
+            PopupField<string> GeneratePopup()
+            {
+                var speakerNames = new List<string> { "None" };
+                speakerNames.AddRange(data.DialogueData.Speakers.Select((s, i) => $"{i + 1}. {s.Name}"));
+
+                string currentSpeaker = data.GetSpeakerName();
+                return new PopupField<string>("Speaker", speakerNames,
+                    string.IsNullOrEmpty(currentSpeaker) ? "None" : $"{data.SpeakerIndex + 1}. {currentSpeaker}");
+            }
         }
 
         protected virtual void DrawAudioField()
@@ -223,7 +231,7 @@ namespace PotikotTools.UniTalks.Editor
             var audioField = new ObjectField("Audio")
             {
                 objectType = typeof(AudioClip),
-                value = UniTalksComponents.Database.LoadResource<AudioClip>(data.AudioResourceName)
+                value = DialoguesComponents.Database.LoadResource<AudioClip>(data.AudioResourceName)
             };
 
             audioField.RegisterValueChangedCallback(evt => HandleAudioChange(evt, audioField));

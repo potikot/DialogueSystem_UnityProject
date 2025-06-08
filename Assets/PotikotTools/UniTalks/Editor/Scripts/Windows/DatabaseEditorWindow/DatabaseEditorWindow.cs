@@ -208,7 +208,7 @@ namespace PotikotTools.UniTalks.Editor
             _dialoguesContainer = new ScrollView()
                 .AddUSSClasses("dialogue-views-container");
 
-            var dialogueDatas = await EditorUniTalksComponents.Database.LoadAllDialoguesAsync();
+            var dialogueDatas = await EditorDialogueComponents.Database.LoadAllDialoguesAsync();
 
             for (var i = 0; i < dialogueDatas.Count; i++)
             {
@@ -365,7 +365,7 @@ namespace PotikotTools.UniTalks.Editor
 
             // edit dialogue button
 
-            var editDialogueButton = new Button(() => EditorUniTalksComponents.DialogueEditorWM.Open(editorDialogueData))
+            var editDialogueButton = new Button(() => EditorDialogueComponents.DialogueEditorWM.Open(editorDialogueData))
             {
                 text = "Edit"
             };
@@ -377,7 +377,7 @@ namespace PotikotTools.UniTalks.Editor
 
             // test dialogue button
             
-            var testDialogueButton = new Button(() => EditorUniTalksComponents.DialoguePreviewWM.Open(editorDialogueData))
+            var testDialogueButton = new Button(() => EditorDialogueComponents.DialoguePreviewWM.Open(editorDialogueData))
             {
                 text = "Test"
             };
@@ -470,7 +470,7 @@ namespace PotikotTools.UniTalks.Editor
                 }
 
                 tags[changedTagIndex] = evt.newValue;
-                await EditorUniTalksComponents.Database.SaveDialogueAsync(editorDialogueData);
+                await EditorDialogueComponents.Database.SaveDialogueAsync(editorDialogueData);
             }
             
             async void OnDelete()
@@ -488,7 +488,7 @@ namespace PotikotTools.UniTalks.Editor
                 
                 c.RemoveFromHierarchy();
                 
-                await EditorUniTalksComponents.Database.SaveDialogueAsync(editorDialogueData);
+                await EditorDialogueComponents.Database.SaveDialogueAsync(editorDialogueData);
             }
         }
 
@@ -522,7 +522,7 @@ namespace PotikotTools.UniTalks.Editor
             tagsContainer.Insert(tagViewIndex, tagView);
             tagsContainer.InsertHorizontalSpace(tagViewIndex + 1, 10f);
 
-            await EditorUniTalksComponents.Database.SaveDialogueAsync(editorDialogueData);
+            await EditorDialogueComponents.Database.SaveDialogueAsync(editorDialogueData);
             tagView.Q<TextField>().Focus();
         }
         
@@ -581,7 +581,7 @@ namespace PotikotTools.UniTalks.Editor
             {
                 if (!canceled)
                 {
-                    var editorDialogueData = await EditorUniTalksComponents.Database.CreateDialogue(dialogueNameInputField.value);
+                    var editorDialogueData = await EditorDialogueComponents.Database.CreateDialogue(dialogueNameInputField.value);
                     if (editorDialogueData != null)
                     {
                         if (_dialoguesContainer.childCount > 0)
@@ -604,7 +604,7 @@ namespace PotikotTools.UniTalks.Editor
             if (EditorUtility.DisplayDialog("Delete dialogue", $"Are you really want to delete dialogue: \"{editorDialogueData.Name}\"?", "Yes", "No"))
             {
                 onDelete?.Invoke();
-                EditorUniTalksComponents.Database.DeleteDialogue(editorDialogueData);
+                EditorDialogueComponents.Database.DeleteDialogue(editorDialogueData);
             }
         }
     }

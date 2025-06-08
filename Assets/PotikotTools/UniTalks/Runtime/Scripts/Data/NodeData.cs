@@ -150,7 +150,7 @@ namespace PotikotTools.UniTalks
         public virtual async Task LoadResourcesAsync()
         {
             if (!string.IsNullOrEmpty(AudioResourceName))
-                AudioResource = await UniTalksComponents.Database.LoadResourceAsync<AudioClip>(AudioResourceName);
+                AudioResource = await DialoguesComponents.Database.LoadResourceAsync<AudioClip>(AudioResourceName);
         }
 
         public virtual void ReleaseResources()

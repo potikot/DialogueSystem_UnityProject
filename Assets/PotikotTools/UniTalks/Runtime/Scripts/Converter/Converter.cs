@@ -1,6 +1,6 @@
 using System;
 
-namespace PotikotTools
+namespace PotikotTools.UniTalks
 {
     public static class Converter
     {
@@ -20,7 +20,7 @@ namespace PotikotTools
             _floatType = typeof(float);
             _boolType = typeof(bool);
 
-            _iConvertableName = nameof(IStringConvertible);
+            _iConvertableName = nameof(IStringParsable);
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace PotikotTools
             Type convertableInterface = targetType.GetInterface(_iConvertableName);
             if (convertableInterface != null)
             {
-                IStringConvertible result = Activator.CreateInstance(targetType) as IStringConvertible;
+                IStringParsable result = Activator.CreateInstance(targetType) as IStringParsable;
                 result.FromString(value);
                 return result;
             }

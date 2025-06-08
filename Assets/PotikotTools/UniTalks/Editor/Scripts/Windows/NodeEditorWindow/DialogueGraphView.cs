@@ -37,7 +37,7 @@ namespace PotikotTools.UniTalks.Editor
             RegisterCallback<KeyDownEvent>(evt =>
             {
                 if (evt.ctrlKey && evt.keyCode == KeyCode.S)
-                    EditorUniTalksComponents.Database.SaveDialogue(editorData);
+                    EditorDialogueComponents.Database.SaveDialogue(editorData);
             });
             
             graphViewChanged += HandleGraphViewChanged;

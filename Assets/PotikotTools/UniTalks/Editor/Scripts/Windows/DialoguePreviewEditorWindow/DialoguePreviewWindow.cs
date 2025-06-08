@@ -1,9 +1,8 @@
-using System;
 using UnityEngine;
 
 namespace PotikotTools.UniTalks.Editor
 {
-    public class DialoguePreviewWindowsManager : WindowsManager<DialoguePreviewWindow> { }
+    public class DialoguePreviewWindowsManager : UniTalksWindowsManager<DialoguePreviewWindow> { }
     
     public class DialoguePreviewWindow : BaseUniTalksEditorWindow
     {
@@ -44,6 +43,8 @@ namespace PotikotTools.UniTalks.Editor
 
         private void OnDisable()
         {
+            EditorData?.RuntimeData?.ReleaseResources();
+
             // DL.Log("Disabling dialogue editor window");
             if (_dialogueController?.CurrentDialogueData == null)
                 return;
@@ -56,7 +57,8 @@ namespace PotikotTools.UniTalks.Editor
         {
             AddDialogueView();
             CreateDialogueController();
-            
+
+            EditorData.RuntimeData.LoadResources();
             _dialogueController.StartDialogue();
         }
         

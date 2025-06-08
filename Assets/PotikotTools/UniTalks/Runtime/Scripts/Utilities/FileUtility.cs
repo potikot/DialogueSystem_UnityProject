@@ -181,14 +181,14 @@ namespace PotikotTools.UniTalks
                 return false;
             }
             
-            return path.StartsWith(UniTalksComponents.Database.RelativeRootPath, StringComparison.CurrentCultureIgnoreCase);
+            return path.StartsWith(DialoguesComponents.Database.RelativeRootPath, StringComparison.CurrentCultureIgnoreCase);
         }
         
         // TODO: manage extensions
         public static bool MoveAssetToDatabase(Type assetType, string oldPath, string newFileName = null)
         {
             newFileName ??= Path.GetFileName(oldPath);
-            string newPath = UniTalksComponents.Database.GetProjectRelativeResourcePath(assetType, newFileName);
+            string newPath = DialoguesComponents.Database.GetProjectRelativeResourcePath(assetType, newFileName);
             string newFolder = Path.GetDirectoryName(newPath);
             
             if (!AssetDatabase.IsValidFolder(newFolder))

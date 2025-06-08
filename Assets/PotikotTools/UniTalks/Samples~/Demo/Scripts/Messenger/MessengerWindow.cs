@@ -19,7 +19,7 @@ namespace PotikotTools.UniTalks.Demo
         private void Start()
         {
             Debug.Log("Execute Command");
-            UniTalksComponents.CommandHandler.Execute("UniTalksAPI.StartDialogue", "test");
+            DialoguesComponents.CommandHandler.Execute("UniTalksAPI.StartDialogue", "test");
             // Initialize();
         }
 
@@ -29,7 +29,7 @@ namespace PotikotTools.UniTalks.Demo
             
             foreach (var chatData in _config.ChatDatas)
             {
-                if (!UniTalksComponents.Database.LoadDialogue(chatData.DialogueName))
+                if (!DialoguesComponents.Database.LoadDialogue(chatData.DialogueName))
                     continue;
                 
                 ChatPanelView chatPanelView = Instantiate(_chatPanelViewPrefab, _chatsContainer);

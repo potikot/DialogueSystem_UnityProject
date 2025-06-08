@@ -63,9 +63,6 @@ namespace PotikotTools.UniTalks
             foreach (string dialogueDirectory in dialogueDirectories)
             {
                 string dialogueName = Path.GetFileName(dialogueDirectory);
-                if (dialogueName[0] == '_')
-                    continue;
-                
                 await AddDialogueTagsAsync(dialogueName);
             }
         }
@@ -123,8 +120,8 @@ namespace PotikotTools.UniTalks
                 return false;
             }
             
-            UniTalksComponents.NodeBinder.Bind(dialogueData);
-            UniTalksComponents.NodeBinder.Clear();
+            DialoguesComponents.NodeBinder.Bind(dialogueData);
+            DialoguesComponents.NodeBinder.Clear();
 
             foreach (NodeData node in dialogueData.Nodes)
             {
@@ -145,8 +142,8 @@ namespace PotikotTools.UniTalks
                 return false;
             }
             
-            UniTalksComponents.NodeBinder.Bind(dialogueData);
-            UniTalksComponents.NodeBinder.Clear();
+            DialoguesComponents.NodeBinder.Bind(dialogueData);
+            DialoguesComponents.NodeBinder.Clear();
 
             foreach (NodeData node in dialogueData.Nodes)
             {
@@ -210,6 +207,16 @@ namespace PotikotTools.UniTalks
             var dialogueNames = new List<string>(dialogues.Keys);
             foreach (var dialogueName in dialogueNames)
                 ReleaseDialogue(dialogueName);
+        }
+
+        public virtual bool TryAddResourceType<T>(string folderName) where T : Object
+        {
+            return resourceDirectories.TryAdd(typeof(T), folderName);
+        }
+        
+        public virtual bool TryAddResourceType(Type resourceType, string folderName)
+        {
+            return resourceDirectories.TryAdd(resourceType, folderName);
         }
         
         public virtual async Task<T> LoadResourceAsync<T>(string resourceName) where T : Object

@@ -17,11 +17,11 @@ namespace PotikotTools.UniTalks.Editor
         
         private Action<int> _onOptionSelected;
 
-        private VisualElement _historyContainer;
+        private EditorDialogueHistoryView _historyContainer;
         private VisualElement _previewContainer;
         private VisualElement _infoContainer;
 
-        private NodeData _data;
+        private NodeData _nodeData;
         
         public bool IsEnabled { get; private set; }
 
@@ -32,7 +32,7 @@ namespace PotikotTools.UniTalks.Editor
 
             this.AddUSSClasses("dialogue-view");
 
-            _historyContainer = new ScrollView().AddUSSClasses("dialogue-history-container");
+            _historyContainer = new EditorDialogueHistoryView();
             _previewContainer = new VisualElement().AddUSSClasses("dialogue-preview-container");
             _infoContainer = new ScrollView().AddUSSClasses("dialogue-info-container");
             
@@ -47,9 +47,14 @@ namespace PotikotTools.UniTalks.Editor
             CreateInfoContainer();
         }
         
-        public void SetData(NodeData data)
+        public void SetData(NodeData nodeData)
         {
-            _data = data;
+            if (_nodeData == nodeData)
+                return;
+            
+            _historyContainer.AddNode(nodeData);
+            
+            _nodeData = nodeData;
             CreatePreviewContainer();
             CreateInfoContainer();
         }
@@ -97,6 +102,18 @@ namespace PotikotTools.UniTalks.Editor
             _onOptionSelected = callback;
         }
 
+        public void AddMenu(object menu)
+        {
+            if (menu is VisualElement m)
+                _menus.Add(m);
+        }
+        
+        public void AddMenu(VisualElement menu)
+        {
+            if (menu != null)
+                _menus.Add(menu);
+        }
+        
         public T GetMenu<T>()
         {
             var m = _menus.FirstOrDefault(m => m is T);
@@ -144,12 +161,12 @@ namespace PotikotTools.UniTalks.Editor
             _previewContainer.Clear();
             _optionViews.Clear();
             
-            _speakerLabel = new Label(_data == null ? "Speaker" : _data.GetSpeakerName()).AddUSSClasses("speaker-label");
-            _textLabel = new Label(_data == null ? "Dialogue Text" : _data.Text).AddUSSClasses("text-label");
+            _speakerLabel = new Label(_nodeData == null ? "Speaker" : _nodeData.GetSpeakerName()).AddUSSClasses("speaker-label");
+            _textLabel = new Label(_nodeData == null ? "Dialogue Text" : _nodeData.Text).AddUSSClasses("text-label");
             _optionsContainer = new ScrollView().AddUSSClasses("option-view-container");
             
-            if (_data != null)
-                GenerateOptions(_data.OutputConnections.Select(o => o.Text).ToArray());
+            if (_nodeData != null)
+                GenerateOptions(_nodeData.OutputConnections.Select(o => o.Text).ToArray());
 
             var textContainer = new VisualElement().AddUSSClasses("text-container");
 
@@ -163,10 +180,10 @@ namespace PotikotTools.UniTalks.Editor
         private void CreateInfoContainer()
         {
             _infoContainer.Clear();
-            if (_data == null)
+            if (_nodeData == null)
                 return;
 
-            InspectorUtility.CreateInspectorWindow(_data, _infoContainer);
+            InspectorUtility.CreateInspectorWindow(_nodeData, _infoContainer);
         }
     }
 }

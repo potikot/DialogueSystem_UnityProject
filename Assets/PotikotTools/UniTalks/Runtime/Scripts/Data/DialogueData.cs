@@ -52,10 +52,10 @@ namespace PotikotTools.UniTalks
         {
             if (string.IsNullOrEmpty(name))
             {
-                if (UniTalksComponents.Database.ContainsDialogue(value))
+                if (DialoguesComponents.Database.ContainsDialogue(value))
                     return false;
             }
-            else if (!UniTalksComponents.Database.TryChangeDialogueName(name, value))
+            else if (!DialoguesComponents.Database.TryChangeDialogueName(name, value))
                 return false;
 
             name = value;

@@ -22,7 +22,7 @@ namespace PotikotTools.UniTalks
         {
             currentDialogueView = dialogueView;
             commandsToExecuteOnExitNode = new List<CommandData>();
-            
+
             nodeHandlers = new Dictionary<Type, INodeHandler>
             {
                 { typeof(SingleChoiceNodeData), new SingleChoiceNodeHandler() },
@@ -47,6 +47,11 @@ namespace PotikotTools.UniTalks
             }
             
             nodeHandlers.Add(nodeType, handler);
+        }
+
+        public virtual bool RemoveNodeHandler(Type nodeType)
+        {
+            return nodeHandlers.Remove(nodeType);
         }
         
         public virtual void StartDialogue()
@@ -166,9 +171,9 @@ namespace PotikotTools.UniTalks
         protected virtual async void ExecuteCommandAsync(CommandData command)
         {
             if (command.HasDelay)
-                await UniTalksComponents.CommandHandler.ExecuteWithDelayAsync(command.Text, command.Delay);
+                await DialoguesComponents.CommandHandler.ExecuteWithDelayAsync(command.Text, command.Delay);
             else
-                UniTalksComponents.CommandHandler.Execute(command.Text);
+                DialoguesComponents.CommandHandler.Execute(command.Text);
         }
     }
 }

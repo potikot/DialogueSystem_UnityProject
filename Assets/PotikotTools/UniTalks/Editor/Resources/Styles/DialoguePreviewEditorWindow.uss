@@ -15,6 +15,17 @@
     border-color: black;
 }
 
+.history-node-view
+{
+    padding: 5px 3px 5px 3px;
+
+    flex-grow: 1;
+    width: 20%;
+
+    border-right-width: var(--ds-border-width-1px);
+    border-color: black;
+}
+
 .dialogue-preview-container
 {
     padding: 5px 10% 5px 10%;

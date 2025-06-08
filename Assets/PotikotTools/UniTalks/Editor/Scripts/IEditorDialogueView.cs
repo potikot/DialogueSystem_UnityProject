@@ -2,6 +2,6 @@ namespace PotikotTools.UniTalks.Editor
 {
     public interface IEditorDialogueView : IDialogueView
     {
-        void SetData(NodeData data);
+        void SetData(NodeData nodeData);
     }
 }

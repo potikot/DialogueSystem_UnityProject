@@ -79,6 +79,18 @@ namespace PotikotTools.UniTalks
             onOptionSelected = callback;
         }
 
+        public void AddMenu(object menu)
+        {
+            if (menu is MonoBehaviour m)
+                menus.Add(m);
+        }
+        
+        public void AddMenu(MonoBehaviour menu)
+        {
+            if (menu)
+                menus.Add(menu);
+        }
+        
         public virtual T GetMenu<T>()
         {
             foreach (var menu in menus)

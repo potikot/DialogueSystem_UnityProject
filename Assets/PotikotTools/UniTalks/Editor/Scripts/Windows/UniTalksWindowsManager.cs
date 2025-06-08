@@ -6,12 +6,12 @@ using UnityEngine;
 
 namespace PotikotTools.UniTalks.Editor
 {
-    public abstract class WindowsManager<T> where T : BaseUniTalksEditorWindow
+    public abstract class UniTalksWindowsManager<T> where T : BaseUniTalksEditorWindow
     {
         protected readonly List<T> windows;
         protected readonly Type[] desiredDockNextTo;
-        
-        protected WindowsManager()
+
+        protected UniTalksWindowsManager()
         {
             var nodeEditorWindows = Resources.FindObjectsOfTypeAll<T>();
             
@@ -22,8 +22,8 @@ namespace PotikotTools.UniTalks.Editor
             {
                 if (!TryRestoreWindow(window))
                     window.Close();
-
-                windows.Add(window);
+                else
+                    windows.Add(window);
             }
         }
 
@@ -39,7 +39,7 @@ namespace PotikotTools.UniTalks.Editor
 
         protected virtual bool TryRestoreWindow(T window)
         {
-            var editorDialogueData = EditorUniTalksComponents.Database.LoadDialogue(window.DialogueName);
+            var editorDialogueData = EditorDialogueComponents.Database.LoadDialogue(window.DialogueName);
             if (editorDialogueData == null)
                 return false;
 
