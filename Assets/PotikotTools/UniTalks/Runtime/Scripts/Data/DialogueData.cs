@@ -61,8 +61,10 @@ namespace PotikotTools.UniTalks
             name = value;
             return true;
         }
+
+        public T AddNode<T>(params object[] args) where T : NodeData => (T)AddNode(typeof(T), args);
         
-        public T AddNode<T>(params object[] args) where T : NodeData
+        public NodeData AddNode(Type type, params object[] args)
         {
             if (args == null || args.Length == 0)
                 args = new object[1] { GetNextNodeId() };
@@ -74,7 +76,7 @@ namespace PotikotTools.UniTalks
                 args = newArgs;
             }
 
-            T node = (T)Activator.CreateInstance(typeof(T), args);
+            NodeData node = (NodeData)Activator.CreateInstance(type, args);
             node.DialogueData = this;
             node.OnChanged += OnChanged;
             

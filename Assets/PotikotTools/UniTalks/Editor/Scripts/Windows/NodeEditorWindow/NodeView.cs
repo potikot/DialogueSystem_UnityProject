@@ -17,10 +17,12 @@ namespace PotikotTools.UniTalks.Editor
         
         protected EditorNodeData editorData;
         protected T data;
+        
         protected DialogueGraphView graphView;
 
         protected virtual string Title => "Dialogue Node";
-
+        protected virtual bool CanBeZeroOptions => false;
+        
         public virtual void Initialize(EditorNodeData editorData, NodeData data, DialogueGraphView graphView)
         {
             this.editorData = editorData;
@@ -42,7 +44,7 @@ namespace PotikotTools.UniTalks.Editor
         {
             if (data == null)
             {
-                DL.LogError("NodeData is null");
+                UniTalksAPI.LogError("NodeData is null");
                 return;
             }
 
@@ -64,9 +66,7 @@ namespace PotikotTools.UniTalks.Editor
         protected virtual void DrawChoiceButton()
         {
             var container = new VisualElement().AddUSSClasses("node__add-choice-btn");
-            
             container.Add(new Button(OnAddChoice) { text = "Add Choice" });
-
             mainContainer.Insert(1, container);
         }
 
@@ -76,9 +76,6 @@ namespace PotikotTools.UniTalks.Editor
 
             foreach (var connection in data.OutputConnections)
                 AddOutputPort(connection);
-            //
-            // if (outputContainer.childCount == 1)
-            //     outputContainer.Q<Button>().visible = false;
         }
 
         protected virtual void AddInputPort()
@@ -110,13 +107,15 @@ namespace PotikotTools.UniTalks.Editor
                 "round-btn",
                 "node__output-port__delete-btn"
             );
+            
+            if (!CanBeZeroOptions && data.OutputConnections.Count <= 1)
+                deleteBtn.style.display = DisplayStyle.None;
 
             var textField = new TextField
             {
                 value = connection.Text,
                 multiline = true
             };
-
             textField.AddUSSClasses("node__output-port__text-field");
             textField.Children().First().AddUSSClasses("node__output-port__text-input");
             textField.RegisterValueChangedCallback(evt => connection.Text = evt.newValue);
@@ -145,7 +144,7 @@ namespace PotikotTools.UniTalks.Editor
 
         protected virtual void OnAddChoice()
         {
-            if (outputContainer.childCount == 1)
+            if (!CanBeZeroOptions && outputContainer.childCount == 1)
                 outputContainer.Q<Button>().style.display = DisplayStyle.Flex;
             
             var newConnection = new ConnectionData("New Choice", data, null);
@@ -157,7 +156,7 @@ namespace PotikotTools.UniTalks.Editor
         
         protected virtual void OnRemoveChoice(int index)
         {
-            if (index < 0 || index >= data.OutputConnections.Count || data.OutputConnections.Count <= 1)
+            if (index < 0 || index >= data.OutputConnections.Count || !CanBeZeroOptions && data.OutputConnections.Count <= 1)
                 return;
             
             int viewIndex = index * 2;
@@ -177,9 +176,10 @@ namespace PotikotTools.UniTalks.Editor
 
             data.OutputConnections.RemoveAt(index);
             outputContainer.RemoveAt(viewIndex);
-            outputContainer.RemoveAt(viewIndex == 0 ? 0 : viewIndex - 1);
-            
-            if (outputContainer.childCount == 1)
+            if (outputContainer.childCount > 0)
+                outputContainer.RemoveAt(viewIndex == 0 ? 0 : viewIndex - 1);
+
+            if (!CanBeZeroOptions && outputContainer.childCount == 1)
                 outputContainer.Q<Button>().style.display = DisplayStyle.None;
         }
         
@@ -209,10 +209,6 @@ namespace PotikotTools.UniTalks.Editor
 
             var popup = GeneratePopup();
             popup.RegisterValueChangedCallback(_ => data.SpeakerIndex = popup.index - 1);
-            // data.DialogueData.Speakers.CollectionChanged += (_, _) =>
-            // {
-            //     
-            // };
             extensionContainer.Add(popup);
 
             PopupField<string> GeneratePopup()

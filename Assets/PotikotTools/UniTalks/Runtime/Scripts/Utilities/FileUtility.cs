@@ -19,7 +19,7 @@ namespace PotikotTools.UniTalks
         {
             if (string.IsNullOrEmpty(absolutePath))
             {
-                DL.LogError($"'{nameof(absolutePath)}' cannot be null or empty.");
+                UniTalksAPI.LogError($"'{nameof(absolutePath)}' cannot be null or empty.");
                 return false;
             }
 
@@ -38,7 +38,7 @@ namespace PotikotTools.UniTalks
         {
             if (string.IsNullOrEmpty(absolutePath))
             {
-                DL.LogError($"'{nameof(absolutePath)}' cannot be null or empty.");
+                UniTalksAPI.LogError($"'{nameof(absolutePath)}' cannot be null or empty.");
                 return false;
             }
 
@@ -57,7 +57,7 @@ namespace PotikotTools.UniTalks
         {
             if (string.IsNullOrEmpty(absolutePath))
             {
-                DL.LogError($"'{nameof(absolutePath)}' cannot be null or empty.");
+                UniTalksAPI.LogError($"'{nameof(absolutePath)}' cannot be null or empty.");
                 return null;
             }
             
@@ -71,7 +71,7 @@ namespace PotikotTools.UniTalks
         {
             if (string.IsNullOrEmpty(absolutePath))
             {
-                DL.LogError($"'{nameof(absolutePath)}' cannot be null or empty.");
+                UniTalksAPI.LogError($"'{nameof(absolutePath)}' cannot be null or empty.");
                 return null;
             }
             
@@ -89,7 +89,7 @@ namespace PotikotTools.UniTalks
         {
             if (string.IsNullOrEmpty(absolutePath))
             {
-                DL.LogError($"'{nameof(absolutePath)}' cannot be null or empty.");
+                UniTalksAPI.LogError($"'{nameof(absolutePath)}' cannot be null or empty.");
                 return false;
             }
 
@@ -108,7 +108,7 @@ namespace PotikotTools.UniTalks
         {
             if (string.IsNullOrEmpty(absolutePath))
             {
-                DL.LogError($"'{nameof(absolutePath)}' cannot be null or empty.");
+                UniTalksAPI.LogError($"'{nameof(absolutePath)}' cannot be null or empty.");
                 return null;
             }
 
@@ -122,7 +122,7 @@ namespace PotikotTools.UniTalks
         {
             if (string.IsNullOrEmpty(absolutePath))
             {
-                DL.LogError($"'{nameof(absolutePath)}' cannot be null or empty.");
+                UniTalksAPI.LogError($"'{nameof(absolutePath)}' cannot be null or empty.");
                 return null;
             }
 
@@ -138,7 +138,7 @@ namespace PotikotTools.UniTalks
         {
             if (string.IsNullOrEmpty(absolutePath))
             {
-                DL.LogError($"'{nameof(absolutePath)}' cannot be null or empty.");
+                UniTalksAPI.LogError($"'{nameof(absolutePath)}' cannot be null or empty.");
                 return null;
             }
             
@@ -147,7 +147,7 @@ namespace PotikotTools.UniTalks
 
             if (!normalizedAbs.StartsWith(normalizedDataPath, StringComparison.OrdinalIgnoreCase))
             {
-                DL.LogError($"'{nameof(absolutePath)}' must be inside the Assets folder ({absolutePath}).");
+                UniTalksAPI.LogError($"'{nameof(absolutePath)}' must be inside the Assets folder ({absolutePath}).");
                 return null;
             }
 
@@ -159,14 +159,14 @@ namespace PotikotTools.UniTalks
         {
             if (string.IsNullOrEmpty(relativePath))
             {
-                DL.LogError($"'{nameof(relativePath)}' cannot be null or empty.");
+                UniTalksAPI.LogError($"'{nameof(relativePath)}' cannot be null or empty.");
                 return null;
             }
             
             string normalizedPath = relativePath.Replace("\\", "/").TrimStart('/');
             if (!normalizedPath.StartsWith("Assets"))
             {
-                DL.LogError($"Path must start with 'Assets', '/Assets', or '\\Assets' ({relativePath}).");
+                UniTalksAPI.LogError($"Path must start with 'Assets', '/Assets', or '\\Assets' ({relativePath}).");
                 return null;
             }
             
@@ -177,7 +177,7 @@ namespace PotikotTools.UniTalks
         {
             if (string.IsNullOrEmpty(path))
             {
-                DL.LogError($"'{nameof(path)}' cannot be null or empty.");
+                UniTalksAPI.LogError($"'{nameof(path)}' cannot be null or empty.");
                 return false;
             }
             
@@ -200,7 +200,7 @@ namespace PotikotTools.UniTalks
             string error = AssetDatabase.MoveAsset(oldPath, newPath);
             if (!string.IsNullOrEmpty(error))
             {
-                DL.LogError(error);
+                UniTalksAPI.LogError(error);
                 return false;
             }
             

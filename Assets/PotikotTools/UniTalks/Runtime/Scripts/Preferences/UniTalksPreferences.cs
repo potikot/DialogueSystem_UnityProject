@@ -14,6 +14,8 @@ namespace PotikotTools.UniTalks
             1080f / 2f - InitialDialogueEditorWindowSize.y / 2f
         );
 
+        public static string[] EmptyDialogueOptions = { "Next" };
+        
         public static readonly UniTalksPreferencesSO Data;
 
         static UniTalksPreferences()

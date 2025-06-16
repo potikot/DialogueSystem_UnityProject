@@ -50,7 +50,7 @@ namespace PotikotTools.UniTalks.Editor
             
             excludedAssembliesContainer.Add(_excludeAssemblyPrefixesToggle);
             excludedAssembliesContainer.Add(excludeAssemblyPrefixesLabel);
-            
+
             Button searchAssembliesButton = new(SearchDeveloperAssemblies)
             {
                 text = "Search Developer Assemblies"

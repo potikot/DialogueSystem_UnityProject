@@ -305,12 +305,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2cd008a310ad47b2bb79d1b6b360b9e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _menus: []
-  _container: {fileID: 702064425}
-  _label: {fileID: 891860632}
-  _optionsContainer: {fileID: 1635556672}
-  _optionViewPrefab: {fileID: 6068335720579786761, guid: 597bd1adc7f7e4043818a667e81a5df8, type: 3}
-  _timerImage: {fileID: 918319814}
+  menus: []
+  container: {fileID: 0}
+  label: {fileID: 0}
+  optionsContainer: {fileID: 0}
+  optionViewPrefab: {fileID: 0}
+  timerImage: {fileID: 0}
 --- !u!1 &891860630
 GameObject:
   m_ObjectHideFlags: 0

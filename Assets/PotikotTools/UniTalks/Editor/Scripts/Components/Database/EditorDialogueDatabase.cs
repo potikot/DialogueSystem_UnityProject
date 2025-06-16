@@ -128,14 +128,14 @@ namespace PotikotTools.UniTalks.Editor
 
             if (string.IsNullOrEmpty(guid))
             {
-                DL.LogError($"Cannot create folder for dialogue with id: {dialogueName}. Relative path: {database.DialoguesRelativeRootPath}");
+                UniTalksAPI.LogError($"Cannot create folder for dialogue with id: {dialogueName}. Relative path: {database.DialoguesRelativeRootPath}");
                 return null;
             }
 
             string uniqueDialogueName = Path.GetFileName(AssetDatabase.GUIDToAssetPath(guid));
             if (string.IsNullOrEmpty(uniqueDialogueName))
             {
-                DL.LogError($"Cannot create folder for dialogue with id: \"{dialogueName}\". Relative path: \"{database.DialoguesRelativeRootPath}\"");
+                UniTalksAPI.LogError($"Cannot create folder for dialogue with id: \"{dialogueName}\". Relative path: \"{database.DialoguesRelativeRootPath}\"");
                 return null;
             }
             

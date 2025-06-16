@@ -11,7 +11,7 @@ namespace PotikotTools.UniTalks
         protected DialogueData currentDialogueData;
 
         protected NodeData currentNodeData;
-        protected Dictionary<Type, INodeHandler> nodeHandlers;
+        protected Dictionary<Type, BaseNodeHandler> nodeHandlers;
 
         protected List<CommandData> commandsToExecuteOnExitNode;
         
@@ -23,7 +23,7 @@ namespace PotikotTools.UniTalks
             currentDialogueView = dialogueView;
             commandsToExecuteOnExitNode = new List<CommandData>();
 
-            nodeHandlers = new Dictionary<Type, INodeHandler>
+            nodeHandlers = new Dictionary<Type, BaseNodeHandler>
             {
                 { typeof(SingleChoiceNodeData), new SingleChoiceNodeHandler() },
                 { typeof(MultipleChoiceNodeData), new MultipleChoiceNodeHandler() },
@@ -33,20 +33,21 @@ namespace PotikotTools.UniTalks
             SetDialogueData(dialogueData);
         }
 
-        public virtual void AddNodeHandler(Type nodeType, INodeHandler handler)
+        public virtual void AddNodeHandler(Type nodeType, BaseNodeHandler handler)
         {
             if (!nodeType.IsSubclassOf(typeof(NodeData)))
             {
-                DL.LogWarning($"{nameof(nodeType)} should be a subclass of {nameof(NodeData)}");
+                UniTalksAPI.LogWarning($"'{nameof(nodeType)}' should be a subclass of {nameof(NodeData)}");
                 return;
             }
             if (!handler.CanHandle(nodeType))
             {
-                DL.LogWarning($"{nameof(handler)} can't handle node type {nodeType}");
+                UniTalksAPI.LogWarning($"'{nameof(handler)}' can't handle node type {nodeType}");
                 return;
             }
             
-            nodeHandlers.Add(nodeType, handler);
+            if (!nodeHandlers.TryAdd(nodeType, handler))
+                UniTalksAPI.LogWarning($"'{nameof(handler)}' already added to handlers list of node type: {nodeType}");
         }
 
         public virtual bool RemoveNodeHandler(Type nodeType)
@@ -58,12 +59,12 @@ namespace PotikotTools.UniTalks
         {
             if (IsDialogueStarted)
             {
-                DL.LogWarning("Dialogue is already started");
+                UniTalksAPI.LogWarning("Dialogue is already started");
                 return;
             }
             if (currentDialogueData == null)
             {
-                DL.LogWarning("Dialogue Data is null");
+                UniTalksAPI.LogWarning("Dialogue Data is null");
                 return;
             }
             
@@ -73,7 +74,7 @@ namespace PotikotTools.UniTalks
 
             if (currentNodeData == null)
             {
-                DL.LogWarning($"Dialogue graph '{currentDialogueData.Name}' is empty");
+                UniTalksAPI.LogWarning($"Dialogue graph '{currentDialogueData.Name}' is empty");
                 return;
             }
             
@@ -90,7 +91,7 @@ namespace PotikotTools.UniTalks
         {
             if (!IsDialogueStarted)
             {
-                DL.LogWarning("Dialogue is not started");
+                UniTalksAPI.LogWarning("Dialogue is not started");
                 return;
             }
             
@@ -136,7 +137,7 @@ namespace PotikotTools.UniTalks
                     commandsToExecuteOnExitNode.Add(command);
                     break;
                 default:
-                    DL.LogError($"Unknown Execution Order: {command.ExecutionOrder}");
+                    UniTalksAPI.LogError($"Unknown Execution Order: {command.ExecutionOrder}");
                     break;
             }
         }
@@ -145,7 +146,7 @@ namespace PotikotTools.UniTalks
         {
             if (dialogueData == null)
             {
-                DL.LogError("Dialogue Data is null");
+                UniTalksAPI.LogError("Dialogue Data is null");
                 return;
             }
             if (dialogueData == currentDialogueData)
@@ -165,15 +166,16 @@ namespace PotikotTools.UniTalks
             if (nodeHandlers.TryGetValue(nodeType, out var handler))
                 handler.Handle(node, this, currentDialogueView);
             else
-                DL.LogError($"Unknown Node Type: {nodeType}");
+                UniTalksAPI.LogError($"Unknown Node Type: {nodeType}");
         }
         
         protected virtual async void ExecuteCommandAsync(CommandData command)
         {
+            string cmd = VariablesParser.Parse(command.Text);
             if (command.HasDelay)
-                await DialoguesComponents.CommandHandler.ExecuteWithDelayAsync(command.Text, command.Delay);
+                await DialoguesComponents.CommandHandler.ExecuteWithDelayAsync(cmd, command.Delay);
             else
-                DialoguesComponents.CommandHandler.Execute(command.Text);
+                DialoguesComponents.CommandHandler.Execute(cmd);
         }
     }
 }

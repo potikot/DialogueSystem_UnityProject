@@ -188,7 +188,7 @@ namespace PotikotTools.UniTalks.Editor
             
             button.clicked += () =>
             {
-                DL.Log("Clicked");
+                UniTalksAPI.Log("Clicked");
                 onClick?.Invoke();
                 DialogueViewOptionButtonCallback(button, 0);
             };
@@ -301,7 +301,7 @@ namespace PotikotTools.UniTalks.Editor
                 nameInputField.RemoveUSSClasses("dialogue-view__text-input-field--focused");
 
                 string newName = evt.newValue.Trim();
-                DL.Log("Trying to rename to: " + newName);
+                UniTalksAPI.Log("Trying to rename to: " + newName);
                 if (newName == editorDialogueData.Name)
                 {
                     nameInputField.SetValueWithoutNotify(newName);
@@ -310,7 +310,7 @@ namespace PotikotTools.UniTalks.Editor
 
                 if (!await editorDialogueData.TrySetName(newName))
                 {
-                    DL.LogError($"Failed to change name for dialogue '{editorDialogueData.Name}' with '{newName}'");
+                    UniTalksAPI.LogError($"Failed to change name for dialogue '{editorDialogueData.Name}' with '{newName}'");
                 }
                 
                 nameInputField.SetValueWithoutNotify(editorDialogueData.Name);
@@ -465,7 +465,7 @@ namespace PotikotTools.UniTalks.Editor
                 int changedTagIndex = tags.IndexOf(evt.previousValue);
                 if (changedTagIndex == -1) // TODO:
                 {
-                    DL.LogError("Tag deleted or changed from another script");
+                    UniTalksAPI.LogError("Tag deleted or changed from another script");
                     return;
                 }
 

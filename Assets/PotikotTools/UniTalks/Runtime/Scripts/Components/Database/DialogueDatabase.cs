@@ -57,7 +57,14 @@ namespace PotikotTools.UniTalks
                 { typeof(Texture), "Images" }
             };
 
-            Directory.CreateDirectory(dialoguesRootPath);
+            if (!Directory.Exists(dialoguesRootPath))
+            {
+                Directory.CreateDirectory(dialoguesRootPath);
+                #if UNITY_EDITOR
+                UnityEditor.AssetDatabase.ImportAsset(dialoguesRelativeRootPath);
+                #endif
+            }
+            
             string[] dialogueDirectories = Directory.GetDirectories(dialoguesRootPath);
             
             foreach (string dialogueDirectory in dialogueDirectories)
@@ -116,7 +123,7 @@ namespace PotikotTools.UniTalks
             DialogueData dialogueData = await persistence.LoadAsync(dialoguesRootPath, dialogueName);
             if (dialogueData == null)
             {
-                DL.LogError($"Dialogue data doesn't exist: {dialogueName}");
+                UniTalksAPI.LogError($"Dialogue data doesn't exist: {dialogueName}");
                 return false;
             }
             
@@ -138,7 +145,7 @@ namespace PotikotTools.UniTalks
             DialogueData dialogueData = persistence.Load(dialoguesRootPath, dialogueName);
             if (dialogueData == null)
             {
-                DL.LogError($"Dialogue data doesn't exist: {dialogueName}");
+                UniTalksAPI.LogError($"Dialogue data doesn't exist: {dialogueName}");
                 return false;
             }
             
@@ -179,7 +186,7 @@ namespace PotikotTools.UniTalks
                 if (!LoadDialogue(dialogueName))
                     flag = false;
 
-            DL.Log($"Loaded {dialogueNames.Count} dialogues");
+            UniTalksAPI.Log($"Loaded {dialogueNames.Count} dialogues");
             
             return flag;
         }
@@ -247,12 +254,12 @@ namespace PotikotTools.UniTalks
             {
                 if (request.asset is T resource)
                 {
-                    DL.Log($"Loaded: {resource.name}");
+                    // DL.Log($"Loaded: {resource.name}");
                     tcs.SetResult(resource);
                 }
                 else
                 {
-                    DL.LogError($"Failed to load AudioClip at path: {path}");
+                    UniTalksAPI.LogError($"Failed to load AudioClip at path: {path}");
                     tcs.SetCanceled();
                 }
             };

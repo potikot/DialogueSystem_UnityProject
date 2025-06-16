@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -13,13 +14,6 @@ namespace PotikotTools.UniTalks.Editor
         
         protected EditorDialogueData editorData;
 
-        protected readonly Dictionary<Type, Type> nodeTypes = new()
-        {
-            { typeof(SingleChoiceNodeData), typeof(SingleChoiceNodeView) },
-            { typeof(MultipleChoiceNodeData), typeof(MultipleChoiceNodeView) },
-            { typeof(TimerNodeData), typeof(TimerNodeView) }
-        };
-        
         protected DialogueData RuntimeData => editorData.RuntimeData;
 
         public EditorDialogueData EditorData => editorData;
@@ -53,37 +47,43 @@ namespace PotikotTools.UniTalks.Editor
 
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
         {
-            evt.menu.AppendAction("Create Single Choice Node", a => AddNode<SingleChoiceNodeView, SingleChoiceNodeData>(a));
-            evt.menu.AppendAction("Create Multiple Choice Node", a => AddNode<MultipleChoiceNodeView, MultipleChoiceNodeData>(a));
-            evt.menu.AppendAction("Create Timer Node", a => AddNode<TimerNodeView, TimerNodeData>(a, 5f));
+            foreach (var pair in DialogueEditorWindowsManager.NodeTypes)
+            {
+                evt.menu.AppendAction(
+                    $"Create {Regex.Replace(pair.Value.viewType.Name, "(?<!^)([A-Z])", " $1")}",
+                    a => AddNode(pair.Value.viewType, pair.Key, a, pair.Value.args)
+                );
+            }
         }
 
         private void AddNode<TView, TData>(DropdownMenuAction dropdownMenuAction, params object[] dataArgs)
-            where TView : Node, INodeView
-            where TData : NodeData
+            where TView : Node, INodeView where TData : NodeData
+            => AddNode(typeof(TView), typeof(TData), dropdownMenuAction, dataArgs);
+
+        private void AddNode(Type viewType, Type dataType, DropdownMenuAction dropdownMenuAction, params object[] dataArgs)
         {
-            TView nodeView = Activator.CreateInstance<TView>();
-            EditorNodeData editorNodeData = new EditorNodeData()
+            var nodeView = (INodeView)Activator.CreateInstance(viewType);
+            EditorNodeData editorNodeData = new EditorNodeData
             {
                 position = this.ChangeCoordinatesTo(contentViewContainer, dropdownMenuAction.eventInfo.localMousePosition)
             };
             
             EditorData.EditorNodeDataList.Add(editorNodeData);
             
-            nodeView.Initialize(editorNodeData, RuntimeData.AddNode<TData>(dataArgs), this);
+            nodeView.Initialize(editorNodeData, RuntimeData.AddNode(dataType, dataArgs), this);
             nodeView.OnChanged += Internal_OnGraphChanged;
             nodeView.Draw();
 
-            AddElement(nodeView);
+            AddElement(nodeView as Node);
         }
-
+        
         private void AddNodes()
         {
             int nodesCount = editorData.EditorNodeDataList.Count;
             for (int i = 0; i < nodesCount; i++)
             {
                 NodeData nodeData = editorData.RuntimeData.Nodes[i];
-                INodeView nodeView = (INodeView)Activator.CreateInstance(nodeTypes[nodeData.GetType()]);
+                INodeView nodeView = (INodeView)Activator.CreateInstance(DialogueEditorWindowsManager.NodeTypes[nodeData.GetType()].viewType);
                 nodeView.Initialize(editorData.EditorNodeDataList[i], nodeData, this);
                 nodeView.OnChanged += Internal_OnGraphChanged;
                 nodeView.Draw();
@@ -157,7 +157,7 @@ namespace PotikotTools.UniTalks.Editor
             {
                 if (!TryGetNodeData(edge, out var data))
                 {
-                    DL.LogError("Edge data could not be parsed");
+                    UniTalksAPI.LogError("Edge data could not be parsed");
                     continue;
                 }
                 
@@ -165,7 +165,7 @@ namespace PotikotTools.UniTalks.Editor
                 data.from.OutputConnections[data.optionIndex].To = data.to;
                 data.to.InputConnection = data.from.OutputConnections[data.optionIndex];
 
-                DL.Log($"Connected: {edge.output.node.title} -> {edge.input.node.title}");
+                UniTalksAPI.Log($"Connected: {edge.output.node.title} -> {edge.input.node.title}");
             }
         }
         
@@ -182,14 +182,14 @@ namespace PotikotTools.UniTalks.Editor
                     {
                         if (!TryGetNodeData(edge, out var data))
                         {
-                            DL.LogError("Edge data could not be parsed");
+                            UniTalksAPI.LogError("Edge data could not be parsed");
                             return;
                         }
 
                         data.from.OutputConnections[data.optionIndex].To = null;
                         data.to.InputConnection = null;
 
-                        DL.Log($"Disconnected: {edge.output.node.title} -> {edge.input.node.title}");
+                        UniTalksAPI.Log($"Disconnected: {edge.output.node.title} -> {edge.input.node.title}");
                         break;
                     }
                     case INodeView nodeView:
@@ -228,7 +228,7 @@ namespace PotikotTools.UniTalks.Editor
             
             if (i < 0)
             {
-                DL.LogError("Port index out of range");
+                UniTalksAPI.LogError("Port index out of range");
                 return false;
             }
 

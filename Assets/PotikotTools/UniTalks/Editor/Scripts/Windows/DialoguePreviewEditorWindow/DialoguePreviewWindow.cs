@@ -1,8 +1,34 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace PotikotTools.UniTalks.Editor
 {
-    public class DialoguePreviewWindowsManager : UniTalksWindowsManager<DialoguePreviewWindow> { }
+    public class DialoguePreviewWindowsManager : UniTalksWindowsManager<DialoguePreviewWindow>
+    {
+        public static readonly Dictionary<Type, BaseNodeHandler> NodeHandlers = new()
+        {
+            { typeof(SingleChoiceNodeData), new SingleChoiceNodeHandler() },
+            { typeof(MultipleChoiceNodeData), new MultipleChoiceNodeHandler() },
+            { typeof(TimerNodeData), new TimerNodeHandler() }
+        };
+
+        public static void AddNodeHandler(Type nodeType, BaseNodeHandler handler)
+        {
+            if (!nodeType.IsSubclassOf(typeof(NodeData)))
+            {
+                UniTalksAPI.LogWarning($"{nameof(nodeType)} should be a subclass of {nameof(NodeData)}");
+                return;
+            }
+            if (!handler.CanHandle(nodeType))
+            {
+                UniTalksAPI.LogWarning($"{nameof(handler)} can't handle node type {nodeType}");
+                return;
+            }
+            
+            NodeHandlers.Add(nodeType, handler);
+        }
+    }
     
     public class DialoguePreviewWindow : BaseUniTalksEditorWindow
     {
@@ -78,6 +104,9 @@ namespace PotikotTools.UniTalks.Editor
         {
             _dialogueController = new EditorDialogueController();
             _dialogueController.Initialize(editorData.RuntimeData, _dialogueView);
+            foreach (var pair in DialoguePreviewWindowsManager.NodeHandlers)
+                _dialogueController.AddNodeHandler(pair.Key, pair.Value);
+            
             _dialogueController.CurrentDialogueData.OnChanged += OnDialogueDataChanged;
             _dialogueController.OnDialogueDataChanged += OnControllerDialogueDataChanged;
         }

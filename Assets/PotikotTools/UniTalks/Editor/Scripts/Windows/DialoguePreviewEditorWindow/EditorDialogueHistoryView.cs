@@ -36,10 +36,10 @@ namespace PotikotTools.UniTalks.Editor
             _scroll.Add(option);
         }
 
-        public void Clear()
-        {
-            _history.Clear();
-            _scroll.Clear();
-        }
+        // public void Clear()
+        // {
+        //     _history.Clear();
+        //     _scroll.Clear();
+        // }
     }
 }

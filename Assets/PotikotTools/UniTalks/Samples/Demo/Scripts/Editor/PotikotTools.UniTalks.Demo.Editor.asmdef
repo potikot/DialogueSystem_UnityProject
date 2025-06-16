@@ -1,0 +1,21 @@
+{
+    "name": "PotikotTools.UniTalks.Demo.Editor",
+    "rootNamespace": "PotikotTools.UniTalks.Demo.Editor",
+    "references": [
+        "GUID:8806bbe859425704989b664c3440b70e",
+        "GUID:6055be8ebefd69e48b49212b09b47b2f",
+        "GUID:3123687b71a67bd4c93e35b3cfc04d28",
+        "PotikotTools.UniTalks.Demo"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

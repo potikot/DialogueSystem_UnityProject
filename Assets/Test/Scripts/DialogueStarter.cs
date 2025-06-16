@@ -10,6 +10,6 @@ public class DialogueStarter : MonoBehaviour
     {
         await UniTalksAPI.LoadDialogueGroupAsync("fefee");
         
-        UniTalksAPI.StartDialogue(_dialogueId, _dialogueView);
+        await UniTalksAPI.StartDialogueAsync(_dialogueId, _dialogueView);
     }
 }

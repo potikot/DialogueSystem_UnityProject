@@ -157,5 +157,7 @@ namespace PotikotTools.UniTalks
         {
             Resources.UnloadAsset(AudioResource);
         }
+
+        protected void CallOnChanged() => OnChanged?.Invoke();
     }
 }

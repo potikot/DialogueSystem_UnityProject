@@ -1,9 +1,42 @@
+using System;
+using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace PotikotTools.UniTalks.Editor
 {
-    public class DialogueEditorWindowsManager : UniTalksWindowsManager<DialogueEditorWindow> { }
+    public class DialogueEditorWindowsManager : UniTalksWindowsManager<DialogueEditorWindow>
+    {
+        public static Dictionary<Type, (Type viewType, object[] args)> NodeTypes = new()
+        {
+            { typeof(SingleChoiceNodeData), (typeof(SingleChoiceNodeView), null) },
+            { typeof(MultipleChoiceNodeData), (typeof(MultipleChoiceNodeView), null) },
+            { typeof(TimerNodeData), (typeof(TimerNodeView), new object[] {0f} ) }
+        };
+
+        public static void AddNodeType<TD, TV>(params object[] args) where TD : NodeData where TV : Node, INodeView
+        {
+            var dataType = typeof(TD);
+            var viewType = typeof(TV);
+
+            if (viewType.BaseType == null)
+            {
+                UniTalksAPI.LogError(viewType.Name + " must be a subclass of NodeView<T>");
+                return;
+            }
+            
+            var genericArguments = viewType.BaseType.GetGenericArguments();
+            if (genericArguments[0] != dataType)
+            {
+                UniTalksAPI.LogError(viewType.Name + " data type is not a subclass of NodeData");
+                return;
+            }
+            
+            if (!NodeTypes.TryAdd(dataType, (viewType, args)))
+                UniTalksAPI.LogError(viewType.Name + " data type is already added");
+        }
+    }
 
     public class DialogueEditorWindow : BaseUniTalksEditorWindow
     {

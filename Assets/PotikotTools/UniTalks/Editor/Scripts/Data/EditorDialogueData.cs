@@ -41,7 +41,7 @@ namespace PotikotTools.UniTalks.Editor
         {
             if (runtimeData == null)
             {
-                DL.LogError($"{nameof(runtimeData)} is null");
+                UniTalksAPI.LogError($"{nameof(runtimeData)} is null");
                 return;
             }
 
@@ -53,7 +53,7 @@ namespace PotikotTools.UniTalks.Editor
         {
             if (runtimeData == null)
             {
-                DL.LogError($"{nameof(runtimeData)} is null");
+                UniTalksAPI.LogError($"{nameof(runtimeData)} is null");
                 return;
             }
             
@@ -63,7 +63,7 @@ namespace PotikotTools.UniTalks.Editor
                 GenerateEditorNodeDatas();
             else if (_runtimeData.Nodes.Count != EditorNodeDataList.Count)
             {
-                DL.LogWarning("Nodes count does not match");
+                UniTalksAPI.LogWarning("Nodes count does not match");
                 GenerateEditorNodeDatas();
             }
             
@@ -86,7 +86,7 @@ namespace PotikotTools.UniTalks.Editor
 
             if (!string.IsNullOrEmpty(error))
             {
-                DL.LogError(error);
+                UniTalksAPI.LogError(error);
                 return false;
             }
             
@@ -101,7 +101,7 @@ namespace PotikotTools.UniTalks.Editor
 
             if (RuntimeData == null)
             {
-                DL.LogError($"{nameof(RuntimeData)} is null");
+                UniTalksAPI.LogError($"{nameof(RuntimeData)} is null");
                 return;
             }
 

@@ -5,6 +5,7 @@ namespace PotikotTools.UniTalks
     public static class DialoguesComponents
     {
         private static DialogueDatabase _database;
+        private static VariablesStore _variables;
         private static NodeBinder _nodeBinder;
         private static CommandHandler _commandHandler;
         private static IAudioHandler _audioHandler;
@@ -21,6 +22,18 @@ namespace PotikotTools.UniTalks
 
                 _database = value;
                 _database.Initialize();
+            }
+        }
+        
+        public static VariablesStore Variables
+        {
+            get => _variables;
+            set
+            {
+                if (value == null)
+                    return;
+
+                _variables = value;
             }
         }
         
@@ -70,6 +83,7 @@ namespace PotikotTools.UniTalks
             
             _isInitialized = true;
             Database = new DialogueDatabase();
+            Variables = new VariablesStore();
             NodeBinder = new NodeBinder();
             CommandHandler = new CommandHandler();
         }

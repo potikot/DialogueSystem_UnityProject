@@ -33,7 +33,19 @@
       "SpeakerIndex": -1,
       "ListenerIndex": 0,
       "Text": "ыуаы"
+    },
+    {
+      "$type": "PotikotTools.UniTalks.MultipleChoiceNodeData, PotikotTools.UniTalks",
+      "Id": 8,
+      "Commands": [],
+      "OutputConnections": [
+        {
+          "Text": "New Choice"
+        }
+      ],
+      "SpeakerIndex": -1,
+      "ListenerIndex": 0
     }
   ],
-  "NextNodeId": 2
+  "NextNodeId": 11
 }

@@ -2,31 +2,31 @@
   "EditorNodeDataList": [
     {
       "position": {
-        "x": -21.0,
-        "y": 27.0
+        "x": -20.0,
+        "y": -528.0
       }
     },
     {
       "position": {
         "x": 360.0,
-        "y": -107.0
+        "y": -697.0
       }
     },
     {
       "position": {
         "x": 360.0,
-        "y": 230.0
+        "y": -407.0
       }
     }
   ],
   "GraphViewPosition": {
-    "x": 139.0,
-    "y": 131.0,
+    "x": -39.0,
+    "y": 763.0,
     "z": 0.0
   },
   "GraphViewScale": {
-    "x": 0.8695652,
-    "y": 0.8695652,
+    "x": 1.0,
+    "y": 1.0,
     "z": 1.0
   },
   "SettingsPanelOpened": false,

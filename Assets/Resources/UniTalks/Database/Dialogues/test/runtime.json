@@ -16,12 +16,11 @@
   "Name": "test",
   "Nodes": [
     {
-      "$type": "PotikotTools.UniTalks.TimerNodeData, PotikotTools.UniTalks",
-      "Duration": 5.0,
-      "Id": 1,
+      "$type": "PotikotTools.UniTalks.Demo.ChatNodeData, PotikotTools.UniTalks.Demo",
+      "Id": 4,
       "Commands": [
         {
-          "Text": "aaa",
+          "Text": "Log {name}",
           "ExecutionOrder": 0,
           "Delay": 0.0
         }
@@ -29,13 +28,13 @@
       "OutputConnections": [
         {
           "Text": "Oh, good to see you, amigo!",
-          "From": 1,
-          "To": 2
+          "From": 4,
+          "To": 5
         },
         {
           "Text": "Nah, I'm not your friend, Sallivan",
-          "From": 1,
-          "To": 3
+          "From": 4,
+          "To": 6
         }
       ],
       "SpeakerIndex": 0,
@@ -44,40 +43,36 @@
       "AudioResourceName": "bum"
     },
     {
-      "$type": "PotikotTools.UniTalks.SingleChoiceNodeData, PotikotTools.UniTalks",
-      "Id": 2,
+      "$type": "PotikotTools.UniTalks.Demo.ChatNodeData, PotikotTools.UniTalks.Demo",
+      "Id": 5,
       "Commands": [
         {
-          "Text": "DL.Log Ok",
+          "Text": "Log Ok",
           "ExecutionOrder": 0,
           "Delay": 0.0
         }
       ],
-      "OutputConnections": [
-        {}
-      ],
+      "OutputConnections": [],
       "SpeakerIndex": 0,
       "ListenerIndex": 0,
-      "Text": "Yeah! 2",
+      "Text": "Yeah!",
       "AudioResourceName": "bum"
     },
     {
-      "$type": "PotikotTools.UniTalks.SingleChoiceNodeData, PotikotTools.UniTalks",
-      "Id": 3,
+      "$type": "PotikotTools.UniTalks.Demo.ChatNodeData, PotikotTools.UniTalks.Demo",
+      "Id": 6,
       "Commands": [
         {
-          "Text": "DL.LogWarning Something went wrong",
+          "Text": "LogWarning Something went wrong",
           "ExecutionOrder": 0,
           "Delay": 0.0
         }
       ],
-      "OutputConnections": [
-        {}
-      ],
+      "OutputConnections": [],
       "SpeakerIndex": 0,
       "ListenerIndex": 0,
       "Text": "..."
     }
   ],
-  "NextNodeId": 4
+  "NextNodeId": 7
 }
