@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -71,13 +72,13 @@ namespace PotikotTools.UniTalks
             string[] splittedCommand = inputCommand.Split(' ');
             if (!TryGet(splittedCommand[0], out ICommandInfo commandInfo))
             {
-                Debug.LogWarning("[Console] Command not found: " + inputCommand);
+                Debug.LogWarning($"[Console] Command not found: {splittedCommand[0]}. Full command: {inputCommand}");
                 return;
             }
 
             if (!TryParseParameters(inputCommand, splittedCommand, commandInfo, out object[] parameters))
             {
-                Debug.LogWarning("[Console] Incorrect input parameters");
+                Debug.LogWarning($"[Console] Incorrect input parameters. Full command: {inputCommand}");
                 return;
             }
 

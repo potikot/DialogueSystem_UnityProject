@@ -112,6 +112,8 @@ namespace PotikotTools.UniTalks.Editor
                         AddElement(fromPort.ConnectTo(toPort));
                     }
                 }
+                
+                fromNodeView.DrawEdges(nodes);
             }
         }
         
@@ -155,6 +157,14 @@ namespace PotikotTools.UniTalks.Editor
             
             foreach (Edge edge in elements)
             {
+                if (edge.output.viewDataKey == "Chained")
+                {
+                    UniTalksAPI.Log("Chained");
+                    if (edge.output.node is INodeView nodeView)
+                        nodeView.OnConnected(edge);
+                    continue;
+                }
+                
                 if (!TryGetNodeData(edge, out var data))
                 {
                     UniTalksAPI.LogError("Edge data could not be parsed");
@@ -180,10 +190,17 @@ namespace PotikotTools.UniTalks.Editor
                 {
                     case Edge edge:
                     {
+                        if (edge.output.viewDataKey == "Chained")
+                        {
+                            if (edge.output.node is INodeView nodeView)
+                                nodeView.OnDisconnected(edge);
+                            continue;
+                        }
+                        
                         if (!TryGetNodeData(edge, out var data))
                         {
                             UniTalksAPI.LogError("Edge data could not be parsed");
-                            return;
+                            continue;
                         }
 
                         data.from.OutputConnections[data.optionIndex].To = null;

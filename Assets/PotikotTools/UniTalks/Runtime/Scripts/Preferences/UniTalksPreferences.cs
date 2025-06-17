@@ -6,7 +6,8 @@ namespace PotikotTools.UniTalks
     public static class UniTalksPreferences
     {
         public const string FileName = "UniTalksRuntimePreferences";
-        
+        public static readonly string ResourceConfigsPath = "UniTalks/Configs/";
+
         public static readonly Vector2 InitialDialogueEditorWindowSize = new(700f, 350f);
         public static readonly Vector2 InitialDialogueEditorWindowPosition = new
         (
@@ -28,13 +29,13 @@ namespace PotikotTools.UniTalks
                         
                     #if UNITY_EDITOR
 
-                    string relativePath = "Assets/Resources/UniTalks/Configs";
+                    string relativePath = "Assets/Resources/" + ResourceConfigsPath;
                     string path = FileUtility.GetAbsolutePath(relativePath);
-                    
+
                     Directory.CreateDirectory(path);
                     UnityEditor.AssetDatabase.ImportAsset(relativePath);
                     UnityEditor.AssetDatabase.CreateAsset(Data, $"{relativePath}/{FileName}.asset");
-
+                        
                     #endif
                 }
         }

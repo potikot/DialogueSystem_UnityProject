@@ -22,9 +22,6 @@ namespace PotikotTools.UniTalks.Demo
             _rectTransform = transform as RectTransform;
         }
 
-        [ContextMenu("SetTextWithRowLimit")]
-        public void f() => SetText(_textLabel.text);
-        
         public void SetText(string text)
         {
             SetTextWithRowLimit(text);
@@ -37,7 +34,7 @@ namespace PotikotTools.UniTalks.Demo
         
         public void SetAvatar(Sprite avatar)
         {
-            _avatarImage.sprite = avatar;
+            // _avatarImage.sprite = avatar;
         }
         
         public void ShowAvatar()

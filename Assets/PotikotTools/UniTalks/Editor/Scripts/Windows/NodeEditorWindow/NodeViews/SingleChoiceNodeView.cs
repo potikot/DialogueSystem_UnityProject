@@ -30,6 +30,6 @@ namespace PotikotTools.UniTalks.Editor
             outputContainer.Add(container);
         }
         
-        protected override void DrawChoiceButton() { }
+        protected override void DrawAddChoiceButton() { }
     }
 }

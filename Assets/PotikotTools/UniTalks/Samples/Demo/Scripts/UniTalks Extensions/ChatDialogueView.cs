@@ -21,7 +21,9 @@ namespace PotikotTools.UniTalks.Demo
         [SerializeField] private GameObject _rightSideMessageViewPrefab;
 
         private List<MessageView> _messages;
-
+        
+        private int _lastMessageSide;
+        
         protected override void Awake()
         {
             base.Awake();
@@ -41,22 +43,37 @@ namespace PotikotTools.UniTalks.Demo
         
         public override void SetText(string text)
         {
+            if (_lastMessageSide == 1)
+                _messages[^1].HideAvatar();
+            
             var message = Instantiate(_leftSideMessageViewPrefab, _messagesContainer)
                 .GetComponentInChildren<MessageView>();
             
             message.SetText(text);
             message.SetAvatar(_titleAvatarImage.sprite);
             message.SetTime(DateTime.Now);
+            _messages.Add(message);
+            _lastMessageSide = 1;
         }
 
         public void SetAnswerText(string text)
         {
+            if (_lastMessageSide == 2)
+                _messages[^1].HideAvatar();
+            
             var message = Instantiate(_rightSideMessageViewPrefab, _messagesContainer)
                 .GetComponentInChildren<MessageView>();
             
             message.SetText(text);
             message.SetAvatar(_titleAvatarImage.sprite);
             message.SetTime(DateTime.Now);
+            _messages.Add(message);
+            _lastMessageSide = 2;
+        }
+
+        public void DisableOptions()
+        {
+            
         }
     }
 }

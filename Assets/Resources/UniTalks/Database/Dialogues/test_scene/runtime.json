@@ -1,0 +1,12 @@
+{
+  "Tags": [
+    "test",
+    "scene"
+  ],
+  "Speakers": [],
+  "LoadResourcesImmediately": false,
+  "Id": 0,
+  "Name": "test_scene",
+  "Nodes": [],
+  "NextNodeId": 0
+}

@@ -1,0 +1,75 @@
+{
+  "Tags": [
+    "test",
+    "sync"
+  ],
+  "Speakers": [
+    {
+      "Name": "Sallivan"
+    },
+    {
+      "Name": "Player"
+    }
+  ],
+  "LoadResourcesImmediately": false,
+  "Id": 0,
+  "Name": "test_sync",
+  "Nodes": [
+    {
+      "$type": "PotikotTools.UniTalks.MultipleChoiceNodeData, PotikotTools.UniTalks",
+      "Id": 7,
+      "Commands": [
+        {
+          "Text": "Log {name}",
+          "ExecutionOrder": 0,
+          "Delay": 0.0
+        }
+      ],
+      "OutputConnections": [
+        {
+          "Text": "Oh, good to see you, amigo!",
+          "From": 7,
+          "To": 9,
+          "Commands": "[]"
+        },
+        {
+          "Text": "Nah, I'm not your friend, Sallivan",
+          "From": 7,
+          "To": 10,
+          "Commands": "[]"
+        }
+      ],
+      "SpeakerIndex": 0,
+      "ListenerIndex": 0,
+      "Text": "Hello, my friend <color=red>{name}</color>!",
+      "AudioResourceName": "bum"
+    },
+    {
+      "$type": "PotikotTools.UniTalks.SingleChoiceNodeData, PotikotTools.UniTalks",
+      "Id": 9,
+      "Commands": [],
+      "OutputConnections": [
+        {
+          "Commands": "[]"
+        }
+      ],
+      "SpeakerIndex": 0,
+      "ListenerIndex": 0,
+      "Text": "Yeah!"
+    },
+    {
+      "$type": "PotikotTools.UniTalks.SingleChoiceNodeData, PotikotTools.UniTalks",
+      "Id": 10,
+      "Commands": [],
+      "OutputConnections": [
+        {
+          "Commands": "[]"
+        }
+      ],
+      "SpeakerIndex": 0,
+      "ListenerIndex": 0,
+      "Text": "..."
+    }
+  ],
+  "NextNodeId": 11
+}

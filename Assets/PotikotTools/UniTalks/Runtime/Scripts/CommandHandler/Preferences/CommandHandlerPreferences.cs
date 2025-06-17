@@ -9,7 +9,8 @@ namespace PotikotTools.UniTalks
     {
         public const BindingFlags ReflectionBindingFlags = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
         public const string FileName = "CommandHandlerRuntimePreferences";
-        
+        public static readonly string ResourceConfigsPath = "UniTalks/Configs/";
+
         private static CommandHandlerPreferencesSO _data;
 
         public static CommandHandlerPreferencesSO Data
@@ -18,17 +19,17 @@ namespace PotikotTools.UniTalks
             {
                 if (_data == null)
                 {
-                    _data = Resources.Load<CommandHandlerPreferencesSO>(FileName);
+                    _data = Resources.Load<CommandHandlerPreferencesSO>(ResourceConfigsPath + FileName);
 
                     if (_data == null)
                     {
                         _data = ScriptableObject.CreateInstance<CommandHandlerPreferencesSO>();
-                        
+
                         #if UNITY_EDITOR
 
-                        string relativePath = "Assets/Resources/UniTalks/Configs";
+                        string relativePath = "Assets/Resources/" + ResourceConfigsPath;
                         string path = FileUtility.GetAbsolutePath(relativePath);
-                    
+
                         Directory.CreateDirectory(path);
                         UnityEditor.AssetDatabase.ImportAsset(relativePath);
                         UnityEditor.AssetDatabase.CreateAsset(Data, $"{relativePath}/{FileName}.asset");

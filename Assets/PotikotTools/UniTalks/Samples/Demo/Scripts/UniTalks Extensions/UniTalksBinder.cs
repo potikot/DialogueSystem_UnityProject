@@ -9,6 +9,8 @@ namespace PotikotTools.UniTalks.Demo
         private static void Initialize()
         {
             UniTalksPreferences.EmptyDialogueOptions = Array.Empty<string>();
+            
+            DialoguesComponents.Variables.Set("name", "Ildus");
         }
     }
 }

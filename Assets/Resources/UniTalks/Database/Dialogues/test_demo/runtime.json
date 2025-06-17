@@ -1,0 +1,138 @@
+{
+  "Tags": [
+    "test",
+    "demo"
+  ],
+  "Speakers": [
+    {
+      "Name": "UNKNOWN"
+    }
+  ],
+  "LoadResourcesImmediately": false,
+  "Id": 0,
+  "Name": "test_demo",
+  "Nodes": [
+    {
+      "$type": "PotikotTools.UniTalks.Demo.ChatNodeData, PotikotTools.UniTalks.Demo",
+      "Id": 0,
+      "Commands": [],
+      "OutputConnections": [
+        {
+          "Text": "Кто это?",
+          "From": 0,
+          "To": 1,
+          "Commands": "[{\"Text\":\"ClearOptions\",\"ExecutionOrder\":0,\"Delay\":0.0}]"
+        },
+        {
+          "Text": "Да",
+          "From": 0,
+          "To": 1,
+          "Commands": "[{\"Text\":\"ClearOptions\",\"ExecutionOrder\":0,\"Delay\":0.0}]"
+        }
+      ],
+      "SpeakerIndex": 0,
+      "ListenerIndex": 0,
+      "Text": "Ты сейчас один?",
+      "Delay": 0.0
+    },
+    {
+      "$type": "PotikotTools.UniTalks.Demo.ChatNodeData, PotikotTools.UniTalks.Demo",
+      "Id": 1,
+      "Commands": [
+        {
+          "Text": "Trigger LightFlicking",
+          "ExecutionOrder": 0,
+          "Delay": 0.5
+        },
+        {
+          "Text": "Clock_SetTimeScale -25",
+          "ExecutionOrder": 0,
+          "Delay": 0.0
+        }
+      ],
+      "OutputConnections": [],
+      "SpeakerIndex": 0,
+      "ListenerIndex": 0,
+      "Text": "Я рядом. Всегда был.",
+      "Delay": 1.0,
+      "NextChainedNode": {
+        "Text": "$_$",
+        "From": 1,
+        "To": 2,
+        "Commands": "[]"
+      }
+    },
+    {
+      "$type": "PotikotTools.UniTalks.Demo.ChatNodeData, PotikotTools.UniTalks.Demo",
+      "Id": 2,
+      "Commands": [
+        {
+          "Text": "PlayerLook -0,416 0,104 1,318 50 1,3",
+          "ExecutionOrder": 0,
+          "Delay": 1.5
+        }
+      ],
+      "OutputConnections": [
+        {
+          "Text": "Что ты такое?",
+          "From": 2,
+          "To": 3,
+          "Commands": "[{\"Text\":\"Trigger BookFalling\",\"ExecutionOrder\":0,\"Delay\":0.0},{\"Text\":\"ClearOptions\",\"ExecutionOrder\":0,\"Delay\":0.0}]"
+        }
+      ],
+      "SpeakerIndex": 0,
+      "ListenerIndex": 0,
+      "Text": "Не смотри в экран... Повернись.",
+      "Delay": 3.0
+    },
+    {
+      "$type": "PotikotTools.UniTalks.Demo.ChatNodeData, PotikotTools.UniTalks.Demo",
+      "Id": 3,
+      "Commands": [],
+      "OutputConnections": [],
+      "SpeakerIndex": 0,
+      "ListenerIndex": 0,
+      "Text": "Я - там, куда ты не осмеливаешься смотреть.",
+      "Delay": 1.5,
+      "NextChainedNode": {
+        "Text": "$_$",
+        "From": 3,
+        "To": 4,
+        "Commands": "[]"
+      }
+    },
+    {
+      "$type": "PotikotTools.UniTalks.Demo.ChatNodeData, PotikotTools.UniTalks.Demo",
+      "Id": 4,
+      "Commands": [],
+      "OutputConnections": [],
+      "SpeakerIndex": 0,
+      "ListenerIndex": 0,
+      "Text": "Ты пахнешь страхом. Мне это нравится.",
+      "Delay": 2.0,
+      "NextChainedNode": {
+        "Text": "$_$",
+        "From": 4,
+        "To": 5,
+        "Commands": "[]"
+      }
+    },
+    {
+      "$type": "PotikotTools.UniTalks.Demo.ChatNodeData, PotikotTools.UniTalks.Demo",
+      "Id": 5,
+      "Commands": [
+        {
+          "Text": "Trigger LightFlicking",
+          "ExecutionOrder": 0,
+          "Delay": 0.0
+        }
+      ],
+      "OutputConnections": [],
+      "SpeakerIndex": 0,
+      "ListenerIndex": 0,
+      "Text": "Сиди. Не вставай.",
+      "Delay": 1.5
+    }
+  ],
+  "NextNodeId": 6
+}

@@ -1,0 +1,55 @@
+{
+  "EditorNodeDataList": [
+    {
+      "position": {
+        "x": 172.0,
+        "y": 108.0
+      }
+    },
+    {
+      "position": {
+        "x": 578.0,
+        "y": 108.0
+      }
+    },
+    {
+      "position": {
+        "x": 969.0,
+        "y": 108.0
+      }
+    },
+    {
+      "position": {
+        "x": 1329.0,
+        "y": 108.0
+      }
+    },
+    {
+      "position": {
+        "x": 1689.0,
+        "y": 108.0
+      }
+    },
+    {
+      "position": {
+        "x": 2042.0,
+        "y": 108.0
+      }
+    }
+  ],
+  "GraphViewPosition": {
+    "x": -207.0,
+    "y": 82.0,
+    "z": 0.0
+  },
+  "GraphViewScale": {
+    "x": 0.657516241,
+    "y": 0.657516241,
+    "z": 1.0
+  },
+  "SettingsPanelOpened": false,
+  "SettingsPanelPosition": {
+    "x": 0.0,
+    "y": 0.0
+  }
+}

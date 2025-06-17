@@ -1,0 +1,58 @@
+{
+  "Tags": [
+    "test",
+    "action"
+  ],
+  "Speakers": [],
+  "LoadResourcesImmediately": false,
+  "Id": 0,
+  "Name": "test_action",
+  "Nodes": [
+    {
+      "$type": "PotikotTools.UniTalks.SingleChoiceNodeData, PotikotTools.UniTalks",
+      "Id": 0,
+      "Commands": [],
+      "OutputConnections": [
+        {
+          "From": 0,
+          "To": 1,
+          "Commands": "[]"
+        }
+      ],
+      "SpeakerIndex": -1,
+      "ListenerIndex": 0,
+      "Text": "ауаыуа"
+    },
+    {
+      "$type": "PotikotTools.UniTalks.MultipleChoiceNodeData, PotikotTools.UniTalks",
+      "Id": 1,
+      "Commands": [],
+      "OutputConnections": [
+        {
+          "Text": "New Choice",
+          "From": 1,
+          "To": 8,
+          "Commands": "[]"
+        }
+      ],
+      "SpeakerIndex": -1,
+      "ListenerIndex": 0,
+      "Text": "ыуаы"
+    },
+    {
+      "$type": "PotikotTools.UniTalks.MultipleChoiceNodeData, PotikotTools.UniTalks",
+      "Id": 8,
+      "Commands": [],
+      "OutputConnections": [
+        {
+          "Text": "New Choice",
+          "Commands": "[]"
+        }
+      ],
+      "SpeakerIndex": -1,
+      "ListenerIndex": 0,
+      "AudioResourceName": "bum"
+    }
+  ],
+  "NextNodeId": 11
+}

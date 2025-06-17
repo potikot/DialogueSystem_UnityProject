@@ -6,6 +6,9 @@ namespace PotikotTools.UniTalks
     {
         public static string Parse(string text)
         {
+            if (string.IsNullOrEmpty(text))
+                return "";
+            
             return Regex.Replace(text, @"\{([^\{\}]+)\}", match =>
             {
                 string variableName = match.Groups[1].Value;

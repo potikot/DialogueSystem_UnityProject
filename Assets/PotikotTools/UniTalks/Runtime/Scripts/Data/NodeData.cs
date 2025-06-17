@@ -158,6 +158,8 @@ namespace PotikotTools.UniTalks
             Resources.UnloadAsset(AudioResource);
         }
 
+        public virtual void ChainNode(NodeData node) { }
+        
         protected void CallOnChanged() => OnChanged?.Invoke();
     }
 }

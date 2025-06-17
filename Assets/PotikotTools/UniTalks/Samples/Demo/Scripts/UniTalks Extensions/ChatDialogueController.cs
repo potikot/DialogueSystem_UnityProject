@@ -68,10 +68,27 @@ namespace PotikotTools.UniTalks.Demo
 
             foreach (var command in commandsToExecuteOnExitNode)
                 ExecuteCommandAsync(command);
+
+            if (!currentNodeData.HasOutputConnections
+                && currentNodeData is ChatNodeData { NextChainedNode: not null } cnd)
+            {
+                if (cnd.NextChainedNode.To == null)
+                    EndDialogue();
+                else
+                {
+                    currentNodeData = cnd.NextChainedNode.To;
+                    HandleNode(currentNodeData);
+                }
+                
+                return;
+            }
             
             if (_availableOptions.Count > 0)
             {
                 var opt = _availableOptions[choice];
+                foreach (var cmd in opt.Commands)
+                    ExecuteCommandAsync(cmd);
+                
                 _chatDialogueView?.SetAnswerText(opt.Text);
                 
                 if (opt.To == null)
@@ -89,6 +106,12 @@ namespace PotikotTools.UniTalks.Demo
             }
         }
 
+        public void ClearOptions()
+        {
+            _availableOptions.Clear();
+            _chatDialogueView.SetAnswerOptions(null);
+        }
+        
         protected override void SetDialogueData(DialogueData dialogueData)
         {
             base.SetDialogueData(dialogueData);
@@ -109,8 +132,8 @@ namespace PotikotTools.UniTalks.Demo
             for (int i = 0; i < _availableOptions.Count; i++)
             {
                 var opt = _availableOptions[i];
-                if (opt.To == null)
-                    UniTalksAPI.LogError($"Dialogue graph 'opt' is null");
+                if (opt.To == null) 
+                    UniTalksAPI.LogWarning("Dialogue graph 'opt' is null");
                 if (opt.To == node)
                 {
                     _availableOptions.RemoveAt(i);
@@ -118,7 +141,6 @@ namespace PotikotTools.UniTalks.Demo
                 }
             }
             
-            UniTalksAPI.Log("Options count: " + _availableOptions.Count);
             base.HandleNode(node);
         }
     }

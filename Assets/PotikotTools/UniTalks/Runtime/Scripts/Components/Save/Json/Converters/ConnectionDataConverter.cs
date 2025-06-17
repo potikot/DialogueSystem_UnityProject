@@ -1,4 +1,6 @@
 using System;
+using System.Collections.ObjectModel;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -19,6 +21,9 @@ namespace PotikotTools.UniTalks
                 obj["To"] = value.To.Id;
             }
             
+            
+            obj["Commands"] = JsonConvert.SerializeObject(value.Commands, serializer.Converters.ToArray());
+            
             obj.WriteTo(writer);
         }
 
@@ -26,18 +31,28 @@ namespace PotikotTools.UniTalks
         {
             var connectionData = existingValue ?? new ConnectionData();
             JObject obj = JObject.Load(reader);
-            
+            bool flag = false;
+
             if (obj.TryGetValue("Text", out JToken text))
+            {
                 connectionData.Text = (string)text;
+                flag = connectionData.Text == "$_$";
+            }
             
             if (obj.TryGetValue("From", out JToken from) && obj.TryGetValue("To", out JToken to))
             {
                 int fromId = (int)from;
                 int toId = (int)to;
 
-                DialoguesComponents.NodeBinder.AddConnection(fromId, toId);
+                if (flag)
+                    DialoguesComponents.NodeBinder.AddChainedConnection(fromId, toId);
+                else
+                    DialoguesComponents.NodeBinder.AddConnection(fromId, toId);
             }
 
+            if (obj.TryGetValue("Commands", out JToken commands))
+                connectionData.Commands = JsonConvert.DeserializeObject<ObservableList<CommandData>>(commands.Value<string>(), serializer.Converters.ToArray());
+            
             return connectionData;
         }
     }

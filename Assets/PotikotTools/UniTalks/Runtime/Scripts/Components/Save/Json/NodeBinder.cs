@@ -6,13 +6,19 @@ namespace PotikotTools.UniTalks
     public class NodeBinder
     {
         private readonly Dictionary<int, List<int>> _connections = new();
-
+        private readonly List<(int from, int to)> _chainedConnections = new();
+        
         public void AddConnection(int from, int to)
         {
             if (_connections.TryGetValue(from, out List<int> connections))
                 connections.Add(to);
             else
                 _connections.Add(from, new List<int> { to });
+        }
+        
+        public void AddChainedConnection(int from, int to)
+        {
+            _chainedConnections.Add((from, to));
         }
         
         public void Bind(DialogueData data)
@@ -38,6 +44,23 @@ namespace PotikotTools.UniTalks
                     node.OutputConnections[i].To.InputConnection = node.OutputConnections[i];
                     i++;
                 }
+            }
+
+            foreach (var connection in _chainedConnections)
+            {
+                NodeData outputNode = null;
+                NodeData inputNode = null;
+                
+                foreach (var node in nodes)
+                {
+                    if (node.Id == connection.from)
+                        outputNode = node;
+                    if (node.Id == connection.to)
+                        inputNode = node;
+                }
+                
+                if (outputNode != null && inputNode != null)
+                    outputNode.ChainNode(inputNode);
             }
         }
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace PotikotTools.UniTalks
 {
@@ -46,8 +47,10 @@ namespace PotikotTools.UniTalks
                 return;
             }
             
-            if (!nodeHandlers.TryAdd(nodeType, handler))
-                UniTalksAPI.LogWarning($"'{nameof(handler)}' already added to handlers list of node type: {nodeType}");
+            nodeHandlers.TryAdd(nodeType, handler);
+            
+            // if (!nodeHandlers.TryAdd(nodeType, handler)) todo
+            //     UniTalksAPI.LogWarning($"'{nameof(handler)}' already added to handlers list of node type: {nodeType}");
         }
 
         public virtual bool RemoveNodeHandler(Type nodeType)
@@ -111,6 +114,9 @@ namespace PotikotTools.UniTalks
             
             if (currentNodeData.HasOutputConnections)
             {
+                foreach (var cmd in currentNodeData.OutputConnections[choice].Commands)
+                    ExecuteCommandAsync(cmd);
+                
                 if (currentNodeData.OutputConnections[choice].To == null)
                 {
                     EndDialogue();

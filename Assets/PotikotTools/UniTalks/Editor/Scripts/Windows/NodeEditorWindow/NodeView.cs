@@ -40,6 +40,10 @@ namespace PotikotTools.UniTalks.Editor
             data.DialogueData.RemoveNode(data);
         }
 
+        public virtual void OnConnected(Edge edge) { }
+        public virtual void OnDisconnected(Edge edge) { }
+        public virtual void DrawEdges(UQueryState<Node> nodes) { }
+        
         public virtual void Draw()
         {
             if (data == null)
@@ -51,7 +55,7 @@ namespace PotikotTools.UniTalks.Editor
             SetPosition(new Rect(editorData.position, Vector2.zero));
             title = Title;
 
-            DrawChoiceButton();
+            DrawAddChoiceButton();
             DrawPorts();
             DrawSpeakerText();
             DrawSpeakerDropdown();
@@ -63,7 +67,7 @@ namespace PotikotTools.UniTalks.Editor
 
         #region Draw Helpers
 
-        protected virtual void DrawChoiceButton()
+        protected virtual void DrawAddChoiceButton()
         {
             var container = new VisualElement().AddUSSClasses("node__add-choice-btn");
             container.Add(new Button(OnAddChoice) { text = "Add Choice" });
@@ -140,6 +144,7 @@ namespace PotikotTools.UniTalks.Editor
                 outputContainer.AddVerticalSpace(1f, Color.black);
 
             outputContainer.Add(container);
+            RefreshExpandedState();
         }
 
         protected virtual void OnAddChoice()
@@ -202,13 +207,19 @@ namespace PotikotTools.UniTalks.Editor
             extensionContainer.Add(container);
         }
 
+        // todo: optimize
         protected virtual void DrawSpeakerDropdown()
         {
             if (data.DialogueData.Speakers == null)
                 return;
 
             var popup = GeneratePopup();
-            popup.RegisterValueChangedCallback(_ => data.SpeakerIndex = popup.index - 1);
+            popup.RegisterValueChangedCallback(OnValueChanged);
+            popup.RegisterCallback<DetachFromPanelEvent>(_ => popup.UnregisterValueChangedCallback(OnValueChanged));
+            data.DialogueData.Speakers.CollectionChanged += (_, _) => RegeneratePopup();
+            foreach (var speaker in data.DialogueData.Speakers)
+                speaker.OnNameChanged += _ => RegeneratePopup();
+            
             extensionContainer.Add(popup);
 
             PopupField<string> GeneratePopup()
@@ -219,6 +230,21 @@ namespace PotikotTools.UniTalks.Editor
                 string currentSpeaker = data.GetSpeakerName();
                 return new PopupField<string>("Speaker", speakerNames,
                     string.IsNullOrEmpty(currentSpeaker) ? "None" : $"{data.SpeakerIndex + 1}. {currentSpeaker}");
+            }
+
+            void OnValueChanged(ChangeEvent<string> newValue)
+            {
+                data.SpeakerIndex = popup.index - 1;
+            }
+
+            void RegeneratePopup()
+            {
+                popup.RemoveFromHierarchy();
+                popup = GeneratePopup();
+                popup.RegisterValueChangedCallback(OnValueChanged);
+                popup.RegisterCallback<DetachFromPanelEvent>(_ => popup.UnregisterValueChangedCallback(OnValueChanged));
+                extensionContainer.Insert(1, popup);
+                RefreshExpandedState();
             }
         }
 

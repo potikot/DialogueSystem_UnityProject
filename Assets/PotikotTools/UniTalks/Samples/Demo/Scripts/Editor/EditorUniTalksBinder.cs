@@ -1,5 +1,6 @@
 using PotikotTools.UniTalks.Editor;
 using UnityEditor;
+using UnityEngine;
 
 namespace PotikotTools.UniTalks.Demo.Editor
 {
@@ -10,6 +11,8 @@ namespace PotikotTools.UniTalks.Demo.Editor
         {
             DialogueEditorWindowsManager.AddNodeType<ChatNodeData, ChatNodeView>();
             DialoguePreviewWindowsManager.AddNodeHandler(typeof(ChatNodeData), new ChatNodeHandler());
+            
+            DialoguesComponents.Variables.Set("name", "Ildus");
         }
     }
 }

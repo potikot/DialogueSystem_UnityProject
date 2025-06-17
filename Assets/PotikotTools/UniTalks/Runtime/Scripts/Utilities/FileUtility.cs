@@ -188,16 +188,16 @@ namespace PotikotTools.UniTalks
         public static bool MoveAssetToDatabase(Type assetType, string oldPath, string newFileName = null)
         {
             newFileName ??= Path.GetFileName(oldPath);
-            string newPath = DialoguesComponents.Database.GetProjectRelativeResourcePath(assetType, newFileName);
-            string newFolder = Path.GetDirectoryName(newPath);
+            string newRelativePath = DialoguesComponents.Database.GetProjectRelativeResourcePath(assetType, newFileName);
+            string newFolderRelativePath = Path.GetDirectoryName(newRelativePath);
             
-            if (!AssetDatabase.IsValidFolder(newFolder))
+            if (!AssetDatabase.IsValidFolder(newFolderRelativePath))
             {
-                Directory.CreateDirectory(newFolder);
-                AssetDatabase.ImportAsset(GetProjectRelativePath(newFolder));
+                Directory.CreateDirectory(GetAbsolutePath(newFolderRelativePath));
+                AssetDatabase.ImportAsset(newFolderRelativePath);
             }
 
-            string error = AssetDatabase.MoveAsset(oldPath, newPath);
+            string error = AssetDatabase.MoveAsset(oldPath, newRelativePath);
             if (!string.IsNullOrEmpty(error))
             {
                 UniTalksAPI.LogError(error);

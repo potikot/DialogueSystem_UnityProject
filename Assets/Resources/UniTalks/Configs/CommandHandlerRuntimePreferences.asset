@@ -20,4 +20,6 @@ MonoBehaviour:
   - Mono
   - netstandard
   - Microsoft
-  CommandAttributeUsingAssemblies: []
+  CommandAttributeUsingAssemblies:
+  - PotikotTools.UniTalks.Demo, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  - PotikotTools.UniTalks, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null

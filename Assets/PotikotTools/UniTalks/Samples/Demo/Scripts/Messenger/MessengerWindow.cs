@@ -15,7 +15,7 @@ namespace PotikotTools.UniTalks.Demo
         
         private Dictionary<string, ChatDialogueController> _chats;
         private ChatDialogueController _activeDialogueController;
-        
+
         private void Start()
         {
             // Debug.Log("Execute Command");
@@ -70,7 +70,6 @@ namespace PotikotTools.UniTalks.Demo
             _activeDialogueController = dialogueController;
             _chats.Add(dialogueName, dialogueController);
             _chatsContainer.gameObject.SetActive(false);
-            dialogueController.StartDialogue();
         }
 
         public void CloseChat()
@@ -78,6 +77,12 @@ namespace PotikotTools.UniTalks.Demo
             _chatsContainer.gameObject.SetActive(true);
             _activeDialogueController?.StopDialogue();
             _activeDialogueController = null;
+        }
+
+        [Command(false)]
+        private static void ClearOptions()
+        {
+            G.Hud.MessengerWindow._activeDialogueController.ClearOptions();
         }
     }
 }

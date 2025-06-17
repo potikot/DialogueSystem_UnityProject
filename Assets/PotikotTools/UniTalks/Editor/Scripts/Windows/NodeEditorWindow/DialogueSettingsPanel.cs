@@ -210,7 +210,6 @@ namespace PotikotTools.UniTalks.Editor
         
         void OnValueChanged(ChangeEvent<string> evt)
         {
-            UniTalksAPI.Log("ValueChanged");
             if (evt.target is not TextField { userData: SpeakerData speakerData })
             {
                 UniTalksAPI.LogError("Speaker not found");
